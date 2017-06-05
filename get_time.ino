@@ -28,7 +28,7 @@ byte gettime_udp()
 {
   int cb = udp.parsePacket();
   if (!cb) {
-        Serial.println("no packet yet");
+        Serial.println(F("no packet yet"));
         return 0;
   }
   else {

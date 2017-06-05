@@ -78,7 +78,7 @@ void serialPrintUint64Hex(uint64_t value) {
     Serial.print((uint32_t) (value >> 32), HEX);
   Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
 }
-void dump(decode_results *results) {
+/*void dump(decode_results *results) {
   // Dumps out the decode_results structure.
   // Call this after IRrecv::decode()
   uint16_t count = results->rawlen;
@@ -127,5 +127,5 @@ void dump(decode_results *results) {
    // Serial.print(" ");
   //}
  // Serial.println();
-}
+}*/
 

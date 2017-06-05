@@ -67,25 +67,7 @@ void parseStringRAW(String str) {
  // Serial.println("");
   irsend.sendRaw(code_array, count - 1, code_array[count - 1] / (1000));                                                
   free(code_array);  // Free up the memory allocated.
-  /*
-        long nextIndex;
-        long codeLength = 1;
-        long currentIndex = 0;
-        nextIndex = str.indexOf(',');
-        for (int i = 1;  i < chieudai_ir;  i++) {irSignal[i - 1] = 0x00;}
-        while (nextIndex != -1) {
-          irSignal[codeLength - 1] = (unsigned int) (str.substring(currentIndex, nextIndex).toInt());
-          irSignal[codeLength - 1]=irSignal[codeLength - 1] * USECPERTICK;
-          codeLength++;
-          currentIndex = nextIndex + 1;
-          nextIndex = str.indexOf(',', currentIndex);
-        }
-        irSignal[codeLength - 1] = (unsigned int) (str.substring(currentIndex, nextIndex).toInt());
-        if (irSignal[codeLength - 1] < 20000) {
-          irSignal[codeLength - 1] = 38000;
-        }
-        irsend.sendRaw(irSignal, codeLength - 1, irSignal[codeLength - 1] / 1000);                                                
-         ts = "";  */
+
 }
 void parseStringGC(String str) {
   int16_t index;
@@ -190,31 +172,10 @@ void setupWiFiConf(void) {
     content1 += FPSTR(br_html);
     content += FPSTR(wifisetting_html);
     content += FPSTR(title_html);
-    /*switch (WiFiConf.sta_language[0])
-    {
-      case '1':
-              content += F("<h1>CĂ i Ä�áº·t Wifi</h1>");
-              content += content1;
-              content += F("<input type='submit' value='OK' onclick='return confirm(\"Thay Ä�á»•i CĂ i Ä�áº·t?\");'></form>");
-              break;
-      default: */
           content += F("<h1>Wifi Setup</h1>");
           content += content1;
          content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
-        // break;     
-   // }
-   /* if (WiFiConf.sta_language[0]=='1'){
-    
-    content += F("<h1>CĂ i Ä�áº·t Wifi</h1>");
-    content += content1;
-    content += F("<input type='submit' value='OK' onclick='return confirm(\"Thay Ä�á»•i CĂ i Ä�áº·t?\");'></form>");
-    }
-    else
-    {
-    content += F("<h1>Wifi Setup</h1>");
-    content += content1;
-   content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
-    }*/
+
     content += FPSTR(_p_html);
     content += network_html;
     content += FPSTR(end_html);
@@ -263,20 +224,6 @@ server.on("/hc2_conf", []() {
     content1 += FPSTR(br_html);  
     content += FPSTR(wifisetting_html);
     content += FPSTR(title_html);
-  /*  if (WiFiConf.sta_language[0]=='1'){
-    content += F("<h1>CĂ i Ä‘áº·t thĂ´ng sá»‘ HC2</h1>");
-    content += FPSTR(p_html);
-    content += F("Wifi Ä‘ang káº¿t ná»‘i: ");
-    content += WiFiConf.sta_ssid;
-    content += F("</br>Ä�á»‹a Chá»‰ IP: ");
-    content += content1;
-    content += F("<input type='submit' value='OK' onclick='return confirm(\"Báº¡n cĂ³ muá»‘n thay Ä‘á»•i cĂ i Ä‘áº·t ?\");'></form>");
-    content +=FPSTR(_p_html);
-    content += F("<li>ThĂ´ng tin HC2");
-    content += F("<li>PassWord Ä‘á»‹nh dáº¡ng User:password#  VD: admin:admin#");
-     }
-     else
-     {*/
     content += F("<h1>HC2 Setting</h1>");
     content += FPSTR(p_html);
     content += F("Wifi conecting : ");
@@ -302,15 +249,15 @@ server.on("/getHC", []() {
     server.send(200, F("text/html"), content);
   });
 server.on("/set_hc2_conf", []() {
-    String new_IPHC = server.arg("iphc2");
-    String new_pwdhc = server.arg("pwdhc2");
-    String new_global1 = server.arg("global1");
-    String new_global2 = server.arg("global2");
-    String new_global3 = server.arg("global3");
+    String new_IPHC = server.arg(F("iphc2"));
+    String new_pwdhc = server.arg(F("pwdhc2"));
+    String new_global1 = server.arg(F("global1"));
+    String new_global2 = server.arg(F("global2"));
+    String new_global3 = server.arg(F("global3"));
     String content = FPSTR(header);content += FPSTR(begin_title);
       content += FPSTR(wifisetting_html);
     content += FPSTR(title_html);
-    content += F("<h1>LÆ°u Wifi</h1>");
+    content += F("<h1>Luu Wifi</h1>");
     if (new_IPHC.length() > 0) {
       new_IPHC.toCharArray(WiFiConf.sta_iphc2, sizeof(WiFiConf.sta_iphc2));
       new_pwdhc.toCharArray(WiFiConf.sta_passhc, sizeof(WiFiConf.sta_passhc));
@@ -328,7 +275,6 @@ server.on("/set_hc2_conf", []() {
       content += FPSTR(p_html);
       content += F("Rejected empty SSID.");
       content += FPSTR(_p_html);
-     //Serial.println("Rejected empty SSID.");
     }
     content += F("<body></html>");
     server.send(200, F("text/html"), content);
@@ -343,8 +289,6 @@ server.on("/set_hc2_conf", []() {
   server.on("/IR", []() {
 
     String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
-   // content =  F("<link href=\"css/index.css\" rel=\"stylesheet\" />");
-   // content =  F("<script src=\"js/jquery-2.1.4.min.js\"></script>");
     content = FPSTR(header);content += FPSTR(begin_title);    
     //content =  F("<meta http-equiv='refresh' content='5'><style>body {background-color:lightgrey}h1 {color:blue}p {color:black}</style><link rel=\"shortcut icon\" href=\"data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAADLy8sAHYsbACCNGADK28UADIEHAHOubwAShQoA//7/AObz6ADn8+gA6fPoAOzz6ADGxsYAXa5eAL7gugAghxAAtbyyABFmCAD09vEAN5ctADuPMAA4ly0AxuG9AKvXqQA2lzYAJ4cZADuXNgAikCIAKIwoAHS1cwDs++YAAHgAAKrKpwAAewAAj8WQACCHEQDa6tgAtbyzAMTcwQA4jzEAOpEuAFCkSwAYZgkAa7JiAIK9ggBAmDoAQJY9AA6FDADQ5NAApMalAC2PKQCozagA9PXwAPT48AAvbScAF2YKAGywZgBtsGYA4+3iAMviywA/mDsARpgyAM/jzgBkkGEA0eXLAC6KJAA2dDMAotCgAEWbRAA5iiQAv9+6AKmr3AAQZQgA8vXxAPn48QA+mDMAsdayAJ7DngChxKEANnQ0ACiRKABlkGIAq7iqAAB3AAAAegAAjsSQAHm5eQDKycoAw9vBAGGxYgB/mqMAhJesAPr6+AC21qoA/v/+AJqamgBygMIASpxAAMjIyADv8PYAYLBgANrr1gCUx5EAZ61gAGitYADQy9EAKGpOACOPJAD7+/wAJI8kAPv9+QDo8OUA/v//AI24iQD///8AWaxVAC+MJABerFUAXaleAF6pXgB5tHUA2uvXAPX16wDPys8AxOLGANHL0gAnhB8Agr1+AJqh1AAOfAgAzOHMAIe+gQCLvoEA6O7pAHK0bQCrt6oAMI4iAC6QKAAtlCsAS5s/AF+rXAB4t3YAwdrBAMrIygDv+e8A3O3eAM/K0ADf4uoAdJdxAHWXcQAniBoAbqtuAP3+9QAMhgwAoc6fAHO0bgAvjiMAFYYMAI28jgBGn0MAyMfIAGOrXQB4uHoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAyPe4c/NhEqT5QlaaAAX3JyXiITc5oWDmYpS11ycgByXIw8ZXJycnJycnxFg3JiclZESXJycnJycnJyOkEXfSScCXIvG1BtbW1rnYVAPRB4m3JyGgRxMU1OnoFycimVLlhycllTjXJycpAccnJmQpYLcnJkHx8zcnIeAnJyRjcPenJyDVNUBnJjgGBHchZIFDAHIAEoHWxyk1tqWnJDNjmDcm+KdCxycm4FK5hydVE7MhJyl34hGAeff3JyeRVScndoB3JyjpkfTHJyNC1VknIKYWcScnKRA3JyCIuhcFdycgl2iYQ+SjUmhoiiXHIMcnJycoI4JyMZLngkcnJyDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"/><meta charset='UTF-8'><title>");
     content += F("mHome - IR Learn");
@@ -366,32 +310,7 @@ server.on("/set_hc2_conf", []() {
     else{
       //content += FPSTR(_p_html);
       content += F("<form method='post' action='codeIR'>");
-     /*switch (WiFiConf.sta_language[0])
-    {
-      case '1':
-              content += FPSTR(label_html);content += F("'raw'>MĂ£ IR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </label><input name='raw'id='raw' value="); //maxlength=32
-              content +=  hienthi; //maxlength=32
-              content += FPSTR(br_html); //maxlength=32
-              content += FPSTR(label_html);
-              content += F("'ts'>Táº§n Sá»‘");
-    for (int i=0;i<7;i++){
-      content += FPSTR(space_html);
-    }
-    content += F(": </label> <input name='ts' id='ts'  value=38000");
-              content += FPSTR(br_html);
-              //content += F("<button onclick='copyToClipboard('raw')'>Copy P1</button>");
-              
-              content += F("<input type='submit' value='Kiá»ƒm Tra MĂ£ Má»›i Há»�c' onclick='return confirm(\"Báº¡n CĂ³ Muá»‘n Kiá»ƒm Tra MĂ£ ?\");'></form>");
-              content += FPSTR(_p_html);
-              //content += FPSTR(_p_html);
-              content += F("ChĂº Ă½ :");
-              //content += FPSTR(_p_html);
-              content += F("<li>Táº§n sá»‘ máº·c Ä‘á»‹nh lĂ  38Khz=38000. Náº¿u Ä‘iá»�u khiá»ƒn khĂ´ng Ä‘Æ°á»£c ta cĂ³ chá»ƒ thá»­ thay Ä‘á»•i táº§n sá»‘ thĂ nh 30000,33000,36000,38000,40000,56000 tĂ¹y vĂ o loáº¡i Remote");
-              content += F("<li>Khi há»�c xong mĂ£ má»›i,báº¡n pháº£i lĂ m má»›i trang Ä‘á»ƒ cáº­p nháº­t mĂ£ má»›i nháº¥t.");
-              content += FPSTR(p_html);
-              content += F("Cáº£m Æ n Ä�Ă£ Ä�á»�c.");
-              break;
-      default: */
+    
             content += FPSTR(label_html);
             content += F("'raw'>IR CODE");
 
@@ -426,15 +345,9 @@ server.on("/set_hc2_conf", []() {
   server.on("/codeIR", HTTP_POST, []() {
     if (hoclenh == 1) { irrecv.disableIRIn(); }
     String data1=server.arg("raw");
-   // Serial.println("");
-    //Serial.println(data1);
-    
     String ts1=server.arg("ts");
     json_ts=ts1;
-   // Serial.println(ts1);
     if (data1.length()>=1264){data1=urlDecodeir(data1);}
-   // content += F("mHome");
-   // content += FPSTR(title_html);
    String content = "";
     if (data1.length() < 12) {
       content += F("Not OK");
@@ -456,8 +369,6 @@ server.on("/set_hc2_conf", []() {
                     }
     String data1 = server.arg("raw");
      parseStringGC(data1);
-    //atasend = 2;
-    // Serial.println(new_ssid);
     String content = FPSTR(header);content += FPSTR(begin_title);
      content += WiFiConf.module_id;
     content += F(".local - set WiFi");
@@ -611,15 +522,12 @@ server.on("/set_hc2_conf", []() {
   //////////////
   server.on("/set_wifi_conf", []() {
     
-    String new_ssid = server.arg("ssid");
-    String new_pwd = server.arg("pwd");
-    String new_ip = server.arg("ip");
-    String new_gateway = server.arg("gateway");
-    String new_subnet = server.arg("subnet");
-     String content =  "OK";
-     //content += FPSTR(wifisetting_html);
-   // content += FPSTR(title_html);
-   // content += F("<h1>LÆ°u Wifi</h1>");
+    String new_ssid = server.arg(F("ssid"));
+    String new_pwd = server.arg(F("pwd"));
+    String new_ip = server.arg(F("ip"));
+    String new_gateway = server.arg(F("gateway"));
+    String new_subnet = server.arg(F("subnet"));
+    // String content =  "OK";
     if (new_ssid.length() > 0) {
       new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
       new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
@@ -627,16 +535,12 @@ server.on("/set_hc2_conf", []() {
       new_gateway.toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));
       new_subnet.toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));
       saveWiFiConf();
-      //content += F("<p>Save  '");
-      //content += WiFiConf.sta_ssid;
-      //content += F("' ... Device Reboot !</p>");
-     // content += F("<body></html>");
     } else {
      // content += F("<p>Rejected empty SSID. </p>");
      // content += F("<body></html>");
     //  Serial.println("Rejected empty SSID.");
     }
-    server.send(200,F("text/html"), content);
+    server.send(200,F("text/html"), F("OK"));
     digitalWrite(status_led, LOW);
     ESP.restart();
   });
@@ -647,8 +551,6 @@ server.on("/set_hc2_conf", []() {
     content += F("<h1>ThĂ´ng Tin :</h1>");
     content += FPSTR(p_html);
     content += FPSTR(support_html);
-   // content += F("</br>Ä�á»‹a chá»‰ : 65/39 Ä�Æ°á»�ng 339 PhÆ°á»�ng TÄƒng NhÆ¡n PhĂº B,Q9,TP.HCM");
-   // content += F("</br>PhĂ¡t Triá»ƒn : Pháº¡m An NhĂ n");
     content += FPSTR(_p_html);
     content += FPSTR(p_html);
     content += FPSTR(get_html);
@@ -675,16 +577,16 @@ server.on("/set_hc2_conf", []() {
     server.send(200, F("text/html"), content);
   });
   server.on("/set_Reset1", HTTP_GET, []() {
-        String new_IPHC = "192.168.1.10";
-    String new_pwdhc = "admin:admin#";
-    String new_global1 ="temp1";
-    String new_global2 = "temp2";
-    String new_global3 = "temp3";
-    String new_ssid = "mhome";
-    String new_pwd = "mhome";
-    String new_ip = "192.168.1.220";
-    String new_gateway = "192.168.1.1";
-    String new_subnet = "255.255.255.0";
+        String new_IPHC = F("192.168.1.10");
+    String new_pwdhc =  F("admin:admin#");
+    String new_global1 = F("temp1");
+    String new_global2 =  F("temp2");
+    String new_global3 =  F("temp3");
+    String new_ssid =  F("mhome");
+    String new_pwd =  F("mhome");
+    String new_ip =  F("192.168.1.220");
+    String new_gateway =  F("192.168.1.1");
+    String new_subnet =  F("255.255.255.0");
       new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
       new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
       new_ip.toCharArray(WiFiConf.sta_ip, sizeof(WiFiConf.sta_ip));
@@ -707,24 +609,15 @@ server.on("/set_hc2_conf", []() {
         ESP.restart();
   });
  server.on("/get_infor", HTTP_GET, []() {
-    //String new_infor = server.arg("infor");
-    //String new_message = server.arg("message");
-    // char new_id[3]="  ";
-    //new_infor.toCharArray(new_id, sizeof(new_id));
-    //if (strstr(new_id,"1") != NULL){String global=WiFiConf.sta_global1;global.trim();SetVariHC(global,new_message);}
-    //else if (strstr(new_id,"2") != NULL){String global=WiFiConf.sta_global2;global.trim();SetVariHC(global,new_message);}
-    //else if (strstr(new_id,"3") != NULL){String global=WiFiConf.sta_global3;global.trim();SetVariHC(global,new_message);}
      String content = "{\"T:\"" + String(nhietdo);
-     content += ",\"H\":" + String(doam);
-     content += ",\"PIR\":\"" + String(time_);
-     content += "\",\"PIR2\":\"" + String(motion_time);
-     content += "\"}";
+     content +=  F(",\"H\":");content += String(doam);
+     content +=  F(",\"PIR\":\"");content += String(time_);
+     content +=  F("\",\"PIR2\":\"");content += String(motion_time);
+     content +=  F("\"}");
 
     server.send(200, F("text/html"), content);
   });
   server.on("/module_id", []() {
-   // IPAddress ip = WiFi.localIP();
-    //String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
     char defaultId[sizeof(WiFiConf.module_id)];
     setDefaultModuleId(defaultId);
     String content = FPSTR(header);content += FPSTR(begin_title);
@@ -749,7 +642,7 @@ server.on("/set_hc2_conf", []() {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-   server.on("/set_language", []() {
+  /* server.on("/set_language", []() {
     String new_language = server.arg("language");
     String content = FPSTR(header);content += FPSTR(begin_title);
        content += F("mHome - Language");
@@ -769,22 +662,18 @@ server.on("/set_hc2_conf", []() {
     server.send(200, F("text/html"), content);
     digitalWrite(status_led, HIGH );
     ESP.restart();
-  });
+  });*/
   server.on("/set_module_id", []() {
     String new_id = server.arg("module_id");
     String content = FPSTR(header);content += FPSTR(begin_title);
-   // content += F("<title>");
-    //content += F("mHome ");
-    //content += FPSTR(title_html);
+
     if (new_id.length() > 0) {
       new_id.toCharArray(WiFiConf.module_id, sizeof(WiFiConf.module_id));
     } else {
       resetModuleId();
     }
     saveWiFiConf();
-    //content += F("<h1>CĂ i Ä‘áº·t tĂªn wifi cho thiáº¿t bá»‹</h1>");
     content += FPSTR(p_html);
-    //content += F("CĂ i Ä‘áº·t tĂªn Wifi lĂ  :  '");
     content += WiFiConf.module_id;
     content += F("' ... Device Rebooting.");
     content += FPSTR(_p_html);
@@ -798,16 +687,10 @@ server.on("/set_hc2_conf", []() {
 void setupWeb(void) {
   server.on("/", []() {
     String content = FPSTR(header);
-
-     //content += "<meta http-equiv=\"refresh\" content=\"60\" />";
- // content += "<script src=\"https://code.jquery.com/jquery-2.1.3.min.js\"></script>";
- // content += "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css\">";
 content += FPSTR(begin_title);
         content += F("mHome - Main page");
     content += FPSTR(title_html);
     content += F("<h1>mHome - Wifi to IR Controller </h1>");
-   // content += FPSTR(get_html);
-    //content += F("'set_language'><input type=\"submit\" name=\"language\" value=\"Vietnamese\"> &nbsp &nbsp &nbsp <input type=\"submit\" name=\"language\" value=\"English\"></form>");
     content += FPSTR(p_html);
     content += F("<li>Nhiệt độ : ");
     content += String(nhietdo);
@@ -827,78 +710,6 @@ content += FPSTR(begin_title);
     content += FPSTR(_p_html);
     content +=FPSTR(fieldset);
 
-   /* switch (WiFiConf.sta_language[0])
-    {
-      case '1':
-                content +=FPSTR(legend_html);
-                content +=F("'/wifi_conf'>Cài đặt WiFi");
-                content +=FPSTR(_legend_html);
-              content += F("<li> ");
-              if (statusmang==0) {                                 
-                  content += FPSTR(notwifi_html);
-                  content += F("<li>IP: 192.168.4.1:4999 ( ");
-                  content += WiFiConf.module_id;
-                  content += F(" )");
-              }
-              else{
-                content += F("Connected to : ");
-                  content += WiFiConf.sta_ssid;
-                  content += F("<li>IP: ");
-                  content += ipStr;
-                  content += F(" ( ");
-                  content += WiFiConf.module_id;
-                  content += F(" )");
-               }
-              content +=FPSTR(_fieldset);
-              content +=FPSTR(fieldset);
-                        content +=FPSTR(legend_html);
-                        content +=F("'/IR'>Học IR");
-                        content +=FPSTR(_legend_html);
-                        content +=F("<li>Pháº§n há»�c code IR cá»§a Remote, Khi há»�c xong copy code tá»›i HC2 Ä‘á»ƒ sá»­ dá»¥ng");
-              content +=FPSTR(_fieldset);
-              content +=FPSTR(fieldset);
-                        content +=FPSTR(legend_html);
-                        content +=F("'/hc2_conf'>CĂ i Ä�áº·t HC2");
-                        content +=FPSTR(_legend_html);
-                        content +=F("<li>Pháº§n nĂ y má»¥c Ä‘Ă­ch Ä‘iá»�n cĂ¡c thĂ´ng sá»‘ cá»§a HC2 vĂ  cĂ¡c biáº¿n global nháº±m cho viá»‡c truyá»�n dá»¯ liá»‡u lĂªn HC2");
-                        content +=F("<li>Tráº¡ng ThĂ¡i:");
-                        content +=SerialHC2;
-              content +=FPSTR(_fieldset);
-              content +=FPSTR(fieldset);
-                        content +=FPSTR(legend_html);
-                        content +=F("'/module_id'>CĂ i tĂªn Wifi");
-                        content +=FPSTR(_legend_html);
-                        //content +=F("<li>Pháº§n nĂ y má»¥c Ä‘Ă­ch Ä‘iá»�n cĂ¡c thĂ´ng sá»‘ cá»§a HC2 vĂ  cĂ¡c biáº¿n global nháº±m cho viá»‡c truyá»�n dá»¯ liá»‡u lĂªn HC2");
-              content +=FPSTR(_fieldset);
-                  content +=FPSTR(fieldset);
-                        content +=FPSTR(legend_html);
-                        content +=F("'/firmware'>Update ChÆ°Æ¡ng TrĂ¬nh");
-                        content +=FPSTR(_legend_html);
-                        content +=F("<li>Update firmware má»›i nháº¥t cho HC2");
-                        content +=F("<li>Status : ");
-                        content +=AppVersion;
-                        content +=timeVersion;
-              content +=FPSTR(_fieldset);
-                  content +=FPSTR(fieldset);
-                        content +=FPSTR(legend_html);
-                        content +=F("'/Reboot'>Khá»Ÿi Ä‘á»™ng láº¡i");
-                        content +=FPSTR(_legend_html);
-              content +=FPSTR(_fieldset);
-                  content +=FPSTR(fieldset);
-                      content +=FPSTR(legend_html);
-                      content +=F("'/Reset1'>Reset");
-                      content +=FPSTR(_legend_html);
-              content +=FPSTR(_fieldset);
-                            content +=FPSTR(fieldset);
-              content +=FPSTR(legend_html);
-              content +=F("'/module_id'>Wifi Name");
-              content +=FPSTR(_legend_html);
-              content +=FPSTR(_fieldset);
-              content +=FPSTR(fieldset);
-              content +=F("<legend>ThĂ´ng tin</legend>");
-              content += FPSTR(information);
-              break;
-       default :*/
               content +=FPSTR(legend_html);
               content +=F("'/wifi_conf'>Wifi setting");
               content +=FPSTR(_legend_html);
@@ -962,8 +773,6 @@ content += FPSTR(begin_title);
               content +=FPSTR(fieldset);
               content +=F("<legend>Information</legend>");
               content += FPSTR(information);
-          //    break;
-    //}
     content +=FPSTR(_fieldset);
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
