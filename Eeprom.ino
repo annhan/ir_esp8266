@@ -15,7 +15,7 @@ int waitConnected(void) {
     }
   return(0);
 }
-int waitConnected1(void) {
+/*int waitConnected1(void) {
   int i=0;
   while (true ) {
     digitalWrite(status_led, LOW);
@@ -29,7 +29,7 @@ int waitConnected1(void) {
     if (i>70){ESP.restart();return (0);}
   }
   return (0);
-}
+}*/
 void printIP(void) {
   Serial.println(WiFiConf.module_id);
 }

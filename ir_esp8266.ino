@@ -1,8 +1,8 @@
 #include "DHT.h"
 #include "variable_http.h"
 #include "KhaiBao.h"
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
+//#include <ESP8266WiFi.h>
+//#include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
@@ -10,8 +10,8 @@
 #include <EEPROM.h>
 #include <IRrecv.h>
 #include <IRsend.h>
-#include <WiFiClient.h>
-#include <WiFiServer.h>
+//#include <WiFiClient.h>
+//#include <WiFiServer.h>
 #include <ir_Daikin.h>
 #include <ir_Mitsubishi.h>
 #include <WiFiUdp.h>
@@ -40,7 +40,7 @@ void parseStringGC(String str);
 void getHC();
 void printIP(void);
 int waitConnected(void);
-int waitConnected1(void);
+//int waitConnected1(void);
 void ketnoimang() ;
 void scanWiFi(void);
 void saveWiFiConf(void);
@@ -100,13 +100,13 @@ void setup() {
   Serial.println("A");
   hoclenh = 0;
   WiFi.mode(WIFI_AP_STA);
-  Serial.println("B");
+//  Serial.println("B");
  // WiFi.setAutoReconnect ( true );
-  Serial.println("C");
+  //Serial.println("C");
   ketnoimang();
-  Serial.println("D");
+ // Serial.println("D");
   statusmang = waitConnected();
-  Serial.println("E");
+//  Serial.println("E");
   if (WiFi.status() == WL_CONNECTED) {
     update_fota();
     Serial.println("Connect");

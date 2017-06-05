@@ -749,7 +749,7 @@ server.on("/set_hc2_conf", []() {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-   server.on("/set_language", []() {
+  /* server.on("/set_language", []() {
     String new_language = server.arg("language");
     String content = FPSTR(header);content += FPSTR(begin_title);
        content += F("mHome - Language");
@@ -769,7 +769,7 @@ server.on("/set_hc2_conf", []() {
     server.send(200, F("text/html"), content);
     digitalWrite(status_led, HIGH );
     ESP.restart();
-  });
+  });*/
   server.on("/set_module_id", []() {
     String new_id = server.arg("module_id");
     String content = FPSTR(header);content += FPSTR(begin_title);
