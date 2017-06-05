@@ -1,0 +1,987 @@
+
+String urlDecodeir(String param) {
+  param.replace("+"," ");
+  param.replace("%2C",",");
+//param.replace("%21","!");
+//param.replace("%23","#");
+//param.replace("%24","$");
+//param.replace("%26","&");
+//param.replace("%27","'");
+//param.replace("%28","(");
+//param.replace("%29",")");
+//param.replace("%2A","*");
+//param.replace("%2B","+");
+//param.replace("%2F","/");
+//param.replace("%3A",":");
+//param.replace("%3B",";");
+//param.replace("%3D","=");
+//param.replace("%3F","?");
+//param.replace("%40","@");
+//param.replace("%5B","[");
+//param.replace("%5D","]");
+return param;
+}
+void parseStringRAW(String str) {
+  int16_t index;
+  uint16_t count;
+
+  // Find out how many items there are in the string.
+  index = -1;
+  count = 1;
+  do {
+    index = str.indexOf(',', index + 1);
+    count++;
+  } while (index != -1);
+
+  // Now we know how many there are, allocate the memory to store them all.
+  code_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
+  // Check we malloc'ed successfully.
+  if (code_array == NULL) {  // malloc failed, so give up.
+    Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",
+                  count * sizeof(uint16_t), ESP.getFreeHeap());
+    Serial.println("Giving up & forcing a reboot.");
+    ESP.restart();  // Reboot.
+    delay(500);  // Wait for the restart to happen.
+    return;  // Should never get here, but just in case.
+  }
+
+  // Now convert the strings to integers and place them in code_array.
+  count = 0;
+  uint16_t start_from = 0;
+  do {
+    index = str.indexOf(',', start_from);
+    code_array[count] = str.substring(start_from, index).toInt();
+
+    start_from = index + 1;
+    count++;
+  } while (index != -1);
+  for (int i=0;i<count-1;i++){
+    if (code_array[i]<2622){
+    code_array[i]=code_array[i]* USECPERTICK;
+    
+    }
+    else code_array[i]=65534;
+   // Serial.print(code_array[i]);
+    //Serial.print(",");
+  }//
+ // Serial.println("");
+  irsend.sendRaw(code_array, count - 1, code_array[count - 1] / (1000));                                                
+  free(code_array);  // Free up the memory allocated.
+  /*
+        long nextIndex;
+        long codeLength = 1;
+        long currentIndex = 0;
+        nextIndex = str.indexOf(',');
+        for (int i = 1;  i < chieudai_ir;  i++) {irSignal[i - 1] = 0x00;}
+        while (nextIndex != -1) {
+          irSignal[codeLength - 1] = (unsigned int) (str.substring(currentIndex, nextIndex).toInt());
+          irSignal[codeLength - 1]=irSignal[codeLength - 1] * USECPERTICK;
+          codeLength++;
+          currentIndex = nextIndex + 1;
+          nextIndex = str.indexOf(',', currentIndex);
+        }
+        irSignal[codeLength - 1] = (unsigned int) (str.substring(currentIndex, nextIndex).toInt());
+        if (irSignal[codeLength - 1] < 20000) {
+          irSignal[codeLength - 1] = 38000;
+        }
+        irsend.sendRaw(irSignal, codeLength - 1, irSignal[codeLength - 1] / 1000);                                                
+         ts = "";  */
+}
+void parseStringGC(String str) {
+  int16_t index;
+  uint16_t count;
+
+  // Find out how many items there are in the string.
+  index = -1;
+  count = 1;
+  do {
+    index = str.indexOf(',', index + 1);
+    count++;
+  } while (index != -1);
+
+  // Now we know how many there are, allocate the memory to store them all.
+  code_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
+  // Check we malloc'ed successfully.
+  if (code_array == NULL) {  // malloc failed, so give up.
+   // Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",count * sizeof(uint16_t), ESP.getFreeHeap());
+   // Serial.println("Giving up & forcing a reboot.");
+    ESP.restart();  // Reboot.
+    delay(500);  // Wait for the restart to happen.
+    return;  // Should never get here, but just in case.
+  }
+
+  // Now convert the strings to integers and place them in code_array.
+  count = 0;
+  uint16_t start_from = 0;
+  do {
+    index = str.indexOf(',', start_from);
+    code_array[count] = str.substring(start_from, index).toInt();
+    start_from = index + 1;
+    count++;
+  } while (index != -1);
+
+  irsend.sendGC(code_array, count);  // All done. Send it.
+  free(code_array);  // Free up the memory allocated.
+  /*
+        long nextIndex;
+        long codeLength = 1;
+        long currentIndex = 0;
+        nextIndex = str.indexOf(',');
+        for (int i = 1;  i < chieudai_ir;  i++) {irSignal[i - 1] = 0x00;}
+        while (nextIndex != -1) {
+          irSignal[codeLength - 1] = (unsigned int) (str.substring(currentIndex, nextIndex).toInt());
+          codeLength++;
+          currentIndex = nextIndex + 1;
+          nextIndex = str.indexOf(',', currentIndex);
+        }
+        irSignal[codeLength - 1] = (unsigned int) (str.substring(currentIndex, nextIndex).toInt());
+        irsend.sendGC(irSignal, codeLength);*/
+}
+
+void setupWiFiConf(void) {
+  
+  server.on("/wifi_conf", []() {
+    //IPAddress ip = WiFi.localIP();
+    //String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
+    String content = FPSTR(header);content += FPSTR(begin_title);
+        String   content1 = FPSTR(p_html);
+     content += F("Connected Wifi: ");
+    content1 += WiFiConf.sta_ssid;
+    content1 += F("</br>IP Address: ");
+    content1 += ipStr;
+    content1 += F(" ( ");
+    content1 += WiFiConf.module_id;
+    content1 += F(".local )");
+    content1 += FPSTR(_p_html);
+    content1 += FPSTR(p_html);
+     content1 += FPSTR(_p_html);
+     content1 += FPSTR(get_html);
+     content1 +=F("'set_wifi_conf'>");
+    content1 += FPSTR(label_html);
+    content1 += F("'ssid'>SSID  </label>");
+    content1 += F("<input name='ssid'id='ssid' maxlength=32 value=") ;
+    content1 += String(WiFiConf.sta_ssid) ;
+    content1 +=  FPSTR(br_html);
+
+    content1 += FPSTR(label_html);
+    content1 += F("'pwd'>PASS  </label>");
+    content1 += F("<input type='password' name='pwd' id='pwd' value=");
+    content1 += String(WiFiConf.sta_pwd);
+    content1 += FPSTR(br_html);
+    content1 += FPSTR(label_html);
+    content1 += F("'ip'>IP  </label>");
+    content1 += F("<input name='ip' id='ip'value=");
+    content1 += String(WiFiConf.sta_ip) ;
+    content1 +=  FPSTR(br_html);
+    
+    content1 += FPSTR(label_html);
+    content1 += F("'gateway' >GATEWAY  </label>");
+    content1 += F("<input  name='gateway' id='gateway' value=") ;
+    content1 += String(WiFiConf.sta_gateway) ;
+    content1 += FPSTR(br_html);
+
+    content1 += FPSTR(label_html);
+    content1 += F("'subnet' >SUBNET  </label>");
+  //  for (int i=0;i<14;i++){
+  //    content1 += FPSTR(space_html);
+  //  }
+    content1 += F("<input  name='subnet' id='subnet' value=");
+    content1 +=  String(WiFiConf.sta_subnet);
+    content1 += FPSTR(br_html);
+    content += FPSTR(wifisetting_html);
+    content += FPSTR(title_html);
+    /*switch (WiFiConf.sta_language[0])
+    {
+      case '1':
+              content += F("<h1>CĂ i Ä�áº·t Wifi</h1>");
+              content += content1;
+              content += F("<input type='submit' value='OK' onclick='return confirm(\"Thay Ä�á»•i CĂ i Ä�áº·t?\");'></form>");
+              break;
+      default: */
+          content += F("<h1>Wifi Setup</h1>");
+          content += content1;
+         content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
+        // break;     
+   // }
+   /* if (WiFiConf.sta_language[0]=='1'){
+    
+    content += F("<h1>CĂ i Ä�áº·t Wifi</h1>");
+    content += content1;
+    content += F("<input type='submit' value='OK' onclick='return confirm(\"Thay Ä�á»•i CĂ i Ä�áº·t?\");'></form>");
+    }
+    else
+    {
+    content += F("<h1>Wifi Setup</h1>");
+    content += content1;
+   content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
+    }*/
+    content += FPSTR(_p_html);
+    content += network_html;
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+server.on("/hc2_conf", []() {
+   // IPAddress ip = WiFi.localIP();
+    String content = FPSTR(header);content += FPSTR(begin_title);
+         String    content1 = ipStr;
+    content1 += F(" ( ");
+    content1 += WiFiConf.module_id;
+    content1 += F(".local )");
+    //content1 += FPSTR(_p_html);
+    content1 += FPSTR(p_html);
+    ///content1 += FPSTR(_p_html);
+    content1 += FPSTR(get_html);
+    content1 += F("'set_hc2_conf'>");
+    
+    content1 += FPSTR(label_html);
+    content1 += F("'iphc2'>IP HC2:");
+
+    content1 += F("</label><input name='iphc2'id='iphc2' maxlength=32 value=");
+    content1 += String(WiFiConf.sta_iphc2);
+    content1 += FPSTR(br_html);
+
+    content1 +=FPSTR(label_html);
+    content1 += F("'pwdhc2'>PASS HC2: </label> <input type='password' name='pwdhc2' id='pwdhc2' value=");
+    content1 += String(WiFiConf.sta_passhc) ;
+    content1 += FPSTR(br_html);
+
+    content1 += FPSTR(label_html);
+    content1 += F("'global1'>Global 1:");
+
+    content1 += F("</label> <input name='global1' id='global1'value=");
+    content1 += String(WiFiConf.sta_global1);
+    content1 += FPSTR(br_html);
+
+    content1 += FPSTR(label_html);
+    content1 += F("'global2'>Global 2:&nbsp;&nbsp;&nbsp;&nbsp;</label> <input  name='global2' id='global2' value=");
+    content1 +=  String(WiFiConf.sta_global2);
+    content1 += FPSTR(br_html);
+    
+    content1 += FPSTR(label_html);
+    content1 += F("'global3'>Global 3:&nbsp;&nbsp;&nbsp;&nbsp;</label> <input  name='global3' id='global3' value=");   
+    content1 += String(WiFiConf.sta_global3) ;    
+    content1 += FPSTR(br_html);  
+    content += FPSTR(wifisetting_html);
+    content += FPSTR(title_html);
+  /*  if (WiFiConf.sta_language[0]=='1'){
+    content += F("<h1>CĂ i Ä‘áº·t thĂ´ng sá»‘ HC2</h1>");
+    content += FPSTR(p_html);
+    content += F("Wifi Ä‘ang káº¿t ná»‘i: ");
+    content += WiFiConf.sta_ssid;
+    content += F("</br>Ä�á»‹a Chá»‰ IP: ");
+    content += content1;
+    content += F("<input type='submit' value='OK' onclick='return confirm(\"Báº¡n cĂ³ muá»‘n thay Ä‘á»•i cĂ i Ä‘áº·t ?\");'></form>");
+    content +=FPSTR(_p_html);
+    content += F("<li>ThĂ´ng tin HC2");
+    content += F("<li>PassWord Ä‘á»‹nh dáº¡ng User:password#  VD: admin:admin#");
+     }
+     else
+     {*/
+    content += F("<h1>HC2 Setting</h1>");
+    content += FPSTR(p_html);
+    content += F("Wifi conecting : ");
+    content += WiFiConf.sta_ssid;
+    content += F("</br>IP address: ");  
+    content += content1;
+    content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Setting ?\");'></form>");
+    content += FPSTR(_p_html);
+    content += FPSTR(get_html);
+    content += F("'getHC'>");
+    content += F("<input type='submit' value='Check'></form>");
+    content += FPSTR(_p_html);
+    content += F("<li>Information HC2");
+    content += F("<li>Format User:password#  Ex: admin:admin123#");
+    //}
+     content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+server.on("/getHC", []() {
+    String content = FPSTR(header);content += FPSTR(begin_title);
+       content += F("Wait");
+    getHC();
+    server.send(200, F("text/html"), content);
+  });
+server.on("/set_hc2_conf", []() {
+    String new_IPHC = server.arg("iphc2");
+    String new_pwdhc = server.arg("pwdhc2");
+    String new_global1 = server.arg("global1");
+    String new_global2 = server.arg("global2");
+    String new_global3 = server.arg("global3");
+    String content = FPSTR(header);content += FPSTR(begin_title);
+      content += FPSTR(wifisetting_html);
+    content += FPSTR(title_html);
+    content += F("<h1>LÆ°u Wifi</h1>");
+    if (new_IPHC.length() > 0) {
+      new_IPHC.toCharArray(WiFiConf.sta_iphc2, sizeof(WiFiConf.sta_iphc2));
+      new_pwdhc.toCharArray(WiFiConf.sta_passhc, sizeof(WiFiConf.sta_passhc));
+      new_global1.toCharArray(WiFiConf.sta_global1, sizeof(WiFiConf.sta_global1));
+      new_global2.toCharArray(WiFiConf.sta_global2, sizeof(WiFiConf.sta_global2));
+      new_global3.toCharArray(WiFiConf.sta_global3, sizeof(WiFiConf.sta_global3));
+      saveWiFiConf();
+      content += FPSTR(p_html);
+      content += F("Save '");
+      content += WiFiConf.sta_ssid;
+      content += F("' ...  device Rebooting !");
+      content += FPSTR(_p_html);
+      
+    } else {
+      content += FPSTR(p_html);
+      content += F("Rejected empty SSID.");
+      content += FPSTR(_p_html);
+     //Serial.println("Rejected empty SSID.");
+    }
+    content += F("<body></html>");
+    server.send(200, F("text/html"), content);
+  });
+
+  server.on("/learning", []() {
+    if (hoclenh==0){hoclenh=1;irrecv.enableIRIn();server.send(200, F("text/html"), "{\"enable\":\"1\"} <p><a href=\"/\"><button>BACK</button></a></p>");}
+    else {hoclenh=0;irrecv.disableIRIn();server.send(200, F("text/html"), "{\"enable\":\"0\"} <p><a href=\"/\"><button>BACK</button></a></p>");}
+   Serial.println(hoclenh);
+   
+  });
+  server.on("/IR", []() {
+
+    String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
+   // content =  F("<link href=\"css/index.css\" rel=\"stylesheet\" />");
+   // content =  F("<script src=\"js/jquery-2.1.4.min.js\"></script>");
+    content = FPSTR(header);content += FPSTR(begin_title);    
+    //content =  F("<meta http-equiv='refresh' content='5'><style>body {background-color:lightgrey}h1 {color:blue}p {color:black}</style><link rel=\"shortcut icon\" href=\"data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAADLy8sAHYsbACCNGADK28UADIEHAHOubwAShQoA//7/AObz6ADn8+gA6fPoAOzz6ADGxsYAXa5eAL7gugAghxAAtbyyABFmCAD09vEAN5ctADuPMAA4ly0AxuG9AKvXqQA2lzYAJ4cZADuXNgAikCIAKIwoAHS1cwDs++YAAHgAAKrKpwAAewAAj8WQACCHEQDa6tgAtbyzAMTcwQA4jzEAOpEuAFCkSwAYZgkAa7JiAIK9ggBAmDoAQJY9AA6FDADQ5NAApMalAC2PKQCozagA9PXwAPT48AAvbScAF2YKAGywZgBtsGYA4+3iAMviywA/mDsARpgyAM/jzgBkkGEA0eXLAC6KJAA2dDMAotCgAEWbRAA5iiQAv9+6AKmr3AAQZQgA8vXxAPn48QA+mDMAsdayAJ7DngChxKEANnQ0ACiRKABlkGIAq7iqAAB3AAAAegAAjsSQAHm5eQDKycoAw9vBAGGxYgB/mqMAhJesAPr6+AC21qoA/v/+AJqamgBygMIASpxAAMjIyADv8PYAYLBgANrr1gCUx5EAZ61gAGitYADQy9EAKGpOACOPJAD7+/wAJI8kAPv9+QDo8OUA/v//AI24iQD///8AWaxVAC+MJABerFUAXaleAF6pXgB5tHUA2uvXAPX16wDPys8AxOLGANHL0gAnhB8Agr1+AJqh1AAOfAgAzOHMAIe+gQCLvoEA6O7pAHK0bQCrt6oAMI4iAC6QKAAtlCsAS5s/AF+rXAB4t3YAwdrBAMrIygDv+e8A3O3eAM/K0ADf4uoAdJdxAHWXcQAniBoAbqtuAP3+9QAMhgwAoc6fAHO0bgAvjiMAFYYMAI28jgBGn0MAyMfIAGOrXQB4uHoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAyPe4c/NhEqT5QlaaAAX3JyXiITc5oWDmYpS11ycgByXIw8ZXJycnJycnxFg3JiclZESXJycnJycnJyOkEXfSScCXIvG1BtbW1rnYVAPRB4m3JyGgRxMU1OnoFycimVLlhycllTjXJycpAccnJmQpYLcnJkHx8zcnIeAnJyRjcPenJyDVNUBnJjgGBHchZIFDAHIAEoHWxyk1tqWnJDNjmDcm+KdCxycm4FK5hydVE7MhJyl34hGAeff3JyeRVScndoB3JyjpkfTHJyNC1VknIKYWcScnKRA3JyCIuhcFdycgl2iYQ+SjUmhoiiXHIMcnJycoI4JyMZLngkcnJyDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"/><meta charset='UTF-8'><title>");
+    content += F("mHome - IR Learn");
+    content += FPSTR(title_html);
+    content += F("<h1>IR Learn</h1>");
+    // content += "<p>LAN: ";
+    String hienthi;
+    for (int k = 0; k < chieudai; k++) {
+      hienthi += String(irSignal[k]);
+      if (k < chieudai - 1) {
+        hienthi += ",";
+      }
+    }
+    
+    if (statusmang==0) {
+      content +=FPSTR(notwifi_html);
+      content +=F("<a href='/wifi_conf'>Wifi Setting</a>");
+    }
+    else{
+      //content += FPSTR(_p_html);
+      content += F("<form method='post' action='codeIR'>");
+     /*switch (WiFiConf.sta_language[0])
+    {
+      case '1':
+              content += FPSTR(label_html);content += F("'raw'>MĂ£ IR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </label><input name='raw'id='raw' value="); //maxlength=32
+              content +=  hienthi; //maxlength=32
+              content += FPSTR(br_html); //maxlength=32
+              content += FPSTR(label_html);
+              content += F("'ts'>Táº§n Sá»‘");
+    for (int i=0;i<7;i++){
+      content += FPSTR(space_html);
+    }
+    content += F(": </label> <input name='ts' id='ts'  value=38000");
+              content += FPSTR(br_html);
+              //content += F("<button onclick='copyToClipboard('raw')'>Copy P1</button>");
+              
+              content += F("<input type='submit' value='Kiá»ƒm Tra MĂ£ Má»›i Há»�c' onclick='return confirm(\"Báº¡n CĂ³ Muá»‘n Kiá»ƒm Tra MĂ£ ?\");'></form>");
+              content += FPSTR(_p_html);
+              //content += FPSTR(_p_html);
+              content += F("ChĂº Ă½ :");
+              //content += FPSTR(_p_html);
+              content += F("<li>Táº§n sá»‘ máº·c Ä‘á»‹nh lĂ  38Khz=38000. Náº¿u Ä‘iá»�u khiá»ƒn khĂ´ng Ä‘Æ°á»£c ta cĂ³ chá»ƒ thá»­ thay Ä‘á»•i táº§n sá»‘ thĂ nh 30000,33000,36000,38000,40000,56000 tĂ¹y vĂ o loáº¡i Remote");
+              content += F("<li>Khi há»�c xong mĂ£ má»›i,báº¡n pháº£i lĂ m má»›i trang Ä‘á»ƒ cáº­p nháº­t mĂ£ má»›i nháº¥t.");
+              content += FPSTR(p_html);
+              content += F("Cáº£m Æ n Ä�Ă£ Ä�á»�c.");
+              break;
+      default: */
+            content += FPSTR(label_html);
+            content += F("'raw'>IR CODE");
+
+    content += F(": </label><input name='raw'id='raw'style=\"width:70%;\" value=");
+            content +=hienthi; //maxlength=32
+            content += FPSTR(br_html); //maxlength=32
+            content += FPSTR(label_html);
+            content += F("'ts'>Frequency");
+
+    content += F(": </label> <input name='ts' id='ts'  value=38000");
+            content += FPSTR(br_html);
+            
+            content += F("<input type='submit' value='Check new  Code' onclick='return confirm(\"Are you ready?\");'></form>");
+            content += FPSTR(_p_html);
+            //content += FPSTR(_p_html);
+            content += F("Attention :");
+            content += FPSTR(_p_html);
+            content += F("<li>The default frequency is 38Khz = 38000. Change the frequency to 30000,33000,36000,38000,40000,56000 if devices not work");
+            content += F("<li>When completed the new code, you have to refresh the page for the latest code update.");
+            content += FPSTR(p_html);
+            content += F("Thank you for reading.");
+          //break;     
+    //}
+    }
+    content += FPSTR(end_html);
+    server.send(200,F("text/html"), content);
+  });
+  ///////////////////////
+  /*
+   * POST DATA IR
+   */
+  server.on("/codeIR", HTTP_POST, []() {
+    if (hoclenh == 1) { irrecv.disableIRIn(); }
+    String data1=server.arg("raw");
+   // Serial.println("");
+    //Serial.println(data1);
+    
+    String ts1=server.arg("ts");
+    json_ts=ts1;
+   // Serial.println(ts1);
+    if (data1.length()>=1264){data1=urlDecodeir(data1);}
+   // content += F("mHome");
+   // content += FPSTR(title_html);
+   String content = "";
+    if (data1.length() < 12) {
+      content += F("Not OK");
+      Serial.println(" ");
+    }
+    else {
+          data1+=",";
+          data1+=ts1;
+          parseStringRAW(data1);
+          content += F("OK");
+    }
+    server.send(200, F("text/html"), content);
+    if (hoclenh == 1) {irrecv.enableIRIn();}
+  });
+  server.on("/codeGC", []() {
+          if (hoclenh == 1) {
+                      irrecv.disableIRIn();
+                    //  delay(500);    
+                    }
+    String data1 = server.arg("raw");
+     parseStringGC(data1);
+    //atasend = 2;
+    // Serial.println(new_ssid);
+    String content = FPSTR(header);content += FPSTR(begin_title);
+     content += WiFiConf.module_id;
+    content += F(".local - set WiFi");
+    content += FPSTR(title_html);
+    content += F("<h1>OK</h1>");
+    server.send(200, "text/html", content);
+          if (hoclenh == 1) { //delay(200);    
+                            irrecv.enableIRIn();  // Start the receiver
+                          }
+  });
+   server.on("/getstatus", []() { 
+    server.send(200,F("text/html"), "OK");
+  });
+
+  /*
+   * Get code IR 
+   */
+   server.on("/getcode", []() {
+    String hienthi;
+    for (int k = 0; k < chieudai; k++) {
+      hienthi += String(irSignal[k]);
+      if (k < chieudai - 1)  hienthi += ",";
+    }
+    String json="{";
+    json += "\"code\":\"" + hienthi ;
+    json += "\",\"f\":" + json_ts;
+    if (hoclenh==0) json += "\",\"enable\": 1";
+    else json += "\",\"enable\": 0";
+    json += "}";
+    if (hienthi.length()>1 ){
+      server.send(200,F("text/html"), json);
+    }
+    else server.send(200,F("text/html"), F("{\"code\":\"error\",\"f\":\"38000\"}"));
+   // ESP.restart();
+  });
+  /*
+   * Send Daikin
+   */
+  server.on("/senddaikin", []() {
+    /*#define DAIKIN_COOL                0b011
+#define DAIKIN_HEAT                0b100
+#define DAIKIN_FAN                 0b110
+#define DAIKIN_AUTO                0b000
+#define DAIKIN_DRY                 0b010
+#define DAIKIN_POWERFUL       0b00000010
+#define DAIKIN_SILENT         0b00100000
+*/
+    String status = server.arg("status");
+    String temp= server.arg("temp");
+    String fan= server.arg("fan");
+    String mode1= server.arg("mode");
+    if (mode1=="Cool") dakinir.setMode(DAIKIN_COOL);
+    else if (mode1=="fan") dakinir.setMode(DAIKIN_FAN);
+    else if (mode1=="auto") dakinir.setMode(DAIKIN_AUTO);
+    else if (mode1=="powerful") dakinir.setMode(DAIKIN_POWERFUL);
+    else if (mode1=="dry") dakinir.setMode(DAIKIN_DRY);
+    else if (mode1=="heat") dakinir.setMode(DAIKIN_HEAT);
+    else if (mode1=="silent") dakinir.setMode(DAIKIN_SILENT);
+    if (status =="OFF"){
+      Serial.println("OFF Daikin");
+    dakinir.off();
+  dakinir.setFan(temp.toInt());
+  dakinir.setTemp(25);
+  dakinir.setSwingVertical(0);
+  dakinir.setSwingHorizontal(0);
+    }
+    else {
+   dakinir.on();
+  dakinir.setFan(fan.toInt());
+  dakinir.setTemp(temp.toInt());
+  dakinir.setSwingVertical(0);
+  dakinir.setSwingHorizontal(0);
+    }
+  // Now send the IR signal.
+  dakinir.send();
+    server.send(200,F("text/html"), "OK");
+   // ESP.restart();
+  });
+  /*
+   * Send MISUBISI
+   */
+  server.on("/sendmisubi", []() {
+    /*#define DAIKIN_COOL                0b011
+#define MITSUBISHI_AC_AUTO        0x20U
+#define MITSUBISHI_AC_COOL        0x18U
+#define MITSUBISHI_AC_DRY         0x10U
+#define MITSUBISHI_AC_HEAT        0x08U
+#define MITSUBISHI_AC_POWER       0x20U
+#define MITSUBISHI_AC_FAN_AUTO       0U
+#define MITSUBISHI_AC_FAN_MAX        5U
+#define MITSUBISHI_AC_FAN_SILENT     6U
+#define MITSUBISHI_AC_MIN_TEMP      16U  // 16C
+#define MITSUBISHI_AC_MAX_TEMP      31U  // 31C
+#define MITSUBISHI_AC_VANE_AUTO      0U
+#define MITSUBISHI_AC_VANE_AUTO_MOVE 7U
+*/
+    String status = server.arg("status");
+    String temp= server.arg("temp");
+    String fan= server.arg("fan");
+    String mode1= server.arg("mode");
+   /* switch (mode1)
+    {
+    case "Cool":
+          mitsubir.setMode(MITSUBISHI_AC_COOL);
+          break;
+    case "fan": 
+          mitsubir.setMode(MITSUBISHI_AC_FAN_AUTO);
+          break;
+    case "auto": 
+          mitsubir.setMode(MITSUBISHI_AC_AUTO);
+          break;
+    case "powerful": 
+          mitsubir.setMode(DAIKIN_POWERFUL);
+          break;
+    case "dry": 
+          mitsubir.setMode(MITSUBISHI_AC_DRY);
+          break;
+    case "heat": 
+          mitsubir.setMode(MITSUBISHI_AC_HEAT);
+          break;
+    case "silent": 
+          mitsubir.setMode(DAIKIN_SILENT);
+          break;
+      
+    }*/
+    if (mode1=="Cool") mitsubir.setMode(MITSUBISHI_AC_COOL);
+    else if (mode1=="fan") mitsubir.setMode(MITSUBISHI_AC_FAN_AUTO);
+    else if (mode1=="auto") mitsubir.setMode(MITSUBISHI_AC_AUTO);
+    else if (mode1=="powerful") mitsubir.setMode(DAIKIN_POWERFUL);
+    else if (mode1=="dry") mitsubir.setMode(MITSUBISHI_AC_DRY);
+    else if (mode1=="heat") mitsubir.setMode(MITSUBISHI_AC_HEAT);
+    else if (mode1=="silent") mitsubir.setMode(DAIKIN_SILENT);
+    if (status =="OFF"){
+       Serial.println("OFF Misu");
+    mitsubir.off();
+  mitsubir.setFan(temp.toInt());
+  mitsubir.setTemp(25);
+  mitsubir.setVane(MITSUBISHI_AC_VANE_AUTO);
+    }
+    else {
+   mitsubir.on();
+  mitsubir.setFan(fan.toInt());
+  mitsubir.setTemp(temp.toInt());
+  mitsubir.setVane(MITSUBISHI_AC_VANE_AUTO);
+    }
+  // Now send the IR signal.
+  mitsubir.send();
+    server.send(200,F("text/html"), "OK");
+   // ESP.restart();
+  });
+  //////////////
+  server.on("/set_wifi_conf", []() {
+    
+    String new_ssid = server.arg("ssid");
+    String new_pwd = server.arg("pwd");
+    String new_ip = server.arg("ip");
+    String new_gateway = server.arg("gateway");
+    String new_subnet = server.arg("subnet");
+     String content =  "OK";
+     //content += FPSTR(wifisetting_html);
+   // content += FPSTR(title_html);
+   // content += F("<h1>LÆ°u Wifi</h1>");
+    if (new_ssid.length() > 0) {
+      new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
+      new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
+      new_ip.toCharArray(WiFiConf.sta_ip, sizeof(WiFiConf.sta_ip));
+      new_gateway.toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));
+      new_subnet.toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));
+      saveWiFiConf();
+      //content += F("<p>Save  '");
+      //content += WiFiConf.sta_ssid;
+      //content += F("' ... Device Reboot !</p>");
+     // content += F("<body></html>");
+    } else {
+     // content += F("<p>Rejected empty SSID. </p>");
+     // content += F("<body></html>");
+    //  Serial.println("Rejected empty SSID.");
+    }
+    server.send(200,F("text/html"), content);
+    digitalWrite(status_led, LOW);
+    ESP.restart();
+  });
+  server.on("/Reboot", HTTP_GET, []() {
+    String content = FPSTR(header);content += FPSTR(begin_title);
+     content += F("mHome - Reset");
+    content += FPSTR(title_html);
+    content += F("<h1>ThĂ´ng Tin :</h1>");
+    content += FPSTR(p_html);
+    content += FPSTR(support_html);
+   // content += F("</br>Ä�á»‹a chá»‰ : 65/39 Ä�Æ°á»�ng 339 PhÆ°á»�ng TÄƒng NhÆ¡n PhĂº B,Q9,TP.HCM");
+   // content += F("</br>PhĂ¡t Triá»ƒn : Pháº¡m An NhĂ n");
+    content += FPSTR(_p_html);
+    content += FPSTR(p_html);
+    content += FPSTR(get_html);
+    content += F("'set_Reset'>");
+    content += F("<input type='submit' value='Reboot' onclick='return confirm(\"Tiáº¿p Tá»¥c ?\");'></form>");
+    content += FPSTR(_p_html);
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+  server.on("/Reset1", HTTP_GET, []() {
+    String content = FPSTR(header);content += FPSTR(begin_title);
+    content += F("mHome - Reset");
+    content += FPSTR(title_html);
+    content += F("<h1>ThĂ´ng Tin :</h1>");
+    content += FPSTR(p_html);
+    content += FPSTR(support_html);
+    content += FPSTR(_p_html);
+    content += FPSTR(p_html);
+    content += FPSTR(get_html);
+    content += F("'set_Reset1'>");
+    content += F("<input type='submit' value='Reset' onclick='return confirm(\"Tiếp tục ?\");'></form>");
+    content += FPSTR(_p_html);
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+  server.on("/set_Reset1", HTTP_GET, []() {
+        String new_IPHC = "192.168.1.10";
+    String new_pwdhc = "admin:admin#";
+    String new_global1 ="temp1";
+    String new_global2 = "temp2";
+    String new_global3 = "temp3";
+    String new_ssid = "mhome";
+    String new_pwd = "mhome";
+    String new_ip = "192.168.1.220";
+    String new_gateway = "192.168.1.1";
+    String new_subnet = "255.255.255.0";
+      new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
+      new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
+      new_ip.toCharArray(WiFiConf.sta_ip, sizeof(WiFiConf.sta_ip));
+      new_gateway.toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));
+      new_subnet.toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));
+      new_IPHC.toCharArray(WiFiConf.sta_iphc2, sizeof(WiFiConf.sta_iphc2));
+      new_pwdhc.toCharArray(WiFiConf.sta_passhc, sizeof(WiFiConf.sta_passhc));
+      new_global1.toCharArray(WiFiConf.sta_global1, sizeof(WiFiConf.sta_global1));
+      new_global2.toCharArray(WiFiConf.sta_global2, sizeof(WiFiConf.sta_global2));
+      new_global3.toCharArray(WiFiConf.sta_global3, sizeof(WiFiConf.sta_global3));
+      String lan="0";
+      lan.toCharArray(WiFiConf.sta_language, sizeof(WiFiConf.sta_language));
+      resetModuleId();
+      saveWiFiConf();
+      digitalWrite(status_led, LOW);
+       ESP.restart();
+  });
+  server.on("/set_Reset", HTTP_GET, []() {
+    digitalWrite(status_led, LOW);
+        ESP.restart();
+  });
+ server.on("/get_infor", HTTP_GET, []() {
+    //String new_infor = server.arg("infor");
+    //String new_message = server.arg("message");
+    // char new_id[3]="  ";
+    //new_infor.toCharArray(new_id, sizeof(new_id));
+    //if (strstr(new_id,"1") != NULL){String global=WiFiConf.sta_global1;global.trim();SetVariHC(global,new_message);}
+    //else if (strstr(new_id,"2") != NULL){String global=WiFiConf.sta_global2;global.trim();SetVariHC(global,new_message);}
+    //else if (strstr(new_id,"3") != NULL){String global=WiFiConf.sta_global3;global.trim();SetVariHC(global,new_message);}
+     String content = "{\"T:\"" + String(nhietdo);
+     content += ",\"H\":" + String(doam);
+     content += ",\"PIR\":\"" + String(time_);
+     content += "\",\"PIR2\":\"" + String(motion_time);
+     content += "\"}";
+
+    server.send(200, F("text/html"), content);
+  });
+  server.on("/module_id", []() {
+   // IPAddress ip = WiFi.localIP();
+    //String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
+    char defaultId[sizeof(WiFiConf.module_id)];
+    setDefaultModuleId(defaultId);
+    String content = FPSTR(header);content += FPSTR(begin_title);
+     content += F("mHome-Local Wifi");
+    content += FPSTR(title_html);
+    content += F("<h1>Thay đổi tên Wifi</h1>");
+    content += FPSTR(p_html);
+    content += F("Module ID: ");
+    content += WiFiConf.module_id;
+    content += F("</br>IP: ");
+    content += ipStr;
+    content += FPSTR(_p_html);
+    content += FPSTR(p_html);
+    content += FPSTR(get_html);
+    content += F("'set_module_id'><label for='module_id'>Tên Wifi: </label><input name='module_id' id='module_id' maxlength=32 value='");
+    content += WiFiConf.module_id;
+    content += F("'><input type='submit' onclick='return confirm(\"Tiếp Tục ?\");'></form>");
+    content += F(" Nếu để trống tên wifi sẽ là : '");
+    content += defaultId;
+    content += F("'");
+    content += FPSTR(_p_html);
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+   server.on("/set_language", []() {
+    String new_language = server.arg("language");
+    String content = FPSTR(header);content += FPSTR(begin_title);
+       content += F("mHome - Language");
+    content += FPSTR(title_html);
+    content += F("</head><body>");
+    content += F("<h1>Save</h1>");
+    content += FPSTR(p_html);
+    content += F("OK '");
+    if (new_language =="Vietnamese") {String lan="1";lan.toCharArray(WiFiConf.sta_language, sizeof(WiFiConf.sta_language));content += "VN";}
+    else
+      {String lan="0";lan.toCharArray(WiFiConf.sta_language, sizeof(WiFiConf.sta_language));content += "EN";}
+      
+      saveWiFiConf();
+      content += F("' ... Device Reboot !");
+      content += FPSTR(_p_html);
+      content += F("<body></html>");
+    server.send(200, F("text/html"), content);
+    digitalWrite(status_led, HIGH );
+    ESP.restart();
+  });
+  server.on("/set_module_id", []() {
+    String new_id = server.arg("module_id");
+    String content = FPSTR(header);content += FPSTR(begin_title);
+   // content += F("<title>");
+    //content += F("mHome ");
+    //content += FPSTR(title_html);
+    if (new_id.length() > 0) {
+      new_id.toCharArray(WiFiConf.module_id, sizeof(WiFiConf.module_id));
+    } else {
+      resetModuleId();
+    }
+    saveWiFiConf();
+    //content += F("<h1>CĂ i Ä‘áº·t tĂªn wifi cho thiáº¿t bá»‹</h1>");
+    content += FPSTR(p_html);
+    //content += F("CĂ i Ä‘áº·t tĂªn Wifi lĂ  :  '");
+    content += WiFiConf.module_id;
+    content += F("' ... Device Rebooting.");
+    content += FPSTR(_p_html);
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+    digitalWrite(status_led, LOW);
+    ESP.restart();
+  });
+}
+
+void setupWeb(void) {
+  server.on("/", []() {
+    String content = FPSTR(header);
+
+     //content += "<meta http-equiv=\"refresh\" content=\"60\" />";
+ // content += "<script src=\"https://code.jquery.com/jquery-2.1.3.min.js\"></script>";
+ // content += "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css\">";
+content += FPSTR(begin_title);
+        content += F("mHome - Main page");
+    content += FPSTR(title_html);
+    content += F("<h1>mHome - Wifi to IR Controller </h1>");
+   // content += FPSTR(get_html);
+    //content += F("'set_language'><input type=\"submit\" name=\"language\" value=\"Vietnamese\"> &nbsp &nbsp &nbsp <input type=\"submit\" name=\"language\" value=\"English\"></form>");
+    content += FPSTR(p_html);
+    content += F("<li>Nhiệt độ : ");
+    content += String(nhietdo);
+    content += F(" *C");
+    content += F("<li>Độ Ẩm: ");
+    content += String(doam);
+    content += F(" %");
+    content += F("<li>PIR : ");
+    content += time_;
+    content += F("  UTC +7 ");
+
+        if (hoclenh==0){
+      content += F("<li>Học Lệnh : <a href='/learning'>Disable");
+      
+    }
+    else content += F("<li>Học Lệnh : <a href='/learning'>Enable");
+    content += FPSTR(_p_html);
+    content +=FPSTR(fieldset);
+
+   /* switch (WiFiConf.sta_language[0])
+    {
+      case '1':
+                content +=FPSTR(legend_html);
+                content +=F("'/wifi_conf'>Cài đặt WiFi");
+                content +=FPSTR(_legend_html);
+              content += F("<li> ");
+              if (statusmang==0) {                                 
+                  content += FPSTR(notwifi_html);
+                  content += F("<li>IP: 192.168.4.1:4999 ( ");
+                  content += WiFiConf.module_id;
+                  content += F(" )");
+              }
+              else{
+                content += F("Connected to : ");
+                  content += WiFiConf.sta_ssid;
+                  content += F("<li>IP: ");
+                  content += ipStr;
+                  content += F(" ( ");
+                  content += WiFiConf.module_id;
+                  content += F(" )");
+               }
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/IR'>Học IR");
+                        content +=FPSTR(_legend_html);
+                        content +=F("<li>Pháº§n há»�c code IR cá»§a Remote, Khi há»�c xong copy code tá»›i HC2 Ä‘á»ƒ sá»­ dá»¥ng");
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/hc2_conf'>CĂ i Ä�áº·t HC2");
+                        content +=FPSTR(_legend_html);
+                        content +=F("<li>Pháº§n nĂ y má»¥c Ä‘Ă­ch Ä‘iá»�n cĂ¡c thĂ´ng sá»‘ cá»§a HC2 vĂ  cĂ¡c biáº¿n global nháº±m cho viá»‡c truyá»�n dá»¯ liá»‡u lĂªn HC2");
+                        content +=F("<li>Tráº¡ng ThĂ¡i:");
+                        content +=SerialHC2;
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/module_id'>CĂ i tĂªn Wifi");
+                        content +=FPSTR(_legend_html);
+                        //content +=F("<li>Pháº§n nĂ y má»¥c Ä‘Ă­ch Ä‘iá»�n cĂ¡c thĂ´ng sá»‘ cá»§a HC2 vĂ  cĂ¡c biáº¿n global nháº±m cho viá»‡c truyá»�n dá»¯ liá»‡u lĂªn HC2");
+              content +=FPSTR(_fieldset);
+                  content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/firmware'>Update ChÆ°Æ¡ng TrĂ¬nh");
+                        content +=FPSTR(_legend_html);
+                        content +=F("<li>Update firmware má»›i nháº¥t cho HC2");
+                        content +=F("<li>Status : ");
+                        content +=AppVersion;
+                        content +=timeVersion;
+              content +=FPSTR(_fieldset);
+                  content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/Reboot'>Khá»Ÿi Ä‘á»™ng láº¡i");
+                        content +=FPSTR(_legend_html);
+              content +=FPSTR(_fieldset);
+                  content +=FPSTR(fieldset);
+                      content +=FPSTR(legend_html);
+                      content +=F("'/Reset1'>Reset");
+                      content +=FPSTR(_legend_html);
+              content +=FPSTR(_fieldset);
+                            content +=FPSTR(fieldset);
+              content +=FPSTR(legend_html);
+              content +=F("'/module_id'>Wifi Name");
+              content +=FPSTR(_legend_html);
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+              content +=F("<legend>ThĂ´ng tin</legend>");
+              content += FPSTR(information);
+              break;
+       default :*/
+              content +=FPSTR(legend_html);
+              content +=F("'/wifi_conf'>Wifi setting");
+              content +=FPSTR(_legend_html);
+              if (statusmang==0){ 
+                  content += F("<li> ");
+                  content += FPSTR(notwifi_html);
+                  content += F("<li>IP: 192.168.4.1:4999 ");
+                  content += F(" ( ");
+                  content += WiFiConf.module_id;
+                  content += F(" )");
+              }
+              else{
+                  content += F("<li>Connected to : ");
+                  content += WiFiConf.sta_ssid;
+                  content += F("<li>IP: ");
+                  content += ipStr;
+                  content += F(" ( ");
+                  content += WiFiConf.module_id;
+                  content += F(" )");
+               }
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+              content +=FPSTR(legend_html);
+              content +=F("'/IR'>IR Leaning");
+              content +=FPSTR(_legend_html);
+              content +=F("<li>Description: This section is for learning IR code from IR remotes.");
+              content +=F("<li>Each successful learning code should be copied to use with Fibaro HC2 later");        
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/hc2_conf'>HC2 Setting");
+                        content +=FPSTR(_legend_html);
+                        content +=F("<li>Description:This section is for setting communication between HC2 and Wifi IR controller");
+                        content +=F("<li>Status : ");
+                        content +=SerialHC2;
+              content +=FPSTR(_fieldset);
+                  content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/firmware'>Firmware Update");
+                        content +=FPSTR(_legend_html);
+                        content +=F("<li>Description: This section is for update firmware of wifi IR controller");
+                        content +=F("<li>Status : ");
+                        content +=AppVersion;
+                        content +=timeVersion;
+              content +=FPSTR(_fieldset);
+                  content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/Reboot'>Reboot Wifi IR Controller");
+                        content +=FPSTR(_legend_html);
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+                      content +=FPSTR(legend_html);
+                      content +=F("'/Reset1'>Reset");
+                      content +=FPSTR(_legend_html);
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+              content +=FPSTR(legend_html);
+              content +=F("'/module_id'>Wifi Name");
+              content +=FPSTR(_legend_html);
+              content +=FPSTR(_fieldset);
+              content +=FPSTR(fieldset);
+              content +=F("<legend>Information</legend>");
+              content += FPSTR(information);
+          //    break;
+    //}
+    content +=FPSTR(_fieldset);
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+    
+  });
+}
+//*******************
+// Hafm tach IP.Gateway
+//*******************
+void parseBytes(const char* str, char sep, byte* bytes, int maxBytes, int base) {
+  for (int i = 0; i < maxBytes; i++) {
+    bytes[i] = strtoul(str, NULL, base);  // Convert byte
+    str = strchr(str, sep);               // Find next separator
+    if (str == NULL || *str == '\0') {
+      break;                            // No more separators, exit
+    }
+    str++;                                // Point to next character after separator
+  }
+}
+
+
