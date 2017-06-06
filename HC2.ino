@@ -4,7 +4,7 @@ const char PROGMEM b64_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 /* 'Private' declarations */
  void a3_to_a4(unsigned char * a4, unsigned char * a3);
- void a4_to_a3(unsigned char * a3, unsigned char * a4);
+// void a4_to_a3(unsigned char * a3, unsigned char * a4);
  unsigned char b64_lookup(char c);
 
 int base64_encode(char *output, char *input, int inputLen) {
@@ -40,7 +40,7 @@ int base64_encode(char *output, char *input, int inputLen) {
   return encLen;
 }
 
-int base64_decode(char * output, char * input, int inputLen) {
+/*int base64_decode(char * output, char * input, int inputLen) {
   int i = 0, j = 0;
   int decLen = 0;
   unsigned char a3[3];
@@ -76,13 +76,13 @@ int base64_decode(char * output, char * input, int inputLen) {
   output[decLen] = '\0';
   return decLen;
 }
-
+*/
 int base64_enc_len(int plainLen) {
   int n = plainLen;
   return (n + 2 - ((n + 2) % 3)) / 3 * 4;
 }
 
-int base64_dec_len(char * input, int inputLen) {
+/*int base64_dec_len(char * input, int inputLen) {
   int i = 0;
   int numEq = 0;
   for(i = inputLen - 1; input[i] == '='; i--) {
@@ -90,7 +90,7 @@ int base64_dec_len(char * input, int inputLen) {
   }
 
   return ((6 * inputLen) / 8) - numEq;
-}
+}*/
 
 void a3_to_a4(unsigned char * a4, unsigned char * a3) {
   a4[0] = (a3[0] & 0xfc) >> 2;
@@ -99,11 +99,11 @@ void a3_to_a4(unsigned char * a4, unsigned char * a3) {
   a4[3] = (a3[2] & 0x3f);
 }
 
-void a4_to_a3(unsigned char * a3, unsigned char * a4) {
+/*void a4_to_a3(unsigned char * a3, unsigned char * a4) {
   a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);
   a3[1] = ((a4[1] & 0xf) << 4) + ((a4[2] & 0x3c) >> 2);
   a3[2] = ((a4[2] & 0x3) << 6) + a4[3];
-}
+}*/
 
  unsigned char b64_lookup(char c) {
   if(c >='A' && c <='Z') return c - 'A';
@@ -115,7 +115,6 @@ void a4_to_a3(unsigned char * a3, unsigned char * a4) {
 }
 /////////////////////////////////////////////////////////////////////////
 void SetVariHC(String vari,String giatri) {
- // String PostData = "{\r\n\"name\": \"\",\r\n\"value\":\"\",\r\n\"invokeScenes\":True\r\n}";
   int vitricat=0;
       for (byte tam=0;tam<sizeof(WiFiConf.sta_passhc);tam++){
             if (WiFiConf.sta_passhc[tam]=='#'){
@@ -126,24 +125,13 @@ void SetVariHC(String vari,String giatri) {
       int encodedLen = base64_enc_len(vitricat-1);
       char encoded[encodedLen];
       base64_encode(encoded, WiFiConf.sta_passhc, vitricat);
-     // Serial.println(encoded);
-     // String url=String("PUT /api/globalVariables/")+vari;
-     // url+= F(" HTTP/1.1");
-     // String url2="Host: "+String(WiFiConf.sta_iphc2);
-     // int chieudai=PostData.length()+vari.length()+giatri.length();
      int chieudai = 51 + vari.length()+giatri.length();
-     // WiFiClient client;
  if (client.connect(WiFiConf.sta_iphc2,80)) {
-      //client.println(url);    
       client.print(F("PUT /api/globalVariables/"));  
       client.print(vari); 
       client.println(" HTTP/1.1"); 
-            client.print(F("Host: "));  
+      client.print(F("Host: "));  
       client.println(String(WiFiConf.sta_iphc2)); 
-    //  client.println(url2);
-      //String url1=F("Authorization: Basic ");
-     // url1+=String(encoded);
-     // client.println(url1);
       client.print(F("Authorization: Basic "));  
       client.println(String(encoded)); 
       client.println(F("Content-Type: application/json"));
@@ -165,16 +153,14 @@ void getHC() {
     return;
   }
   String url = F("/api/settings/info");
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+  client.print("GET " + url + " HTTP/1.1\r\n" +
                "Host: "+String(WiFiConf.sta_iphc2)+"\r\n" + 
                "Connection: close\r\n\r\n");
   timeout = millis();
   while (client.available() == 0) {
     delay(10);
     if (millis() - timeout > 5000) {
-      //Serial.println(">>> Client Timeout !");
-      client.stop();
-      
+      client.stop();    
       SerialHC2=F("HC2 not connected.");
       return;
     }

@@ -52,14 +52,12 @@ void parseStringRAW(String str) {
   do {
     index = str.indexOf(',', start_from);
     code_array[count] = str.substring(start_from, index).toInt();
-
     start_from = index + 1;
     count++;
   } while (index != -1);
   for (int i=0;i<count-1;i++){
-    if (code_array[i]<2622){
-    code_array[i]=code_array[i]* USECPERTICK;
-    
+    if (code_array[i]<1310){
+    code_array[i]=code_array[i]* USECPERTICK;  
     }
     else code_array[i]=65534;
    // Serial.print(code_array[i]);
@@ -127,7 +125,7 @@ void setupWiFiConf(void) {
     //IPAddress ip = WiFi.localIP();
     //String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
     String content = FPSTR(header);content += FPSTR(begin_title);
-        String   content1 = FPSTR(p_html);
+     String   content1 = FPSTR(p_html);
      content += F("Connected Wifi: ");
     content1 += WiFiConf.sta_ssid;
     content1 += F("</br>IP Address: ");
@@ -165,15 +163,12 @@ void setupWiFiConf(void) {
 
     content1 += FPSTR(label_html);
     content1 += F("'subnet' >SUBNET  </label>");
-  //  for (int i=0;i<14;i++){
-  //    content1 += FPSTR(space_html);
-  //  }
     content1 += F("<input  name='subnet' id='subnet' value=");
     content1 +=  String(WiFiConf.sta_subnet);
     content1 += FPSTR(br_html);
     content += FPSTR(wifisetting_html);
     content += FPSTR(title_html);
-          content += F("<h1>Wifi Setup</h1>");
+    content += F("<h1>Wifi Setup</h1>");
           content += content1;
          content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
 
@@ -282,8 +277,8 @@ server.on("/set_hc2_conf", []() {
   });
 
   server.on("/learning", []() {
-    if (hoclenh==0){hoclenh=1;irrecv.enableIRIn();server.send(200, F("text/html"), "{\"enable\":\"1\"} <p><a href=\"/\"><button>BACK</button></a></p>");}
-    else {hoclenh=0;irrecv.disableIRIn();server.send(200, F("text/html"), "{\"enable\":\"0\"} <p><a href=\"/\"><button>BACK</button></a></p>");}
+    if (hoclenh==0){hoclenh=1;irrecv.enableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"1\"} <p><a href=\"/\"><button>BACK</button></a></p>"));}
+    else {hoclenh=0;irrecv.disableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"0\"} <p><a href=\"/\"><button>BACK</button></a></p>"));}
    Serial.println(hoclenh);
    
   });

@@ -11,19 +11,18 @@ void Tach_TCP(String str) {
     strtokIndx = str.substring(0, index);
     str=str.substring(index+1,str.length());
     if (strtokIndx=="sendir" ){
-      parseStringGC(str);
-      Serial.println("sendirrrrr");
+      parseStringGC(str);     
     }
     else{
-      parseStringRAW(str);
-      Serial.println("send raw");
+      parseStringRAW(str);      
     }
+    Serial.println(strtokIndx);
 }
 /* NHáº­n TCP
  *  
  */
 void nhan_TCP(){
-      client = serverTCP.available();
+    client = serverTCP.available();
     if(client) {
       timeout = millis();
        while(!client.available()){
