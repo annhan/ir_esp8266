@@ -523,7 +523,7 @@ server.on(html_setup_SETHC2, []() {
     String new_ip = server.arg(F("ip"));
     String new_gateway = server.arg(F("gateway"));
     String new_subnet = server.arg(F("subnet"));
-    // String content =  "OK";
+    String content =  "OK";
     if (new_ssid.length() > 0) {
       new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
       new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
@@ -532,11 +532,13 @@ server.on(html_setup_SETHC2, []() {
       new_subnet.toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));
       saveWiFiConf();
     } else {
+      content="NOT OK";
      // content += F("<p>Rejected empty SSID. </p>");
      // content += F("<body></html>");
     //  Serial.println("Rejected empty SSID.");
     }
-    server.send(200,F("text/html"), F("OK"));
+    server.send(200,F("text/html"),content);
+    delay(500);
     digitalWrite(status_led, LOW);
     ESP.restart();
   });
