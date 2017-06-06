@@ -6,13 +6,8 @@
 void update_fota(){
     delay(5000);
   HTTPClient http;
-  //1. Register device if it not exist
   String url = "http://fota.vn/api/device/" + String(ApiKey) + "?id=" + WiFi.macAddress();
   http.begin(url);
-//  Serial.println("Register device: " + url);
- // Serial.println("Status code = " + String(http.GET()));
-
-  //1. Check ota service
   char ota_url[128];
   sprintf(ota_url, "%s/api/fota/%s", ApiURL, ApiKey);
  // Serial.println("Checking update, url=" + String(ota_url));

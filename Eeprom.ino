@@ -15,6 +15,7 @@ int waitConnected(void) {
     }
   return(0);
 }
+<<<<<<< HEAD
 /*int waitConnected1(void) {
   int i=0;
   while (true ) {
@@ -30,6 +31,9 @@ int waitConnected(void) {
   }
   return (0);
 }*/
+=======
+
+>>>>>>> ir_dev
 void printIP(void) {
   Serial.println(WiFiConf.module_id);
 }
@@ -42,9 +46,7 @@ void ketnoimang() {
 }
 void printWiFiConf(void) {
   Serial.println(WiFiConf.sta_ssid);
- // Serial.println(WiFiConf.sta_pwd);
-//  Serial.println(WiFiConf.sta_ip);
- // Serial.println(WiFiConf.sta_gateway);
+
 
 }
 bool loadWiFiConf() {

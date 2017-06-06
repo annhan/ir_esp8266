@@ -11,19 +11,18 @@ void Tach_TCP(String str) {
     strtokIndx = str.substring(0, index);
     str=str.substring(index+1,str.length());
     if (strtokIndx=="sendir" ){
-      parseStringGC(str);
-      Serial.println("sendirrrrr");
+      parseStringGC(str);     
     }
     else{
-      parseStringRAW(str);
-      Serial.println("send raw");
+      parseStringRAW(str);      
     }
+    Serial.println(strtokIndx);
 }
 /* NHáº­n TCP
  *  
  */
 void nhan_TCP(){
-      client = serverTCP.available();
+    client = serverTCP.available();
     if(client) {
       timeout = millis();
        while(!client.available()){
@@ -78,7 +77,7 @@ void serialPrintUint64Hex(uint64_t value) {
     Serial.print((uint32_t) (value >> 32), HEX);
   Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
 }
-void dump(decode_results *results) {
+/*void dump(decode_results *results) {
   // Dumps out the decode_results structure.
   // Call this after IRrecv::decode()
   uint16_t count = results->rawlen;
@@ -127,5 +126,5 @@ void dump(decode_results *results) {
    // Serial.print(" ");
   //}
  // Serial.println();
-}
+}*/
 

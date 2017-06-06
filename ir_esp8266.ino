@@ -1,8 +1,11 @@
 #include "DHT.h"
 #include "variable_http.h"
 #include "KhaiBao.h"
+<<<<<<< HEAD
 //#include <ESP8266WiFi.h>
 //#include <ESP8266HTTPClient.h>
+=======
+>>>>>>> ir_dev
 #include <ESP8266httpUpdate.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
@@ -10,8 +13,11 @@
 #include <EEPROM.h>
 #include <IRrecv.h>
 #include <IRsend.h>
+<<<<<<< HEAD
 //#include <WiFiClient.h>
 //#include <WiFiServer.h>
+=======
+>>>>>>> ir_dev
 #include <ir_Daikin.h>
 #include <ir_Mitsubishi.h>
 #include <WiFiUdp.h>
@@ -100,13 +106,21 @@ void setup() {
   Serial.println("A");
   hoclenh = 0;
   WiFi.mode(WIFI_AP_STA);
+<<<<<<< HEAD
 //  Serial.println("B");
+=======
+ // Serial.println("B");
+>>>>>>> ir_dev
  // WiFi.setAutoReconnect ( true );
   //Serial.println("C");
   ketnoimang();
  // Serial.println("D");
   statusmang = waitConnected();
+<<<<<<< HEAD
 //  Serial.println("E");
+=======
+ // Serial.println("E");
+>>>>>>> ir_dev
   if (WiFi.status() == WL_CONNECTED) {
     update_fota();
     Serial.println("Connect");
@@ -142,11 +156,11 @@ void setup() {
   _motion_status = 1;
   MDNS.addService("http", "tcp", 4999);
     if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
+    Serial.println(F("Card failed, or not present"));
     // don't do anything more:
     return;
   }
-  Serial.println("card initialized.");
+  Serial.println(F("card initialized."));
 }
 
 
@@ -154,7 +168,7 @@ int hoc_ir(byte stt) {
   if (stt == 1) {
     if (irrecv.decode(&results, &save)) {
       serialPrintUint64Hex(results.value);
-      dump(&results);
+      //dump(&results);
       dumpInfo(&results);
       dumpCode(&results);
       return 1;
@@ -187,6 +201,7 @@ void loop() {
       }
       nhan_TCP();
       if (demgiay % 10 == 0) {
+        SetVariHC("NHAN",String(demgiay));
         demgiay++ ;
         float H = dht.readHumidity();
         float T = dht.readTemperature();
@@ -247,7 +262,7 @@ void loop() {
 
       if (thoigianthuc - motion_time > 5 ) {
 
-        Serial.println("Status Motion : 1");
+        Serial.println(F("Status Motion : 1"));
 
         _motion_status = 1;
         motion_time = thoigianthuc;
@@ -267,9 +282,11 @@ void loop() {
     }
   }
   else if (_motion_status == 1) {
-    Serial.println("Status Motion : 0");
+    Serial.println(F("Status Motion : 0"));
     _motion_status = 0;
   }
-
+  
+//String PostData = "{\r\n\"name\": \"\",\r\n\"value\":\"\",\r\n\"invokeScenes\":True\r\n}";
+//Serial.println(PostData.length());
 }
 
