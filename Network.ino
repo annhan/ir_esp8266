@@ -403,7 +403,7 @@ server.on(html_setup_SETHC2, []() {
   /*
    * Send Daikin
    */
-  server.on(html_setup_senddaikin, []() {
+  server.on(html_setup_senddaikin, HTTP_GET, []() {
     /*#define DAIKIN_COOL                0b011
 #define DAIKIN_HEAT                0b100
 #define DAIKIN_FAN                 0b110
@@ -446,7 +446,7 @@ server.on(html_setup_SETHC2, []() {
   /*
    * Send MISUBISI
    */
-  server.on(html_setup_sendmisu, []() {
+  server.on(html_setup_sendmisu, HTTP_GET,  []() {
     /*#define DAIKIN_COOL                0b011
 #define MITSUBISHI_AC_AUTO        0x20U
 #define MITSUBISHI_AC_COOL        0x18U
@@ -516,14 +516,14 @@ server.on(html_setup_SETHC2, []() {
    // ESP.restart();
   });
   //////////////
-  server.on(html_setup_setwifi, []() {
+  server.on(html_setup_setwifi, HTTP_GET, []() {
     
     String new_ssid = server.arg(F("ssid"));
     String new_pwd = server.arg(F("pwd"));
     String new_ip = server.arg(F("ip"));
     String new_gateway = server.arg(F("gateway"));
     String new_subnet = server.arg(F("subnet"));
-    // String content =  "OK";
+    String content =  "OK";
     if (new_ssid.length() > 0) {
       new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
       new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
@@ -531,12 +531,15 @@ server.on(html_setup_SETHC2, []() {
       new_gateway.toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));
       new_subnet.toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));
       saveWiFiConf();
+      
     } else {
      // content += F("<p>Rejected empty SSID. </p>");
      // content += F("<body></html>");
     //  Serial.println("Rejected empty SSID.");
+    content="NOT OK";
     }
-    server.send(200,F("text/html"), F("OK"));
+    server.send(200, F("text/html"), content);
+    delay(500);
     digitalWrite(status_led, LOW);
     ESP.restart();
   });
@@ -638,40 +641,10 @@ server.on(html_setup_SETHC2, []() {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-<<<<<<< HEAD
-  /* server.on("/set_language", []() {
-    String new_language = server.arg("language");
-    String content = FPSTR(header);content += FPSTR(begin_title);
-       content += F("mHome - Language");
-    content += FPSTR(title_html);
-    content += F("</head><body>");
-    content += F("<h1>Save</h1>");
-    content += FPSTR(p_html);
-    content += F("OK '");
-    if (new_language =="Vietnamese") {String lan="1";lan.toCharArray(WiFiConf.sta_language, sizeof(WiFiConf.sta_language));content += "VN";}
-    else
-      {String lan="0";lan.toCharArray(WiFiConf.sta_language, sizeof(WiFiConf.sta_language));content += "EN";}
-      
-      saveWiFiConf();
-      content += F("' ... Device Reboot !");
-      content += FPSTR(_p_html);
-      content += F("<body></html>");
-    server.send(200, F("text/html"), content);
-    digitalWrite(status_led, HIGH );
-    ESP.restart();
-  });*/
-  server.on("/set_module_id", []() {
-    String new_id = server.arg("module_id");
-    String content = FPSTR(header);content += FPSTR(begin_title);
-   // content += F("<title>");
-    //content += F("mHome ");
-    //content += FPSTR(title_html);
-=======
   server.on(html_setup_SETmodule, []() {
     String new_id = server.arg(F("module_id"));
     String content = "";//FPSTR(header);content += FPSTR(begin_title);
 
->>>>>>> ir_dev
     if (new_id.length() > 0) {
       new_id.toCharArray(WiFiConf.module_id, sizeof(WiFiConf.module_id));
     } else {

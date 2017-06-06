@@ -1,11 +1,6 @@
 #include "DHT.h"
 #include "variable_http.h"
 #include "KhaiBao.h"
-<<<<<<< HEAD
-//#include <ESP8266WiFi.h>
-//#include <ESP8266HTTPClient.h>
-=======
->>>>>>> ir_dev
 #include <ESP8266httpUpdate.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
@@ -13,11 +8,6 @@
 #include <EEPROM.h>
 #include <IRrecv.h>
 #include <IRsend.h>
-<<<<<<< HEAD
-//#include <WiFiClient.h>
-//#include <WiFiServer.h>
-=======
->>>>>>> ir_dev
 #include <ir_Daikin.h>
 #include <ir_Mitsubishi.h>
 #include <WiFiUdp.h>
@@ -106,21 +96,13 @@ void setup() {
   Serial.println("A");
   hoclenh = 0;
   WiFi.mode(WIFI_AP_STA);
-<<<<<<< HEAD
-//  Serial.println("B");
-=======
  // Serial.println("B");
->>>>>>> ir_dev
  // WiFi.setAutoReconnect ( true );
   //Serial.println("C");
   ketnoimang();
  // Serial.println("D");
   statusmang = waitConnected();
-<<<<<<< HEAD
-//  Serial.println("E");
-=======
  // Serial.println("E");
->>>>>>> ir_dev
   if (WiFi.status() == WL_CONNECTED) {
     update_fota();
     Serial.println("Connect");
