@@ -115,7 +115,7 @@ void a4_to_a3(unsigned char * a3, unsigned char * a4) {
 }
 /////////////////////////////////////////////////////////////////////////
 void SetVariHC(String vari,String giatri) {
-  String PostData = "{\r\n\"name\": \"\",\r\n\"value\":\"\",\r\n\"invokeScenes\":True\r\n}";
+ // String PostData = "{\r\n\"name\": \"\",\r\n\"value\":\"\",\r\n\"invokeScenes\":True\r\n}";
   int vitricat=0;
       for (byte tam=0;tam<sizeof(WiFiConf.sta_passhc);tam++){
             if (WiFiConf.sta_passhc[tam]=='#'){
@@ -127,18 +127,25 @@ void SetVariHC(String vari,String giatri) {
       char encoded[encodedLen];
       base64_encode(encoded, WiFiConf.sta_passhc, vitricat);
      // Serial.println(encoded);
-      String url=String("PUT /api/globalVariables/")+vari;
-      url+= F(" HTTP/1.1");
-      String url2="Host: "+String(WiFiConf.sta_iphc2);
-      int chieudai=PostData.length()+vari.length()+giatri.length();
-      WiFiClient client;
+     // String url=String("PUT /api/globalVariables/")+vari;
+     // url+= F(" HTTP/1.1");
+     // String url2="Host: "+String(WiFiConf.sta_iphc2);
+     // int chieudai=PostData.length()+vari.length()+giatri.length();
+     int chieudai = 51 + vari.length()+giatri.length();
+     // WiFiClient client;
  if (client.connect(WiFiConf.sta_iphc2,80)) {
-      client.println(url);
-      //Serial.println("OK URL");     
-      client.println(url2);
-      String url1=F("Authorization: Basic ");
-      url1+=String(encoded);
-      client.println(url1);
+      //client.println(url);    
+      client.print(F("PUT /api/globalVariables/"));  
+      client.print(vari); 
+      client.println(" HTTP/1.1"); 
+            client.print(F("Host: "));  
+      client.println(String(WiFiConf.sta_iphc2)); 
+    //  client.println(url2);
+      //String url1=F("Authorization: Basic ");
+     // url1+=String(encoded);
+     // client.println(url1);
+      client.print(F("Authorization: Basic "));  
+      client.println(String(encoded)); 
       client.println(F("Content-Type: application/json"));
       client.print(F("Content-Length: "));
       client.println(chieudai);

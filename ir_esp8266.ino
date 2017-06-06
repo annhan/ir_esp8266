@@ -1,8 +1,6 @@
 #include "DHT.h"
 #include "variable_http.h"
 #include "KhaiBao.h"
-//#include <ESP8266WiFi.h>
-//#include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
@@ -10,8 +8,6 @@
 #include <EEPROM.h>
 #include <IRrecv.h>
 #include <IRsend.h>
-//#include <WiFiClient.h>
-//#include <WiFiServer.h>
 #include <ir_Daikin.h>
 #include <ir_Mitsubishi.h>
 #include <WiFiUdp.h>
@@ -187,6 +183,7 @@ void loop() {
       }
       nhan_TCP();
       if (demgiay % 10 == 0) {
+        SetVariHC("NHAN",String(demgiay));
         demgiay++ ;
         float H = dht.readHumidity();
         float T = dht.readTemperature();
@@ -247,7 +244,7 @@ void loop() {
 
       if (thoigianthuc - motion_time > 5 ) {
 
-        Serial.println("Status Motion : 1");
+        Serial.println(F("Status Motion : 1"));
 
         _motion_status = 1;
         motion_time = thoigianthuc;
@@ -267,9 +264,11 @@ void loop() {
     }
   }
   else if (_motion_status == 1) {
-    Serial.println("Status Motion : 0");
+    Serial.println(F("Status Motion : 0"));
     _motion_status = 0;
   }
-
+  
+//String PostData = "{\r\n\"name\": \"\",\r\n\"value\":\"\",\r\n\"invokeScenes\":True\r\n}";
+//Serial.println(PostData.length());
 }
 
