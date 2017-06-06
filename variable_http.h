@@ -17,3 +17,24 @@ const char information[] PROGMEM = "<li>Copyright © by Kim Son Tien Co.Ltd - mH
 const char header[] PROGMEM = "<!DOCTYPE HTML>\r\n<html><head><style>body {background-color:lightgrey; font-size: 24px;} .voffset {margin-top: 30px;} h1 {color:blue}p {color:black} label {width:200px;display: inline-block;} </style><link rel=\"shortcut icon\" href=\"data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAADLy8sAHYsbACCNGADK28UADIEHAHOubwAShQoA//7/AObz6ADn8+gA6fPoAOzz6ADGxsYAXa5eAL7gugAghxAAtbyyABFmCAD09vEAN5ctADuPMAA4ly0AxuG9AKvXqQA2lzYAJ4cZADuXNgAikCIAKIwoAHS1cwDs++YAAHgAAKrKpwAAewAAj8WQACCHEQDa6tgAtbyzAMTcwQA4jzEAOpEuAFCkSwAYZgkAa7JiAIK9ggBAmDoAQJY9AA6FDADQ5NAApMalAC2PKQCozagA9PXwAPT48AAvbScAF2YKAGywZgBtsGYA4+3iAMviywA/mDsARpgyAM/jzgBkkGEA0eXLAC6KJAA2dDMAotCgAEWbRAA5iiQAv9+6AKmr3AAQZQgA8vXxAPn48QA+mDMAsdayAJ7DngChxKEANnQ0ACiRKABlkGIAq7iqAAB3AAAAegAAjsSQAHm5eQDKycoAw9vBAGGxYgB/mqMAhJesAPr6+AC21qoA/v/+AJqamgBygMIASpxAAMjIyADv8PYAYLBgANrr1gCUx5EAZ61gAGitYADQy9EAKGpOACOPJAD7+/wAJI8kAPv9+QDo8OUA/v//AI24iQD///8AWaxVAC+MJABerFUAXaleAF6pXgB5tHUA2uvXAPX16wDPys8AxOLGANHL0gAnhB8Agr1+AJqh1AAOfAgAzOHMAIe+gQCLvoEA6O7pAHK0bQCrt6oAMI4iAC6QKAAtlCsAS5s/AF+rXAB4t3YAwdrBAMrIygDv+e8A3O3eAM/K0ADf4uoAdJdxAHWXcQAniBoAbqtuAP3+9QAMhgwAoc6fAHO0bgAvjiMAFYYMAI28jgBGn0MAyMfIAGOrXQB4uHoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAyPe4c/NhEqT5QlaaAAX3JyXiITc5oWDmYpS11ycgByXIw8ZXJycnJycnxFg3JiclZESXJycnJycnJyOkEXfSScCXIvG1BtbW1rnYVAPRB4m3JyGgRxMU1OnoFycimVLlhycllTjXJycpAccnJmQpYLcnJkHx8zcnIeAnJyRjcPenJyDVNUBnJjgGBHchZIFDAHIAEoHWxyk1tqWnJDNjmDcm+KdCxycm4FK5hydVE7MhJyl34hGAeff3JyeRVScndoB3JyjpkfTHJyNC1VknIKYWcScnKRA3JyCIuhcFdycgl2iYQ+SjUmhoiiXHIMcnJycoI4JyMZLngkcnJyDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"/><meta charset='UTF-8' http-equiv=\"refresh\" content=\"60\" />";
 const char begin_title[] PROGMEM ="<title>";
 
+const char status_html_ok[] PROGMEM ="OK";
+
+const char html_setup_wifi[] PROGMEM ="/wifi_conf";
+const char html_setup_hc2[] PROGMEM ="/hc2_conf";
+const char html_setup_switch[] PROGMEM ="/learning";
+const char html_setup_leaningir[] PROGMEM ="/IR";
+const char html_setup_reboot[] PROGMEM ="/Reboot";
+const char html_setup_reset[] PROGMEM ="/Reset1";
+const char html_setup_SETreset1[] PROGMEM ="/set_Reset1";
+const char html_setup_SETreset[] PROGMEM ="/set_Reset";
+const char html_setup_GETinfor[] PROGMEM ="/get_infor";
+const char html_setup_module[] PROGMEM ="/module_id";
+const char html_setup_SETmodule[] PROGMEM ="/set_module_id";
+const char html_setup_setwifi[] PROGMEM ="/set_wifi_conf";
+const char html_setup_sendmisu[] PROGMEM ="/sendmisubi";
+const char html_setup_senddaikin[] PROGMEM ="/senddaikin";
+const char html_setup_getcode[] PROGMEM ="/getcode";
+const char html_setup_getstatus[] PROGMEM ="/getstatus";
+const char html_setup_codeGC[] PROGMEM ="/codeGC";
+const char html_setup_codeIR[] PROGMEM ="/codeIR";
+const char html_setup_SETHC2[] PROGMEM ="/set_hc2_conf";

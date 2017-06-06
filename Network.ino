@@ -121,7 +121,7 @@ void parseStringGC(String str) {
 
 void setupWiFiConf(void) {
   
-  server.on("/wifi_conf", []() {
+  server.on(html_setup_wifi, []() {
     //IPAddress ip = WiFi.localIP();
     //String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
     String content = FPSTR(header);content += FPSTR(begin_title);
@@ -177,7 +177,7 @@ void setupWiFiConf(void) {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-server.on("/hc2_conf", []() {
+server.on(html_setup_hc2, []() {
    // IPAddress ip = WiFi.localIP();
     String content = FPSTR(header);content += FPSTR(begin_title);
          String    content1 = ipStr;
@@ -244,7 +244,7 @@ server.on("/getHC", []() {
     getHC();
     server.send(200, F("text/html"), content);
   });
-server.on("/set_hc2_conf", []() {
+server.on(html_setup_SETHC2, []() {
     String new_IPHC = server.arg(F("iphc2"));
     String new_pwdhc = server.arg(F("pwdhc2"));
     String new_global1 = server.arg(F("global1"));
@@ -276,13 +276,13 @@ server.on("/set_hc2_conf", []() {
     server.send(200, F("text/html"), content);
   });
 
-  server.on("/learning", []() {
+  server.on(html_setup_switch, []() {
     if (hoclenh==0){hoclenh=1;irrecv.enableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"1\"} <p><a href=\"/\"><button>BACK</button></a></p>"));}
     else {hoclenh=0;irrecv.disableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"0\"} <p><a href=\"/\"><button>BACK</button></a></p>"));}
    Serial.println(hoclenh);
    
   });
-  server.on("/IR", []() {
+  server.on(html_setup_leaningir, []() {
 
     String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
     content = FPSTR(header);content += FPSTR(begin_title);    
@@ -338,7 +338,7 @@ server.on("/set_hc2_conf", []() {
   /*
    * POST DATA IR
    */
-  server.on("/codeIR", HTTP_POST, []() {
+  server.on(html_setup_codeIR, HTTP_POST, []() {
     if (hoclenh == 1) { irrecv.disableIRIn(); }
     String data1=server.arg("raw");
     String ts1=server.arg("ts");
@@ -358,7 +358,7 @@ server.on("/set_hc2_conf", []() {
     server.send(200, F("text/html"), content);
     if (hoclenh == 1) {irrecv.enableIRIn();}
   });
-  server.on("/codeGC", []() {
+  server.on(html_setup_codeGC, []() {
           if (hoclenh == 1) {
                       irrecv.disableIRIn();
                     //  delay(500);    
@@ -375,14 +375,14 @@ server.on("/set_hc2_conf", []() {
                             irrecv.enableIRIn();  // Start the receiver
                           }
   });
-   server.on("/getstatus", []() { 
+   server.on(html_setup_getstatus, []() { 
     server.send(200,F("text/html"), "OK");
   });
 
   /*
    * Get code IR 
    */
-   server.on("/getcode", []() {
+   server.on(html_setup_getcode, []() {
     String hienthi;
     for (int k = 0; k < chieudai; k++) {
       hienthi += String(irSignal[k]);
@@ -403,7 +403,7 @@ server.on("/set_hc2_conf", []() {
   /*
    * Send Daikin
    */
-  server.on("/senddaikin", []() {
+  server.on(html_setup_senddaikin, []() {
     /*#define DAIKIN_COOL                0b011
 #define DAIKIN_HEAT                0b100
 #define DAIKIN_FAN                 0b110
@@ -412,10 +412,10 @@ server.on("/set_hc2_conf", []() {
 #define DAIKIN_POWERFUL       0b00000010
 #define DAIKIN_SILENT         0b00100000
 */
-    String status = server.arg("status");
-    String temp= server.arg("temp");
-    String fan= server.arg("fan");
-    String mode1= server.arg("mode");
+    String status = server.arg(F("status"));
+    String temp= server.arg(F("temp"));
+    String fan= server.arg(F("fan"));
+    String mode1= server.arg(F("mode"));
     if (mode1=="Cool") dakinir.setMode(DAIKIN_COOL);
     else if (mode1=="fan") dakinir.setMode(DAIKIN_FAN);
     else if (mode1=="auto") dakinir.setMode(DAIKIN_AUTO);
@@ -446,7 +446,7 @@ server.on("/set_hc2_conf", []() {
   /*
    * Send MISUBISI
    */
-  server.on("/sendmisubi", []() {
+  server.on(html_setup_sendmisu, []() {
     /*#define DAIKIN_COOL                0b011
 #define MITSUBISHI_AC_AUTO        0x20U
 #define MITSUBISHI_AC_COOL        0x18U
@@ -461,10 +461,10 @@ server.on("/set_hc2_conf", []() {
 #define MITSUBISHI_AC_VANE_AUTO      0U
 #define MITSUBISHI_AC_VANE_AUTO_MOVE 7U
 */
-    String status = server.arg("status");
-    String temp= server.arg("temp");
-    String fan= server.arg("fan");
-    String mode1= server.arg("mode");
+    String status = server.arg(F("status"));
+    String temp= server.arg(F("temp"));
+    String fan= server.arg(F("fan"));
+    String mode1= server.arg(F("mode"));
    /* switch (mode1)
     {
     case "Cool":
@@ -516,7 +516,7 @@ server.on("/set_hc2_conf", []() {
    // ESP.restart();
   });
   //////////////
-  server.on("/set_wifi_conf", []() {
+  server.on(html_setup_setwifi, []() {
     
     String new_ssid = server.arg(F("ssid"));
     String new_pwd = server.arg(F("pwd"));
@@ -540,7 +540,7 @@ server.on("/set_hc2_conf", []() {
     digitalWrite(status_led, LOW);
     ESP.restart();
   });
-  server.on("/Reboot", HTTP_GET, []() {
+  server.on(html_setup_reboot, HTTP_GET, []() {
     String content = FPSTR(header);content += FPSTR(begin_title);
      content += F("mHome - Reset");
     content += FPSTR(title_html);
@@ -556,7 +556,7 @@ server.on("/set_hc2_conf", []() {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-  server.on("/Reset1", HTTP_GET, []() {
+ server.on(html_setup_reset, HTTP_GET, []() {
     String content = FPSTR(header);content += FPSTR(begin_title);
     content += F("mHome - Reset");
     content += FPSTR(title_html);
@@ -572,7 +572,7 @@ server.on("/set_hc2_conf", []() {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-  server.on("/set_Reset1", HTTP_GET, []() {
+  server.on(html_setup_SETreset1, HTTP_GET, []() {
         String new_IPHC = F("192.168.1.10");
     String new_pwdhc =  F("admin:admin#");
     String new_global1 = F("temp1");
@@ -600,12 +600,12 @@ server.on("/set_hc2_conf", []() {
       digitalWrite(status_led, LOW);
        ESP.restart();
   });
-  server.on("/set_Reset", HTTP_GET, []() {
+  server.on(html_setup_SETreset, HTTP_GET, []() {
     digitalWrite(status_led, LOW);
         ESP.restart();
   });
- server.on("/get_infor", HTTP_GET, []() {
-     String content = "{\"T:\"" + String(nhietdo);
+ server.on(html_setup_GETinfor, HTTP_GET, []() {
+     String content = F("{\"T:\""); content += String(nhietdo);
      content +=  F(",\"H\":");content += String(doam);
      content +=  F(",\"PIR\":\"");content += String(time_);
      content +=  F("\",\"PIR2\":\"");content += String(motion_time);
@@ -613,7 +613,7 @@ server.on("/set_hc2_conf", []() {
 
     server.send(200, F("text/html"), content);
   });
-  server.on("/module_id", []() {
+  server.on(html_setup_module, []() {
     char defaultId[sizeof(WiFiConf.module_id)];
     setDefaultModuleId(defaultId);
     String content = FPSTR(header);content += FPSTR(begin_title);
@@ -638,30 +638,9 @@ server.on("/set_hc2_conf", []() {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-  /* server.on("/set_language", []() {
-    String new_language = server.arg("language");
-    String content = FPSTR(header);content += FPSTR(begin_title);
-       content += F("mHome - Language");
-    content += FPSTR(title_html);
-    content += F("</head><body>");
-    content += F("<h1>Save</h1>");
-    content += FPSTR(p_html);
-    content += F("OK '");
-    if (new_language =="Vietnamese") {String lan="1";lan.toCharArray(WiFiConf.sta_language, sizeof(WiFiConf.sta_language));content += "VN";}
-    else
-      {String lan="0";lan.toCharArray(WiFiConf.sta_language, sizeof(WiFiConf.sta_language));content += "EN";}
-      
-      saveWiFiConf();
-      content += F("' ... Device Reboot !");
-      content += FPSTR(_p_html);
-      content += F("<body></html>");
-    server.send(200, F("text/html"), content);
-    digitalWrite(status_led, HIGH );
-    ESP.restart();
-  });*/
-  server.on("/set_module_id", []() {
-    String new_id = server.arg("module_id");
-    String content = FPSTR(header);content += FPSTR(begin_title);
+  server.on(html_setup_SETmodule, []() {
+    String new_id = server.arg(F("module_id"));
+    String content = "";//FPSTR(header);content += FPSTR(begin_title);
 
     if (new_id.length() > 0) {
       new_id.toCharArray(WiFiConf.module_id, sizeof(WiFiConf.module_id));
@@ -669,11 +648,11 @@ server.on("/set_hc2_conf", []() {
       resetModuleId();
     }
     saveWiFiConf();
-    content += FPSTR(p_html);
+   // content += FPSTR(p_html);
     content += WiFiConf.module_id;
-    content += F("' ... Device Rebooting.");
-    content += FPSTR(_p_html);
-    content += FPSTR(end_html);
+   // content += F("' ... Device Rebooting.");
+   // content += FPSTR(_p_html);
+   // content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
     digitalWrite(status_led, LOW);
     ESP.restart();
