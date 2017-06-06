@@ -663,11 +663,11 @@ server.on(html_setup_SETHC2, []() {
     content += F("'set_module_id'>");
             
     content += F("<div class=\"row\">");
-    content +=F("<label for='module_id' class=\"req\" >Tên Wifi: </label><input name='module_id' class=\"txt\" id='module_id' maxlength=32 value='");
+    content +=F("<label for='module_id' class=\"req\" >Tên Wifi: </label><input name='module_id' class=\"txt\" id='module_id' maxlength=32 value=");
     content += WiFiConf.module_id;
     content +=F("></div>");
     content += F("<div class=\"row\">");
-    content += F("'<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Tiếp Tục ?\");'>'</div></form>");
+    content += F("<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Tiếp Tục ?\");'></div></form>");
     content += F(" Nếu để trống tên wifi sẽ là : '");
     content += defaultId;
     content += F("'");
