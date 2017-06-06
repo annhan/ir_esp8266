@@ -120,13 +120,14 @@ void parseStringGC(String str) {
 }
 
 void setupWiFiConf(void) {
-  
+   
   server.on(html_setup_wifi, []() {
     //IPAddress ip = WiFi.localIP();
     //String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    String content = FPSTR(header);content += FPSTR(begin_title);
+         String content = FPSTR(header);content += FPSTR(begin_title);
      String   content1 = FPSTR(p_html);
      content += F("Connected Wifi: ");
+      content1 = FPSTR(p_html);
     content1 += WiFiConf.sta_ssid;
     content1 += F("</br>IP Address: ");
     content1 += ipStr;
@@ -138,39 +139,54 @@ void setupWiFiConf(void) {
      content1 += FPSTR(_p_html);
      content1 += FPSTR(get_html);
      content1 +=F("'set_wifi_conf'>");
-    content1 += FPSTR(label_html);
-    content1 += F("'ssid'>SSID  </label>");
-    content1 += F("<input name='ssid'id='ssid' maxlength=32 value=") ;
+     content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'ssid' class=\"req\">SSID : </label>");
+    content1 += F("<input name='ssid'class=\"txt\" id='ssid' maxlength=32 value=") ;
     content1 += String(WiFiConf.sta_ssid) ;
-    content1 +=  FPSTR(br_html);
+   // content1 +=  FPSTR(br_html);
+    content1 +=F("></div>");
 
-    content1 += FPSTR(label_html);
-    content1 += F("'pwd'>PASS  </label>");
-    content1 += F("<input type='password' name='pwd' id='pwd' value=");
-    content1 += String(WiFiConf.sta_pwd);
-    content1 += FPSTR(br_html);
-    content1 += FPSTR(label_html);
-    content1 += F("'ip'>IP  </label>");
-    content1 += F("<input name='ip' id='ip'value=");
-    content1 += String(WiFiConf.sta_ip) ;
-    content1 +=  FPSTR(br_html);
     
-    content1 += FPSTR(label_html);
-    content1 += F("'gateway' >GATEWAY  </label>");
-    content1 += F("<input  name='gateway' id='gateway' value=") ;
-    content1 += String(WiFiConf.sta_gateway) ;
-    content1 += FPSTR(br_html);
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'pwd' class=\"req\">Password :  </label>");
+    content1 += F("<input type='password' class=\"txt\" name='pwd' id='pwd' value=");
+    content1 += String(WiFiConf.sta_pwd);
 
-    content1 += FPSTR(label_html);
-    content1 += F("'subnet' >SUBNET  </label>");
-    content1 += F("<input  name='subnet' id='subnet' value=");
+    
+        content1 +=F("></div>");
+        
+    content1 += F("<div class=\"row\">");
+    //content1 += FPSTR(br_html);
+    content1 += FPSTR(label1_html);
+    content1 += F("'ip' class=\"req\">Ip : </label>");
+    content1 += F("<input name='ip' class=\"txt\" id='ip' value=");
+    content1 += String(WiFiConf.sta_ip) ;
+  //  content1 +=  FPSTR(br_html);
+        content1 +=F("></div>");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'gateway' class=\"req\" >Gateway :  </label>");
+    content1 += F("<input  name='gateway' class=\"txt\" id='gateway' value=") ;
+    content1 += String(WiFiConf.sta_gateway) ;
+    //content1 += FPSTR(br_html);
+    content1 +=F("></div>");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'subnet' class=\"req\">Subnet :</label>");
+    content1 += F("<input  name='subnet' class=\"txt\" id='subnet' value=");
     content1 +=  String(WiFiConf.sta_subnet);
-    content1 += FPSTR(br_html);
+   // content1 += FPSTR(br_html);
+       content1 +=F("></div>");
+   
     content += FPSTR(wifisetting_html);
     content += FPSTR(title_html);
     content += F("<h1>Wifi Setup</h1>");
-          content += content1;
-         content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
+    
+content += content1;
+       
+         content += F("<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
 
     content += FPSTR(_p_html);
     content += network_html;
@@ -179,45 +195,47 @@ void setupWiFiConf(void) {
   });
 server.on(html_setup_hc2, []() {
    // IPAddress ip = WiFi.localIP();
-    String content = FPSTR(header);content += FPSTR(begin_title);
+       String content = FPSTR(header);content += FPSTR(begin_title);
          String    content1 = ipStr;
+     content1 = ipStr;
     content1 += F(" ( ");
     content1 += WiFiConf.module_id;
     content1 += F(".local )");
-    //content1 += FPSTR(_p_html);
     content1 += FPSTR(p_html);
-    ///content1 += FPSTR(_p_html);
     content1 += FPSTR(get_html);
     content1 += F("'set_hc2_conf'>");
-    
-    content1 += FPSTR(label_html);
-    content1 += F("'iphc2'>IP HC2:");
-
-    content1 += F("</label><input name='iphc2'id='iphc2' maxlength=32 value=");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'iphc2' class=\"req\">IP HC2:");
+    content1 += F("</label><input name='iphc2' class=\"txt\" id='iphc2' maxlength=32 value=");
     content1 += String(WiFiConf.sta_iphc2);
-    content1 += FPSTR(br_html);
-
-    content1 +=FPSTR(label_html);
-    content1 += F("'pwdhc2'>PASS HC2: </label> <input type='password' name='pwdhc2' id='pwdhc2' value=");
+        content1 +=F("></div>");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'pwdhc2' class=\"req\">PASS HC2: </label> <input type='password' class=\"txt\" name='pwdhc2' id='pwdhc2' value=");
     content1 += String(WiFiConf.sta_passhc) ;
-    content1 += FPSTR(br_html);
+        content1 +=F("></div>");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'global1' class=\"req\">Global 1:");
 
-    content1 += FPSTR(label_html);
-    content1 += F("'global1'>Global 1:");
-
-    content1 += F("</label> <input name='global1' id='global1'value=");
+    content1 += F("</label> <input name='global1' class=\"txt\" id='global1'value=");
     content1 += String(WiFiConf.sta_global1);
-    content1 += FPSTR(br_html);
-
-    content1 += FPSTR(label_html);
-    content1 += F("'global2'>Global 2:&nbsp;&nbsp;&nbsp;&nbsp;</label> <input  name='global2' id='global2' value=");
+        content1 +=F("></div>");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'global2' class=\"req\">Global 2:</label> <input  name='global2' class=\"txt\" id='global2' value=");
     content1 +=  String(WiFiConf.sta_global2);
-    content1 += FPSTR(br_html);
-    
-    content1 += FPSTR(label_html);
-    content1 += F("'global3'>Global 3:&nbsp;&nbsp;&nbsp;&nbsp;</label> <input  name='global3' id='global3' value=");   
+        content1 +=F("></div>");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'global3' class=\"req\">Global 3:</label> <input  name='global3'  class=\"txt\" id='global3' value=");   
     content1 += String(WiFiConf.sta_global3) ;    
-    content1 += FPSTR(br_html);  
+            content1 +=F("></div>");
+
+
+
+    
     content += FPSTR(wifisetting_html);
     content += FPSTR(title_html);
     content += F("<h1>HC2 Setting</h1>");
@@ -225,12 +243,12 @@ server.on(html_setup_hc2, []() {
     content += F("Wifi conecting : ");
     content += WiFiConf.sta_ssid;
     content += F("</br>IP address: ");  
-    content += content1;
-    content += F("<input type='submit' value='OK' onclick='return confirm(\"Change Setting ?\");'></form>");
+   content += content1;
+    content += F("<input type='submit'  id=\"submitbtn\"  value='OK' onclick='return confirm(\"Change Setting ?\");'></form>");
     content += FPSTR(_p_html);
     content += FPSTR(get_html);
     content += F("'getHC'>");
-    content += F("<input type='submit' value='Check'></form>");
+    content += F("<input type='submit' id=\"submitbtn\" value='Check'></form>"); // class=\"button\"
     content += FPSTR(_p_html);
     content += F("<li>Information HC2");
     content += F("<li>Format User:password#  Ex: admin:admin123#");
@@ -277,8 +295,8 @@ server.on(html_setup_SETHC2, []() {
   });
 
   server.on(html_setup_switch, []() {
-    if (hoclenh==0){hoclenh=1;irrecv.enableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"1\"} <p><a href=\"/\"><button>BACK</button></a></p>"));}
-    else {hoclenh=0;irrecv.disableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"0\"} <p><a href=\"/\"><button>BACK</button></a></p>"));}
+    if (hoclenh==0){hoclenh=1;irrecv.enableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"1\"} <p><a href=\"/\"><button >BACK</button></a></p>"));}
+    else {hoclenh=0;irrecv.disableIRIn();server.send(200, F("text/html"), F("{\"enable\":\"0\"} <p><a href=\"/\"><button >BACK</button></a></p>"));}
    Serial.println(hoclenh);
    
   });
@@ -305,32 +323,27 @@ server.on(html_setup_SETHC2, []() {
     else{
       //content += FPSTR(_p_html);
       content += F("<form method='post' action='codeIR'>");
-    
-            content += FPSTR(label_html);
-            content += F("'raw'>IR CODE");
-    
-    content += F(": </label><input name='raw'id='raw'style=\"width:70%;\" value=");
-              //  for (int k = 1; k <= chieudai; k++) {
-              //  content +=String(results.rawbuf[k]);
-              //  if (k <= chieudai - 1) {
-              //      content += ",";
-             //   }
-              //   }
-                     for (int k = 1; k < results.rawlen; k++) {
-        content +=String(results.rawbuf[k]);
-        if (k < results.rawlen - 1) {
-            content += ",";
-       }
-    }
-            //content +=hienthi; //maxlength=32
-            content += FPSTR(br_html); //maxlength=32
-            content += FPSTR(label_html);
-            content += F("'ts'>Frequency");
-
-    content += F(": </label> <input name='ts' id='ts'  value=38000");
-            content += FPSTR(br_html);
             
-            content += F("<input type='submit' value='Check new  Code' onclick='return confirm(\"Are you ready?\");'></form>");
+    content += F("<div class=\"row\">");
+    content += FPSTR(label1_html);
+            content += F("'raw' class=\"req\">IR CODE");
+    
+    content += F(": </label><input name='raw' class=\"txt\" id='raw'style=\"width:70%;\" value=");
+             for (int k = 1; k < results.rawlen; k++) {
+                 content +=String(results.rawbuf[k]);
+                if (k < results.rawlen - 1) content += ",";
+            }
+            //content +=hienthi; //maxlength=32
+        content +=F("></div>");
+    content += F("<div class=\"row\">");
+    content += FPSTR(label1_html);
+            content += F("'ts' class=\"req\">Frequency");
+
+    content += F(": </label> <input name='ts'class=\"txt\" id='ts'  value=38000");
+                    content +=F("></div>");
+
+            
+            content += F("<input type='submit' id=\"submitbtn\" value='Check' onclick='return confirm(\"Are you ready?\");'></form>");
             content += FPSTR(_p_html);
             //content += FPSTR(_p_html);
             content += F("Attention :");
@@ -387,7 +400,7 @@ server.on(html_setup_SETHC2, []() {
                           }
   });
    server.on(html_setup_getstatus, []() { 
-    server.send(200,F("text/html"), "OK");
+    server.send(200,F("text/html"), status_html_ok);
   });
 
   /*
@@ -444,7 +457,7 @@ server.on(html_setup_SETHC2, []() {
     else if (mode1=="heat") dakinir.setMode(DAIKIN_HEAT);
     else if (mode1=="silent") dakinir.setMode(DAIKIN_SILENT);
     if (status =="OFF"){
-      Serial.println("OFF Daikin");
+      Serial.println(F("OFF Daikin"));
     dakinir.off();
   dakinir.setFan(temp.toInt());
   dakinir.setTemp(25);
@@ -460,7 +473,7 @@ server.on(html_setup_SETHC2, []() {
     }
   // Now send the IR signal.
   dakinir.send();
-    server.send(200,F("text/html"), "OK");
+    server.send(200,F("text/html"), status_html_ok);
    // ESP.restart();
   });
   /*
@@ -518,7 +531,7 @@ server.on(html_setup_SETHC2, []() {
     else if (mode1=="heat") mitsubir.setMode(MITSUBISHI_AC_HEAT);
     else if (mode1=="silent") mitsubir.setMode(DAIKIN_SILENT);
     if (status =="OFF"){
-       Serial.println("OFF Misu");
+       Serial.println(F("OFF Misu"));
     mitsubir.off();
   mitsubir.setFan(temp.toInt());
   mitsubir.setTemp(25);
@@ -532,7 +545,7 @@ server.on(html_setup_SETHC2, []() {
     }
   // Now send the IR signal.
   mitsubir.send();
-    server.send(200,F("text/html"), "OK");
+    server.send(200,F("text/html"), status_html_ok);
    // ESP.restart();
   });
   //////////////
@@ -543,7 +556,7 @@ server.on(html_setup_SETHC2, []() {
     String new_ip = server.arg(F("ip"));
     String new_gateway = server.arg(F("gateway"));
     String new_subnet = server.arg(F("subnet"));
-    String content =  "OK";
+    String content =  status_html_ok;
     if (new_ssid.length() > 0) {
       new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
       new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
@@ -570,7 +583,7 @@ server.on(html_setup_SETHC2, []() {
     content += FPSTR(p_html);
     content += FPSTR(get_html);
     content += F("'set_Reset'>");
-    content += F("<input type='submit' value='Reboot' onclick='return confirm(\"Tiáº¿p Tá»¥c ?\");'></form>");
+    content += F("<input type='submit' id=\"submitbtn\" value='Reboot' onclick='return confirm(\"Tiáº¿p Tá»¥c ?\");'></form>");
     content += FPSTR(_p_html);
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
@@ -586,7 +599,7 @@ server.on(html_setup_SETHC2, []() {
     content += FPSTR(p_html);
     content += FPSTR(get_html);
     content += F("'set_Reset1'>");
-    content += F("<input type='submit' value='Reset' onclick='return confirm(\"Tiếp tục ?\");'></form>");
+    content += F("<input type='submit' id=\"submitbtn\" value='Reset' onclick='return confirm(\"Tiếp tục ?\");'></form>");
     content += FPSTR(_p_html);
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
@@ -647,9 +660,14 @@ server.on(html_setup_SETHC2, []() {
     content += FPSTR(_p_html);
     content += FPSTR(p_html);
     content += FPSTR(get_html);
-    content += F("'set_module_id'><label for='module_id'>Tên Wifi: </label><input name='module_id' id='module_id' maxlength=32 value='");
+    content += F("'set_module_id'>");
+            
+    content += F("<div class=\"row\">");
+    content +=F("<label for='module_id' class=\"req\" >Tên Wifi: </label><input name='module_id' class=\"txt\" id='module_id' maxlength=32 value='");
     content += WiFiConf.module_id;
-    content += F("'><input type='submit' onclick='return confirm(\"Tiếp Tục ?\");'></form>");
+    content +=F("></div>");
+    content += F("<div class=\"row\">");
+    content += F("'<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Tiếp Tục ?\");'>'</div></form>");
     content += F(" Nếu để trống tên wifi sẽ là : '");
     content += defaultId;
     content += F("'");
@@ -686,6 +704,7 @@ content += FPSTR(begin_title);
     content += FPSTR(title_html);
     content += F("<h1>mHome - Wifi to IR Controller </h1>");
     content += FPSTR(p_html);
+    content +=FPSTR(fieldset);
     content += F("<li>Nhiệt độ : ");
     content += String(nhietdo);
     content += F(" *C");
@@ -697,12 +716,13 @@ content += FPSTR(begin_title);
     content += F("  UTC +7 ");
 
         if (hoclenh==0){
-      content += F("<li>Học Lệnh : <a href='/learning'>Disable");
+      content += F("<li>Học Lệnh : <a href='/learning'>Disable</a>");
       
     }
-    else content += F("<li>Học Lệnh : <a href='/learning'>Enable");
-    content += FPSTR(_p_html);
-    content +=FPSTR(fieldset);
+    else content += F("<li>Học Lệnh : <a href='/learning'>Enable</a>");
+    content +=FPSTR(_fieldset);
+    content += FPSTR(_p_html);              
+              content +=FPSTR(fieldset);
 
               content +=FPSTR(legend_html);
               content +=F("'/wifi_conf'>Wifi setting");

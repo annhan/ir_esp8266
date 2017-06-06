@@ -20,8 +20,8 @@ float doam=0;
  *  */
 const char ApiKey[] = "BkxnF0xUl-";
 const char ApiURL[] = "http://fota.vn";
-const char AppVersion[] = "mIR-V0.1";  // Phien ban
-const char timeVersion[] = " 1/06/2017";
+const char AppVersion[] = "mIR-V0.2";  // Phien ban
+const char timeVersion[] = " 06/06/2017";
 /*
  * Wifi
  */
@@ -45,9 +45,9 @@ int statusmang=0;
 String ts;
 String json_ts="38000";
 uint16_t *code_array;
-int chieudai_ir = 1100 ;
+//int chieudai_ir = 1100 ;
 //uint16_t irSignal[1100];  // SAMSUNG E0E040BF
-int chieudai = 0;
+//int chieudai = 0;
 
 
 int demgiay=0;
@@ -79,16 +79,16 @@ struct WiFiConfStruct {
   char module_id[32];
 } WiFiConf = {
   WIFI_CONF_FORMAT,
-  "mhome",
-  "mhome",
+  "",
+  "",
   "192.168.1.240",
   "192.168.1.1",
   "255.255.2550.0",
-  "192.168.1.10",
-  "admin:admin@",
-  "temp1",
-  "temp2",
-  "temp3",
+  "",
+  "",
+  "",
+  "",
+  "",
   "0",
   ""
 };

@@ -62,7 +62,7 @@ void dumpInfo(decode_results *results) {
 }
 void  dumpCode (decode_results *results)
 { 
-  chieudai = results->rawlen - 1;
+ // chieudai = results->rawlen - 1;
  // for (int i = 1;  i < results->rawlen;  i++) {irSignal[i - 1] = results->rawbuf[i];}
   //for (int i = results->rawlen;  i < chieudai_ir;  i++) {irSignal[i - 1] = 0x00;}
 }
