@@ -46,9 +46,7 @@ String ts;
 String json_ts="38000";
 uint16_t *code_array;
 int chieudai_ir = 1100 ;
-uint16_t irSignal[1100];  // SAMSUNG E0E040BF
-//uint16_t irphat[1100];
-//unsigned int *codeArray;
+//uint16_t irSignal[1100];  // SAMSUNG E0E040BF
 int chieudai = 0;
 
 

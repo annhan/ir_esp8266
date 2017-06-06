@@ -6,7 +6,8 @@
 void update_fota(){
     delay(5000);
   HTTPClient http;
-  String url = "http://fota.vn/api/device/" + String(ApiKey) + "?id=" + WiFi.macAddress();
+  String url = F("http://fota.vn/api/device/");
+ url +=  String(ApiKey); url += F("?id="); url += WiFi.macAddress();
   http.begin(url);
   char ota_url[128];
   sprintf(ota_url, "%s/api/fota/%s", ApiURL, ApiKey);

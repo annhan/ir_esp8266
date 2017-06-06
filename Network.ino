@@ -290,15 +290,14 @@ server.on(html_setup_SETHC2, []() {
     content += F("mHome - IR Learn");
     content += FPSTR(title_html);
     content += F("<h1>IR Learn</h1>");
-    // content += "<p>LAN: ";
-    String hienthi;
-    for (int k = 0; k < chieudai; k++) {
-      hienthi += String(irSignal[k]);
-      if (k < chieudai - 1) {
-        hienthi += ",";
-      }
-    }
     
+   // String hienthi;
+   // for (int k = 0; k < chieudai; k++) {
+    //  hienthi += String(irSignal[k]);
+    //  if (k < chieudai - 1) {
+  //      hienthi += ",";
+    //  }
+   // }
     if (statusmang==0) {
       content +=FPSTR(notwifi_html);
       content +=F("<a href='/wifi_conf'>Wifi Setting</a>");
@@ -309,9 +308,21 @@ server.on(html_setup_SETHC2, []() {
     
             content += FPSTR(label_html);
             content += F("'raw'>IR CODE");
-
+    
     content += F(": </label><input name='raw'id='raw'style=\"width:70%;\" value=");
-            content +=hienthi; //maxlength=32
+              //  for (int k = 1; k <= chieudai; k++) {
+              //  content +=String(results.rawbuf[k]);
+              //  if (k <= chieudai - 1) {
+              //      content += ",";
+             //   }
+              //   }
+                     for (int k = 1; k < results.rawlen; k++) {
+        content +=String(results.rawbuf[k]);
+        if (k < results.rawlen - 1) {
+            content += ",";
+       }
+    }
+            //content +=hienthi; //maxlength=32
             content += FPSTR(br_html); //maxlength=32
             content += FPSTR(label_html);
             content += F("'ts'>Frequency");
@@ -340,8 +351,8 @@ server.on(html_setup_SETHC2, []() {
    */
   server.on(html_setup_codeIR, HTTP_POST, []() {
     if (hoclenh == 1) { irrecv.disableIRIn(); }
-    String data1=server.arg("raw");
-    String ts1=server.arg("ts");
+    String data1=server.arg(F("raw"));
+    String ts1=server.arg(F("ts"));
     json_ts=ts1;
     if (data1.length()>=1264){data1=urlDecodeir(data1);}
    String content = "";
@@ -383,18 +394,27 @@ server.on(html_setup_SETHC2, []() {
    * Get code IR 
    */
    server.on(html_setup_getcode, []() {
-    String hienthi;
-    for (int k = 0; k < chieudai; k++) {
-      hienthi += String(irSignal[k]);
-      if (k < chieudai - 1)  hienthi += ",";
-    }
+   // String hienthi;
+    //for (int k = 0; k < chieudai; k++) {
+    //  hienthi += String(irSignal[k]);
+    //  if (k < chieudai - 1)  hienthi += ",";
+   // }
     String json="{";
-    json += "\"code\":\"" + hienthi ;
+    //json += "\"code\":\"" + hienthi ;
+    json += "\"code\":\"" ;
+   
+    for (int k = 1; k < results.rawlen; k++) {
+        json +=String(results.rawbuf[k]);
+        if (k < results.rawlen - 1) {
+            json += ",";
+       }
+    }
+    
     json += "\",\"f\":" + json_ts;
     if (hoclenh==0) json += "\",\"enable\": 1";
     else json += "\",\"enable\": 0";
     json += "}";
-    if (hienthi.length()>1 ){
+    if (json.length()>50 ){
       server.send(200,F("text/html"), json);
     }
     else server.send(200,F("text/html"), F("{\"code\":\"error\",\"f\":\"38000\"}"));
@@ -533,9 +553,6 @@ server.on(html_setup_SETHC2, []() {
       saveWiFiConf();
     } else {
       content="NOT OK";
-     // content += F("<p>Rejected empty SSID. </p>");
-     // content += F("<body></html>");
-    //  Serial.println("Rejected empty SSID.");
     }
     server.send(200,F("text/html"),content);
     delay(500);
@@ -546,7 +563,7 @@ server.on(html_setup_SETHC2, []() {
     String content = FPSTR(header);content += FPSTR(begin_title);
      content += F("mHome - Reset");
     content += FPSTR(title_html);
-    content += F("<h1>ThĂ´ng Tin :</h1>");
+    content += F("<h1>Thông Tin :</h1>");
     content += FPSTR(p_html);
     content += FPSTR(support_html);
     content += FPSTR(_p_html);
@@ -562,7 +579,7 @@ server.on(html_setup_SETHC2, []() {
     String content = FPSTR(header);content += FPSTR(begin_title);
     content += F("mHome - Reset");
     content += FPSTR(title_html);
-    content += F("<h1>ThĂ´ng Tin :</h1>");
+    content += F("<h1>Thông Tin :</h1>");
     content += FPSTR(p_html);
     content += FPSTR(support_html);
     content += FPSTR(_p_html);
