@@ -37,8 +37,9 @@ byte gettime_udp()
     unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
     unsigned long secsSince1900 = highWord << 16 | lowWord;
     const unsigned long seventyYears = 2208988800UL;
+    if  (secsSince1900 > 2400000000 ){
     thoigianthuc = secsSince1900 - seventyYears;
-
+    }
     return 1 ;
   }  
 }
