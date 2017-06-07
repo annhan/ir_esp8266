@@ -1,0 +1,103 @@
+warning: LF will be replaced by CRLF in Eeprom.ino.
+The file will have its original line endings in your working directory.
+warning: LF will be replaced by CRLF in Network.ino.
+The file will have its original line endings in your working directory.
+warning: LF will be replaced by CRLF in ir_esp8266.ino.
+The file will have its original line endings in your working directory.
+[1mdiff --git a/Eeprom.ino b/Eeprom.ino[m
+[1mindex b39464b..fe44c87 100644[m
+[1m--- a/Eeprom.ino[m
+[1m+++ b/Eeprom.ino[m
+[36m@@ -15,7 +15,7 @@[m [mint waitConnected(void) {[m
+     }[m
+   return(0);[m
+ }[m
+[31m-int waitConnected1(void) {[m
+[32m+[m[32m/*int waitConnected1(void) {[m
+   int i=0;[m
+   while (true ) {[m
+     digitalWrite(status_led, LOW);[m
+[36m@@ -29,7 +29,7 @@[m [mint waitConnected1(void) {[m
+     if (i>70){ESP.restart();return (0);}[m
+   }[m
+   return (0);[m
+[31m-}[m
+[32m+[m[32m}*/[m
+ void printIP(void) {[m
+   Serial.println(WiFiConf.module_id);[m
+ }[m
+[1mdiff --git a/Network.ino b/Network.ino[m
+[1mindex ebbc253..360d886 100644[m
+[1m--- a/Network.ino[m
+[1m+++ b/Network.ino[m
+[36m@@ -749,7 +749,7 @@[m [mserver.on("/set_hc2_conf", []() {[m
+     content += FPSTR(end_html);[m
+     server.send(200, F("text/html"), content);[m
+   });[m
+[31m-   server.on("/set_language", []() {[m
+[32m+[m[32m  /* server.on("/set_language", []() {[m
+     String new_language = server.arg("language");[m
+     String content = FPSTR(header);content += FPSTR(begin_title);[m
+        content += F("mHome - Language");[m
+[36m@@ -769,7 +769,7 @@[m [mserver.on("/set_hc2_conf", []() {[m
+     server.send(200, F("text/html"), content);[m
+     digitalWrite(status_led, HIGH );[m
+     ESP.restart();[m
+[31m-  });[m
+[32m+[m[32m  });*/[m
+   server.on("/set_module_id", []() {[m
+     String new_id = server.arg("module_id");[m
+     String content = FPSTR(header);content += FPSTR(begin_title);[m
+[1mdiff --git a/ir_esp8266.ino b/ir_esp8266.ino[m
+[1mindex 490aa58..9a09ad9 100644[m
+[1m--- a/ir_esp8266.ino[m
+[1m+++ b/ir_esp8266.ino[m
+[36m@@ -1,8 +1,8 @@[m
+ #include "DHT.h"[m
+ #include "variable_http.h"[m
+ #include "KhaiBao.h"[m
+[31m-#include <ESP8266WiFi.h>[m
+[31m-#include <ESP8266HTTPClient.h>[m
+[32m+[m[32m//#include <ESP8266WiFi.h>[m
+[32m+[m[32m//#include <ESP8266HTTPClient.h>[m
+ #include <ESP8266httpUpdate.h>[m
+ #include <ESP8266WebServer.h>[m
+ #include <ESP8266HTTPUpdateServer.h>[m
+[36m@@ -10,8 +10,8 @@[m
+ #include <EEPROM.h>[m
+ #include <IRrecv.h>[m
+ #include <IRsend.h>[m
+[31m-#include <WiFiClient.h>[m
+[31m-#include <WiFiServer.h>[m
+[32m+[m[32m//#include <WiFiClient.h>[m
+[32m+[m[32m//#include <WiFiServer.h>[m
+ #include <ir_Daikin.h>[m
+ #include <ir_Mitsubishi.h>[m
+ #include <WiFiUdp.h>[m
+[36m@@ -40,7 +40,7 @@[m [mvoid parseStringGC(String str);[m
+ void getHC();[m
+ void printIP(void);[m
+ int waitConnected(void);[m
+[31m-int waitConnected1(void);[m
+[32m+[m[32m//int waitConnected1(void);[m
+ void ketnoimang() ;[m
+ void scanWiFi(void);[m
+ void saveWiFiConf(void);[m
+[36m@@ -100,13 +100,13 @@[m [mvoid setup() {[m
+   Serial.println("A");[m
+   hoclenh = 0;[m
+   WiFi.mode(WIFI_AP_STA);[m
+[31m-  Serial.println("B");[m
+[32m+[m[32m//  Serial.println("B");[m
+  // WiFi.setAutoReconnect ( true );[m
+[31m-  Serial.println("C");[m
+[32m+[m[32m  //Serial.println("C");[m
+   ketnoimang();[m
+[31m-  Serial.println("D");[m
+[32m+[m[32m // Serial.println("D");[m
+   statusmang = waitConnected();[m
+[31m-  Serial.println("E");[m
+[32m+[m[32m//  Serial.println("E");[m
+   if (WiFi.status() == WL_CONNECTED) {[m
+     update_fota();[m
+     Serial.println("Connect");[m

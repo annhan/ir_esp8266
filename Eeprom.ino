@@ -16,6 +16,22 @@ int waitConnected(void) {
   return(0);
 }
 
+/*int waitConnected1(void) {
+  int i=0;
+  while (true ) {
+    digitalWrite(status_led, LOW);
+    if (WiFi.status() == WL_CONNECTED) {
+      return (1);
+    }
+    delay(400);
+    digitalWrite(status_led, HIGH);
+    delay(400);
+    i++;
+    if (i>70){ESP.restart();return (0);}
+  }
+  return (0);
+}*/
+
 void printIP(void) {
   Serial.println(WiFiConf.module_id);
 }

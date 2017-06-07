@@ -92,6 +92,7 @@ const char begin_title[] PROGMEM ="<title>";
 
 const char status_html_ok[] PROGMEM ="OK";
 
+
 const char html_setup_wifi[] PROGMEM ="/wifi_conf";
 const char html_setup_hc2[] PROGMEM ="/hc2_conf";
 const char html_setup_switch[] PROGMEM ="/learning";
