@@ -43,3 +43,15 @@ byte gettime_udp()
   }  
 }
 
+
+void conver_time(){
+  hour = (motion_time  % 86400L) / 3600 ;
+  hour = hour + 7 ;
+  hour = hour % 24;
+  time_ = hour;
+  time_ += " : ";
+  if ( ((motion_time % 3600) / 60) < 10 ) time_ += "0";
+  minute = (motion_time  % 3600) / 60 ;
+  time_ += minute;
+}
+

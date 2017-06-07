@@ -83,14 +83,7 @@ void setup() {
   }
   motion_time = EEPROMReadlong(1000);
   Serial.println(motion_time);
-  hour = (motion_time  % 86400L) / 3600 ;
-  hour = hour + 7 ;
-  hour = hour % 24;
-  time_ = hour;
-  time_ += " : ";
-  if ( ((motion_time % 3600) / 60) < 10 ) time_ += "0";
-  minute = (motion_time  % 3600) / 60 ;
-  time_ += minute;
+  conver_time();
   Serial.println(time_);
   scanWiFi();
   Serial.println("A");
@@ -248,16 +241,7 @@ void loop() {
 
         _motion_status = 1;
         motion_time = thoigianthuc;
-        hour = (motion_time  % 86400L) / 3600 ;
-        hour = hour + 7 ;
-        hour = hour % 24;
-        time_ = hour;
-        time_ += " : ";
-        if ( ((motion_time % 3600) / 60) < 10 ) {
-          time_ += "0";
-        }
-        minute = (motion_time  % 3600) / 60 ;
-        time_ += minute;
+        conver_time();
         Serial.println(time_);
         EEPROMWritelong(1000, motion_time);
       }
