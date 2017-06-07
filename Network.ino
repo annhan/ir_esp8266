@@ -637,7 +637,7 @@ server.on(html_setup_SETHC2, []() {
         ESP.restart();
   });
  server.on(html_setup_GETinfor, HTTP_GET, []() {
-     String content = F("{\"T:\""); content += String(nhietdo);
+     String content = F("{\"T\":"); content += String(nhietdo);
      content +=  F(",\"H\":");content += String(doam);
      content +=  F(",\"PIR\":\"");content += String(time_);
      content +=  F("\",\"PIR2\":\"");content += String(motion_time);
