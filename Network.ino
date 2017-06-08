@@ -316,6 +316,7 @@ server.on(html_setup_SETHC2, []() {
       content +=F("<a href='/wifi_conf'>Wifi Setting</a>");
     }
     else{
+      
       //content += FPSTR(_p_html);
       content += F("<form method='post' action='codeIR'>");
             
@@ -544,7 +545,10 @@ server.on("/remote_save", []() {
     content += F("mHome - IR Learn");
     content += FPSTR(title_html);
     content += F("<h1>Set Remote</h1>");
-    
+    content += F("<li>Remote ML : ");
+    content += duongdan_ML;
+    content += F("<li>Remote TV : ");
+    content += duongdan_TV;
            content += F("<form method='get' action='set_remote_ML'>");
                           content += F("<nav>");
               content +=FPSTR(fieldset);
