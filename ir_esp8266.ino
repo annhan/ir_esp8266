@@ -138,6 +138,7 @@ void setup() {
     return;
   }
   Serial.println(F("card initialized."));
+  user_using();
 }
 
 

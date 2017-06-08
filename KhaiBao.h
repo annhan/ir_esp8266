@@ -10,6 +10,17 @@
 #define DHTPin 5
 #define MotionPin 4
 
+
+String duongdan_ML="User";
+String duongdan_TV="User";
+
+
+
+
+
+
+
+
 byte _motion_status=0;
 unsigned long motion_time=0;
 
@@ -77,20 +88,28 @@ struct WiFiConfStruct {
   char sta_global3[20];
   char sta_language[3];
   char module_id[32];
+  char sta_ML[2];
+  char sta_TV[2];
+  char sta_MQ[2];
+  char sta_Amply[2];
 } WiFiConf = {
   WIFI_CONF_FORMAT,
   "",
   "",
   "192.168.1.240",
   "192.168.1.1",
-  "255.255.2550.0",
+  "255.255.255.0",
   "",
   "",
   "",
   "",
   "",
   "0",
-  ""
+  "",
+    "0",
+  "0",
+  "0",
+  "0"
 };
 
 

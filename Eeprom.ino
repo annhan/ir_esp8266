@@ -136,3 +136,27 @@ void EEPROMWritelong(int address, unsigned long value)
       return ((four << 0) & 0xFF) + ((three << 8) & 0xFF00) + ((two << 16) & 0xFF0000) + ((one << 24) & 0xFF000000);
       }     
 
+void user_using(){
+  Serial.println(WiFiConf.sta_ML);
+  if (String(WiFiConf.sta_ML) == "0") duongdan_ML="User";
+  else if (String(WiFiConf.sta_ML) == "1") duongdan_ML="Carrier";
+  else if (String(WiFiConf.sta_ML) == "2") duongdan_ML="Daikin";
+  else if (String(WiFiConf.sta_ML) =="3") duongdan_ML="Electrolux";
+  else if (String(WiFiConf.sta_ML)=="4") duongdan_ML="Hitachi";
+  else if (String(WiFiConf.sta_ML) =="5") duongdan_ML="LG";
+  else if (String(WiFiConf.sta_ML)=="6") duongdan_ML="Misu";
+  else if (String(WiFiConf.sta_ML)=="7") duongdan_ML="Panasonic";
+  else if (String(WiFiConf.sta_ML)=="8") duongdan_ML="Reetech";
+  else if (String(WiFiConf.sta_ML)=="9") duongdan_ML="Samsung";
+  else if (String(WiFiConf.sta_ML)=="a") duongdan_ML="Sanyo";
+  else if (String(WiFiConf.sta_ML)=="b") duongdan_ML="Sharp";
+  else if (String(WiFiConf.sta_ML)=="c") duongdan_ML="Toshiba";
+
+  if (String(WiFiConf.sta_TV)=="0") duongdan_TV="User";
+  else if (String(WiFiConf.sta_TV)=="1") duongdan_TV="LG";
+  else if (String(WiFiConf.sta_TV)=="2") duongdan_TV="Samsung";
+  else if (String(WiFiConf.sta_TV)=="3") duongdan_TV="Sony";
+  else if (String(WiFiConf.sta_TV)=="4") duongdan_TV="Toshiba";
+  
+}
+

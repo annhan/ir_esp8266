@@ -348,40 +348,138 @@ server.on(html_setup_SETHC2, []() {
             content += FPSTR(p_html);
             content += F("Thank you for reading.");
 
-            
-            content += F("<form method='get' action='Savecode_ML'>");
-                          
+           content += F("<form method='get' action='Savecode_ML'>");
+                          content += F("<nav>");
               content +=FPSTR(fieldset);
                       content +=FPSTR(legend_html);
-                      content +=F("'/Reset1'>Máy Lạnh");
+                      content +=F(">Máy Lạnh");
                       content +=FPSTR(_legend_html);
-             content += F("<div class=\"row\">");
-          content +="<li><select name='Nut' class=\"dropbtn\">";
+          content += F("<div class=\"row\">");
+          content +="<li><select name='button' class=\"dropbtn\">";
             content +=F("<option value=\"ON\">ON</option>");
             content +=F("<option value=\"OFF\">OFF</option>");
-            content +=F("<option value=\"16\">16</option>");
-            content +=F("<option value=\"17\">17</option>");
-            content +=F("<option value=\"18\">18</option>");
-            content +=F("<option value=\"19\">19</option>");
-            content +=F("<option value=\"20\">20</option>");
-            content +=F("<option value=\"21\">21</option>");
-            content +=F("<option value=\"22\">22</option>");
-            content +=F("<option value=\"23\">23</option>");
-            content +=F("<option value=\"24\">24</option>");
-            content +=F("<option value=\"25\">25</option>");
-            content +=F("<option value=\"26\">26</option>");
-            content +=F("<option value=\"27\">27</option>");
-            content +=F("<option value=\"28\">28</option>");
+            content +=F("<option value=\"16\">16 *C</option>");
+            content +=F("<option value=\"17\">17 *C</option>");
+            content +=F("<option value=\"18\">18 *C</option>");
+            content +=F("<option value=\"19\">19 *C</option>");
+            content +=F("<option value=\"20\">20 *C</option>");
+            content +=F("<option value=\"21\">21 *C</option>");
+            content +=F("<option value=\"22\">22 *C</option>");
+            content +=F("<option value=\"23\">23 *C</option>");
+            content +=F("<option value=\"24\">24 *C</option>");
+            content +=F("<option value=\"25\">25 *C</option>");
+            content +=F("<option value=\"26\">26 *C</option>");
+            content +=F("<option value=\"27\">27 *C</option>");
+            content +=F("<option value=\"28\">28 *C</option>");
+            content +=F("<option value=\"POWERFUL\">POWERFUL</option>");
+            content +=F("<option value=\"FAN1\">FAN1</option>");
+            content +=F("<option value=\"FAN2\">FAN2</option>");
+            content +=F("<option value=\"FAN3\">FAN3</option>");
+            content +=F("<option value=\"COOL\">COOL</option>");
+            content +=F("<option value=\"AUTO\">AUTO</option>");
+            content +=F("<option value=\"DRY\">DRY</option>");
           content +="</select>";
           content +=F("</div>");
-          content += F("<li><input type='submit' id=\"submitbtn\" value='Save' onclick='return confirm(\"Save?\");'>");
+          content += F("<div class=\"row\">");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Save ML' onclick='return confirm(\"Save?\");'>");
+          content +=F("</div>");
           content +=FPSTR(_fieldset);
           content += F("</form>");
+          content += F("</nav>");
+          content += F("<nav>");
+           content += F("<form method='get' action='Savecode_TV'>");       
+           content +=FPSTR(fieldset);
+                     content +=FPSTR(legend_html);
+                      content +=F(">TV");
+                      content +=FPSTR(_legend_html);
+          content += F("<div class=\"row\">");
+          content +="<li><select name='button1' class=\"dropbtn\">";
+            content +=F("<option value=\"ON\">ON</option>");
+            content +=F("<option value=\"OFF\">OFF</option>");
+            content +=F("<option value=\"HDMI\">HDMI</option>");
+            content +=F("<option value=\"NEXT\">NEXT</option>");
+            content +=F("<option value=\"PRE\">PRE</option>");
+            content +=F("<option value=\"UP\">UP</option>");
+            content +=F("<option value=\"DOWN\">DOWN</option>");
+            content +=F("<option value=\"VOLUMEUP\">Volume UP</option>");
+            content +=F("<option value=\"VOLUMEDW\">Volume DW</option>");
+            content +=F("<option value=\"CH_UP\">CH UP</option>");
+            content +=F("<option value=\"CH_DOWN\">CH DOWN</option>");
+            content +=F("<option value=\"SMART\">SMART</option>");
+            content +=F("<option value=\"RETURN\">RETURN</option>");
+            content +=F("<option value=\"OK\">OK</option>");
+            content +=F("<option value=\"1\">1</option>");
+            content +=F("<option value=\"2\">2</option>");
+            content +=F("<option value=\"3\">3</option>");
+            content +=F("<option value=\"4\">4</option>");
+            content +=F("<option value=\"5\">5</option>");
+            content +=F("<option value=\"6\">6</option>");
+            content +=F("<option value=\"7\">7</option>");
+            content +=F("<option value=\"8\">8</option>");
+            content +=F("<option value=\"9\">9</option>");
+            content +=F("<option value=\"0\">0</option>");
+          content +="</select>";
+          content +=F("</div>");
+          content += F("<div class=\"row\">");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Save TV' onclick='return confirm(\"Save?\");'>");
+          content +=F("</div>");
+          content +=FPSTR(_fieldset);
+          content += F("</form>");
+          content += F("</nav>");
+          
+          content += F("<nav>");
+           content += F("<form method='get' action='Savecode_Q'>");               
+              content +=FPSTR(fieldset);
+                      content +=FPSTR(legend_html);
+                      content +=F(">Quạt");
+                      content +=FPSTR(_legend_html);
+          content += F("<div class=\"row\">");
+          content +="<li><select name='button2' class=\"dropbtn\">";
+            content +=F("<option value=\"ON\">ON</option>");
+            content +=F("<option value=\"OFF\">OFF</option>");
+            content +=F("<option value=\"SPEED1\">SPEED 1</option>");
+            content +=F("<option value=\"SPEED2\">SPEED 2</option>");
+            content +=F("<option value=\"SPEED3\">SPEED 3</option>");
+            content +=F("<option value=\"SPEED4\">SPEED 4</option>");
+            content +=F("<option value=\"SPEED5\">SPEED 5</option>");
+            content +=F("<option value=\"SWIMUP\">SWIM UP</option>");
+            content +=F("<option value=\"SWIMLE\">SWIM LEFT</option>");
+          content +="</select>";
+          content +=F("</div>");
+           content += F("<div class=\"row\">");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Save Quạt' onclick='return confirm(\"Save?\");'>");
+          content +=F("</div>");
+          content +=FPSTR(_fieldset);
+         
+          content += F("</form>");
+      content += F("</nav>");
 
-          
-          
-      
-            
+          content += F("<nav>");
+          content += F("<form method='get' action='Savecode_Amply'>");               
+          content +=FPSTR(fieldset);
+          content +=FPSTR(legend_html);
+          content +=F(">Amply");
+          content +=FPSTR(_legend_html);
+          content += F("<div class=\"row\">");
+          content +="<li><select name='button3' class=\"dropbtn\">";
+            content +=F("<option value=\"ON\">ON</option>");
+            content +=F("<option value=\"OFF\">OFF</option>");
+            content +=F("<option value=\"VOLUP\">VOL +</option>");
+            content +=F("<option value=\"VOLDW\">VOL -</option>");
+            content +=F("<option value=\"NEXT\">NEXT</option>");
+            content +=F("<option value=\"PAUSE\">PAUSE</option>");
+            content +=F("<option value=\"STOP\">STOP</option>");
+            content +=F("<option value=\"PRE\">PRE</option>");
+            content +=F("<option value=\"PLAY\">PLAY</option>");
+          content +="</select>";
+          content +=F("</div>");
+           content += F("<div class=\"row\">");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Save Quạt' onclick='return confirm(\"Save?\");'>");
+          content +=F("</div>");
+          content +=FPSTR(_fieldset);
+         
+          content += F("</form>");
+      content += F("</nav>");
           //break;     
     //}
     }
@@ -394,19 +492,130 @@ server.on(html_setup_SETHC2, []() {
  */
 
   server.on("/Savecode_ML", []() {
-    String data1=server.arg(F("Nut"));
-    data1="ML/"+data1;
+    String data1=server.arg(F("button"));
+  //  String maker=server.arg(F("maker"));
+    data1="ML/User/" +data1;
     String data= writefile(data1);
     data1=data1 + data ;
     server.send(200, F("text/html"), data1);
   });
-    server.on("/sendcode_SD", []() {
+    server.on("/Savecode_TV", []() {
+    String data1=server.arg(F("button"));
+  //  String maker=server.arg(F("maker"));
+    data1="TV/User/" +data1;
+    String data= writefile(data1);
+    data1=data1 + data ;
+    server.send(200, F("text/html"), data1);
+  });
+    server.on("/Savecode_Q", []() {
+    String data1=server.arg(F("button"));
+  //  String maker=server.arg(F("maker"));
+    data1="Quat/User/" +data1;
+    String data= writefile(data1);
+    data1=data1 + data ;
+    server.send(200, F("text/html"), data1);
+  });
+    server.on("/Savecode_Amply", []() {
+    String data1=server.arg(F("button"));
+  //  String maker=server.arg(F("maker"));
+    data1="Amply/User/" +data1;
+    String data= writefile(data1);
+    data1=data1 + data ;
+    server.send(200, F("text/html"), data1);
+  });
+  server.on("/sendcode_SD", []() {
     String type=server.arg(F("type"));
+    String maker=server.arg(F("maker"));
     String button=server.arg(F("button"));
-    type=type +"/"+button;
+    type=type + "/" + maker + "/" +button ;
     int chieudai = readfile(type);
     Serial.println(chieudai);
     server.send(200, F("text/html"), "OK");
+  });  
+
+  
+////////////////////////////
+
+server.on("/remote_save", []() {
+
+    String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
+    content = FPSTR(header);content += FPSTR(begin_title);    
+    //content =  F("<meta http-equiv='refresh' content='5'><style>body {background-color:lightgrey}h1 {color:blue}p {color:black}</style><link rel=\"shortcut icon\" href=\"data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAADLy8sAHYsbACCNGADK28UADIEHAHOubwAShQoA//7/AObz6ADn8+gA6fPoAOzz6ADGxsYAXa5eAL7gugAghxAAtbyyABFmCAD09vEAN5ctADuPMAA4ly0AxuG9AKvXqQA2lzYAJ4cZADuXNgAikCIAKIwoAHS1cwDs++YAAHgAAKrKpwAAewAAj8WQACCHEQDa6tgAtbyzAMTcwQA4jzEAOpEuAFCkSwAYZgkAa7JiAIK9ggBAmDoAQJY9AA6FDADQ5NAApMalAC2PKQCozagA9PXwAPT48AAvbScAF2YKAGywZgBtsGYA4+3iAMviywA/mDsARpgyAM/jzgBkkGEA0eXLAC6KJAA2dDMAotCgAEWbRAA5iiQAv9+6AKmr3AAQZQgA8vXxAPn48QA+mDMAsdayAJ7DngChxKEANnQ0ACiRKABlkGIAq7iqAAB3AAAAegAAjsSQAHm5eQDKycoAw9vBAGGxYgB/mqMAhJesAPr6+AC21qoA/v/+AJqamgBygMIASpxAAMjIyADv8PYAYLBgANrr1gCUx5EAZ61gAGitYADQy9EAKGpOACOPJAD7+/wAJI8kAPv9+QDo8OUA/v//AI24iQD///8AWaxVAC+MJABerFUAXaleAF6pXgB5tHUA2uvXAPX16wDPys8AxOLGANHL0gAnhB8Agr1+AJqh1AAOfAgAzOHMAIe+gQCLvoEA6O7pAHK0bQCrt6oAMI4iAC6QKAAtlCsAS5s/AF+rXAB4t3YAwdrBAMrIygDv+e8A3O3eAM/K0ADf4uoAdJdxAHWXcQAniBoAbqtuAP3+9QAMhgwAoc6fAHO0bgAvjiMAFYYMAI28jgBGn0MAyMfIAGOrXQB4uHoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAyPe4c/NhEqT5QlaaAAX3JyXiITc5oWDmYpS11ycgByXIw8ZXJycnJycnxFg3JiclZESXJycnJycnJyOkEXfSScCXIvG1BtbW1rnYVAPRB4m3JyGgRxMU1OnoFycimVLlhycllTjXJycpAccnJmQpYLcnJkHx8zcnIeAnJyRjcPenJyDVNUBnJjgGBHchZIFDAHIAEoHWxyk1tqWnJDNjmDcm+KdCxycm4FK5hydVE7MhJyl34hGAeff3JyeRVScndoB3JyjpkfTHJyNC1VknIKYWcScnKRA3JyCIuhcFdycgl2iYQ+SjUmhoiiXHIMcnJycoI4JyMZLngkcnJyDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"/><meta charset='UTF-8'><title>");
+    content += F("mHome - IR Learn");
+    content += FPSTR(title_html);
+    content += F("<h1>Set Remote</h1>");
+    
+           content += F("<form method='get' action='set_remote_ML'>");
+                          content += F("<nav>");
+              content +=FPSTR(fieldset);
+                      content +=FPSTR(legend_html);
+                      content +=F(">Máy Lạnh");
+                      content +=FPSTR(_legend_html);
+          content += F("<div class=\"row\">");
+          content +="<li><select name='button' class=\"dropbtn\">";
+            content +=F("<option value=\"0\">User</option>");
+            content +=F("<option value=\"1\">Carrier</option>");
+            content +=F("<option value=\"2\">Daikin</option>");
+            content +=F("<option value=\"3\">Electrolux</option>");
+            content +=F("<option value=\"4\">Hitachi</option>");
+            content +=F("<option value=\"5\">LG</option>");
+            content +=F("<option value=\"6\">Misu</option>");
+            content +=F("<option value=\"7\">panasonic</option>");
+            content +=F("<option value=\"8\">Reetech</option>");
+            content +=F("<option value=\"9\">Samsung</option>");
+            content +=F("<option value=\"a\">Sanyo</option>");
+            content +=F("<option value=\"b\">Sharp</option>");
+            content +=F("<option value=\"c\">Toshiba</option>");
+          content +="</select>";
+          content +=F("</div>");
+          content += F("<div class=\"row\">");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Set ML' onclick='return confirm(\"Save?\");'>");
+          content +=F("</div>");
+          content +=FPSTR(_fieldset);
+          content += F("</form>");
+          content += F("</nav>");
+          content += F("<nav>");
+           content += F("<form method='get' action='set_remote_TV'>");       
+           content +=FPSTR(fieldset);
+                     content +=FPSTR(legend_html);
+                      content +=F(">TV");
+                      content +=FPSTR(_legend_html);
+          content += F("<div class=\"row\">");
+          content +="<li><select name='button1' class=\"dropbtn\">";
+            content +=F("<option value=\"0\">User</option>");
+            content +=F("<option value=\"1\">LG</option>");
+            content +=F("<option value=\"2\">Samsung</option>");
+            content +=F("<option value=\"3\">Sony</option>");
+            content +=F("<option value=\"4\">Toshiba</option>");
+          content +="</select>";
+          content +=F("</div>");
+          content += F("<div class=\"row\">");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Set TV' onclick='return confirm(\"Save?\");'>");
+          content +=F("</div>");
+          content +=FPSTR(_fieldset);
+          content += F("</form>");
+          content += F("</nav>");          
+        
+    
+    content += FPSTR(end_html);
+    server.send(200,F("text/html"), content);
+  });
+
+  server.on("/set_remote_ML",  []() {
+    String data1=server.arg(F("button"));
+    data1.toCharArray(WiFiConf.sta_ML, sizeof(WiFiConf.sta_ML));
+    user_using();
+    saveWiFiConf();
+    server.send(200, F("text/html"), duongdan_ML);
+
+  });
+    server.on("/set_remote_TV",  []() {
+    String data1=server.arg(F("button"));
+    data1.toCharArray(WiFiConf.sta_TV, sizeof(WiFiConf.sta_TV));
+    user_using();
+    saveWiFiConf();
+    server.send(200, F("text/html"), duongdan_TV);
+
   });
   ///////////////////////
   /*
@@ -813,6 +1022,12 @@ content += FPSTR(begin_title);
                         content +=F("<li>Description:This section is for setting communication between HC2 and Wifi IR controller");
                         content +=F("<li>Status : ");
                         content +=SerialHC2;
+              content +=FPSTR(_fieldset);
+              
+              content +=FPSTR(fieldset);
+                        content +=FPSTR(legend_html);
+                        content +=F("'/remote_save'>Setting Remote");
+                        content +=FPSTR(_legend_html);
               content +=FPSTR(_fieldset);
                   content +=FPSTR(fieldset);
                         content +=FPSTR(legend_html);
