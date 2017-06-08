@@ -17,6 +17,13 @@ const char fieldset[] PROGMEM ="<fieldset>";
 const char information[] PROGMEM = "<li>Copyright © by Kim Son Tien Co.Ltd - mHome <li>www.nhathongminhmhome.com <li>Designed by mHome - R&D Department <li>Made in VietNam";
 const char header[] PROGMEM = "<!DOCTYPE HTML>\r\n<html><head>"
                               "<style>"
+                              ".dropbtn {"
+    "background-color: #4CAF50;"
+    "color: white;"
+    "padding: 10px;"
+    "font-size: 20px;"  
+"}"
+
                               "fieldset {"
 "margin-top:10px;"
 "background:#ffffcc;"

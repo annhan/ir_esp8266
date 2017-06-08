@@ -6,13 +6,11 @@
 void update_fota(){
     delay(5000);
   HTTPClient http;
-<<<<<<< HEAD
+
   String url = F("http://fota.vn/api/device/");
  url +=  String(ApiKey); url += F("?id="); url += WiFi.macAddress();
-=======
-  //1. Register device if it not exist
-  String url = "http://fota.vn/api/device/" + String(ApiKey) + "?id=" + WiFi.macAddress();
->>>>>>> master
+
+
   http.begin(url);
 //  Serial.println("Register device: " + url);
  // Serial.println("Status code = " + String(http.GET()));

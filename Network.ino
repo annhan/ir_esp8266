@@ -66,7 +66,6 @@ void parseStringRAW(String str) {
  // Serial.println("");
   irsend.sendRaw(code_array, count - 1, code_array[count - 1] / (1000));                                                
   free(code_array);  // Free up the memory allocated.
-
 }
 void parseStringGC(String str) {
   int16_t index;
@@ -231,11 +230,7 @@ server.on(html_setup_hc2, []() {
     content1 += FPSTR(label1_html);
     content1 += F("'global3' class=\"req\">Global 3:</label> <input  name='global3'  class=\"txt\" id='global3' value=");   
     content1 += String(WiFiConf.sta_global3) ;    
-            content1 +=F("></div>");
-
-
-
-    
+    content1 +=F("></div>");
     content += FPSTR(wifisetting_html);
     content += FPSTR(title_html);
     content += F("<h1>HC2 Setting</h1>");
@@ -243,7 +238,7 @@ server.on(html_setup_hc2, []() {
     content += F("Wifi conecting : ");
     content += WiFiConf.sta_ssid;
     content += F("</br>IP address: ");  
-   content += content1;
+    content += content1;
     content += F("<input type='submit'  id=\"submitbtn\"  value='OK' onclick='return confirm(\"Change Setting ?\");'></form>");
     content += FPSTR(_p_html);
     content += FPSTR(get_html);
@@ -352,11 +347,66 @@ server.on(html_setup_SETHC2, []() {
             content += F("<li>When completed the new code, you have to refresh the page for the latest code update.");
             content += FPSTR(p_html);
             content += F("Thank you for reading.");
+
+            
+            content += F("<form method='get' action='Savecode_ML'>");
+                          
+              content +=FPSTR(fieldset);
+                      content +=FPSTR(legend_html);
+                      content +=F("'/Reset1'>Máy Lạnh");
+                      content +=FPSTR(_legend_html);
+             content += F("<div class=\"row\">");
+          content +="<li><select name='Nut' class=\"dropbtn\">";
+            content +=F("<option value=\"ON\">ON</option>");
+            content +=F("<option value=\"OFF\">OFF</option>");
+            content +=F("<option value=\"16\">16</option>");
+            content +=F("<option value=\"17\">17</option>");
+            content +=F("<option value=\"18\">18</option>");
+            content +=F("<option value=\"19\">19</option>");
+            content +=F("<option value=\"20\">20</option>");
+            content +=F("<option value=\"21\">21</option>");
+            content +=F("<option value=\"22\">22</option>");
+            content +=F("<option value=\"23\">23</option>");
+            content +=F("<option value=\"24\">24</option>");
+            content +=F("<option value=\"25\">25</option>");
+            content +=F("<option value=\"26\">26</option>");
+            content +=F("<option value=\"27\">27</option>");
+            content +=F("<option value=\"28\">28</option>");
+          content +="</select>";
+          content +=F("</div>");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Save' onclick='return confirm(\"Save?\");'>");
+          content +=FPSTR(_fieldset);
+          content += F("</form>");
+
+          
+          
+      
+            
           //break;     
     //}
     }
     content += FPSTR(end_html);
     server.send(200,F("text/html"), content);
+  });
+
+/*
+ * Save data to
+ */
+
+  server.on("/Savecode_ML", []() {
+    String data1=server.arg(F("Nut"));
+    data1="ML/"+data1;
+    String data= writefile(data1);
+    data1=data1 + data ;
+    server.send(200, F("text/html"), data1);
+  });
+    server.on("/sendcode_SD", []() {
+    String type=server.arg(F("type"));
+    String button=server.arg(F("button"));
+    type=type +"/"+button;
+    int chieudai = readfile(type);
+    Serial.println(chieudai);
+    server.send(200, F("text/html"), "OK");
   });
   ///////////////////////
   /*
@@ -415,14 +465,12 @@ server.on(html_setup_SETHC2, []() {
     String json="{";
     //json += "\"code\":\"" + hienthi ;
     json += "\"code\":\"" ;
-   
     for (int k = 1; k < results.rawlen; k++) {
         json +=String(results.rawbuf[k]);
         if (k < results.rawlen - 1) {
             json += ",";
        }
     }
-    
     json += "\",\"f\":" + json_ts;
     if (hoclenh==0) json += "\",\"enable\": 1";
     else json += "\",\"enable\": 0";
@@ -556,11 +604,10 @@ server.on(html_setup_SETHC2, []() {
     String new_ip = server.arg(F("ip"));
     String new_gateway = server.arg(F("gateway"));
     String new_subnet = server.arg(F("subnet"));
-<<<<<<< HEAD
+
     String content =  status_html_ok;
-=======
-    String content =  "OK";
->>>>>>> master
+
+
     if (new_ssid.length() > 0) {
       new_ssid.toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
       new_pwd.toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
@@ -570,18 +617,11 @@ server.on(html_setup_SETHC2, []() {
       saveWiFiConf();
       
     } else {
-<<<<<<< HEAD
+
       content="NOT OK";
     }
-    server.send(200,F("text/html"),content);
-=======
-     // content += F("<p>Rejected empty SSID. </p>");
-     // content += F("<body></html>");
-    //  Serial.println("Rejected empty SSID.");
-    content="NOT OK";
-    }
     server.send(200, F("text/html"), content);
->>>>>>> master
+
     delay(500);
     digitalWrite(status_led, LOW);
     ESP.restart();

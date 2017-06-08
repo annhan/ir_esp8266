@@ -13,6 +13,8 @@
 #include <WiFiUdp.h>
 #include <SPI.h>
 #include <SD.h>
+File myFile;
+
 
 const int chipSelect = 16;
 
@@ -46,7 +48,7 @@ void parseBytes(const char* str, char sep, byte* bytes, int maxBytes, int base);
 void setupWeb(void);
 void setupWiFiConf(void);
 void dumpCode (decode_results *results);
-
+void conver_time();
 void Tach_TCP(String str);
 void nhan_TCP();
 
@@ -208,7 +210,7 @@ void loop() {
         statusmang = 0;
         _resetketnoi = 0;
       }
-      if  ((_resetketnoi % 5000) == 0)ketnoimang();
+      if  ((_resetketnoi % 5000) == 0)ketnoimang() ;
       if ( (unsigned long) (millis() - timeled) > 500 ) {
         if (denled == 0) denled = 1;
         else denled = 0;
@@ -217,7 +219,7 @@ void loop() {
         Serial.println("DISCONNECT");
       }
       _resetketnoi = _resetketnoi + 1;
-      if (_resetketnoi >= 20000) {
+      if (_resetketnoi >= 65000) {
         Serial.println("A");
         digitalWrite(status_led, HIGH );
         //pinMode(status_led, INPUT);
