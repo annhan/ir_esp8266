@@ -17,6 +17,38 @@ const char fieldset[] PROGMEM ="<fieldset>";
 const char information[] PROGMEM = "<li>Copyright © by Kim Son Tien Co.Ltd - mHome <li>www.nhathongminhmhome.com <li>Designed by mHome - R&D Department <li>Made in VietNam";
 const char header[] PROGMEM = "<!DOCTYPE HTML>\r\n<html><head>"
                               "<style>"
+                              "input {"
+  "padding: 5px 0;"
+  "font-size: 1.5em;"
+  "font-family: inherit;"
+  "width: 150px;"
+"}"
+
+
+                              
+".weekDays-selector input {"
+  "display: none!important;"
+"}"
+
+".weekDays-selector input[type=checkbox] + label {"
+  "display: inline-block;"
+  "border-radius: 6px;"
+  "background: #dddddd;"
+  "height: 40px;"
+  "width: 30px;"
+  "margin-right: 3px;"
+  "line-height: 40px;"
+  "text-align: center;"
+  //cursor: pointer;
+"}"
+
+".weekDays-selector input[type=checkbox]:checked + label {"
+  "background: #2AD705;"
+  "color: #ffffff;"
+"}"
+
+
+                              
 "nav {"
     "float: left;"
     "margin-right:30px;"

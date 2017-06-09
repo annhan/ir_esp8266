@@ -42,6 +42,7 @@ byte gettime_udp()
     thoigianthuc = secsSince1900 - seventyYears;
     long day = thoigianthuc / 86400L;
     weekday = (day+4) % 7;
+    thoigianthuc= thoigianthuc  % 86400L ;
     }
     return 1 ;
   }  
@@ -71,5 +72,28 @@ switch (day){
   case 6: return "Saturday"; break;
   default : return "Not" ; break;
 }
+}
+
+
+unsigned long conver_time_string_to_int(String timeget){
+   int hh, mm ;
+    char time_begin_char[10];
+    timeget.toCharArray(time_begin_char, sizeof(time_begin_char));
+    sscanf(time_begin_char, "%d:%d", &hh, &mm);
+    unsigned long showSecs = (hh * 3600) + (mm * 60);
+    return showSecs;
+}
+
+String conver_time_int_to_string(unsigned long timeget){
+    String trave="";
+    int gio=timeget / 3600;
+    if ( gio < 9)trave += "0" ;
+    trave +=String(timeget / 3600) ;
+    trave += ":";
+    int phut = (timeget  % 3600) / 60 ;
+    if (phut <9) trave += "0" ;
+    trave += String((timeget  % 3600) / 60 );
+    Serial.println(trave);
+    return(trave);
 }
 

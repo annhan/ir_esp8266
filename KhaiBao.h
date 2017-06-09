@@ -117,6 +117,18 @@ struct WiFiConfStruct {
  * Thoi gian thuc doc tu server
  */
 
+boolean read_setting=0;
+int temp_set=0;
+unsigned long time_begin_int=0;
+unsigned long time_end_int=0;
+boolean is_mon = 0 ;
+boolean is_tue = 0 ;
+boolean is_wed = 0 ;
+boolean is_thu = 0 ;
+boolean is_fri = 0 ;
+boolean is_sat = 0 ;
+boolean is_sun = 0 ;
+
 
 unsigned long thoigianthuc=0;
 String time_ ;
@@ -126,3 +138,9 @@ int day;
 int hour;
 int minute;
 int weekday;
+
+
+String time_begin="";
+String time_end="";
+
+

@@ -139,6 +139,7 @@ void setup() {
   }
   Serial.println(F("card initialized."));
   user_using();
+  read_setting=read_file_setting();
 }
 
 
@@ -201,8 +202,10 @@ void loop() {
         demgiay++;
       }
       else if (demgiay % 36 == 0) {
+        if (read_setting) read_setting=read_file_setting();
         demgiay = 1 ;
         gettime_udp();
+        read_file_setting();
       }
       break ;
     default:
