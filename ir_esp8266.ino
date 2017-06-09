@@ -202,10 +202,10 @@ void loop() {
         demgiay++;
       }
       else if (demgiay % 36 == 0) {
-        if (read_setting) read_setting=read_file_setting();
+        if (read_setting == 0) read_setting=read_file_setting();
         demgiay = 1 ;
         gettime_udp();
-        read_file_setting();
+        
       }
       break ;
     default:

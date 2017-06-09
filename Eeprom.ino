@@ -148,9 +148,9 @@ void user_using(){
   else if (String(WiFiConf.sta_ML)=="7") duongdan_ML="Panasonic";
   else if (String(WiFiConf.sta_ML)=="8") duongdan_ML="Reetech";
   else if (String(WiFiConf.sta_ML)=="9") duongdan_ML="Samsung";
-  else if (String(WiFiConf.sta_ML)=="a") duongdan_ML="Sanyo";
-  else if (String(WiFiConf.sta_ML)=="b") duongdan_ML="Sharp";
-  else if (String(WiFiConf.sta_ML)=="c") duongdan_ML="Toshiba";
+  else if (String(WiFiConf.sta_ML)=="10") duongdan_ML="Sanyo";
+  else if (String(WiFiConf.sta_ML)=="11") duongdan_ML="Sharp";
+  else if (String(WiFiConf.sta_ML)=="12") duongdan_ML="Toshiba";
 
   if (String(WiFiConf.sta_TV)=="0") duongdan_TV="User";
   else if (String(WiFiConf.sta_TV)=="1") duongdan_TV="LG";

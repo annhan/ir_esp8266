@@ -43,6 +43,7 @@ byte gettime_udp()
     long day = thoigianthuc / 86400L;
     weekday = (day+4) % 7;
     thoigianthuc= thoigianthuc  % 86400L ;
+    Serial.println(thoigianthuc);
     }
     return 1 ;
   }  

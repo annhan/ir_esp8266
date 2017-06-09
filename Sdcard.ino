@@ -25,23 +25,23 @@ String write_file_setting(){
   File myFile1 = SD.open("Setting/setting.txt", O_WRITE | O_TRUNC);
   if (myFile1) {
     myFile1.print(time_begin_int);
-   myFile1.println("\n");
+   myFile1.println("");
        myFile1.print(time_end_int);
-   myFile1.println("\n");
+   myFile1.println("");
        myFile1.print(temp_set);
-   myFile1.println("\n");
+   myFile1.println("");
           myFile1.print(is_mon);
-   myFile1.println("\n");
+   myFile1.println("");
           myFile1.print(is_tue);
-   myFile1.println("\n");
+   myFile1.println("");
           myFile1.print(is_wed);
-   myFile1.println("\n");
+   myFile1.println("");
           myFile1.print(is_thu);
-   myFile1.println("\n");
+   myFile1.println("");
           myFile1.print(is_fri);
-   myFile1.println("\n");
+   myFile1.println("");
           myFile1.print(is_sat);
-   myFile1.println("\n");
+   myFile1.println("");
           myFile1.print(is_sun);
    myFile1.println("\n");
     myFile1.close();
@@ -66,7 +66,6 @@ boolean read_file_setting(){
     giatritam.toCharArray(char_tam, sizeof(char_tam));
       time_begin_int=atoi(char_tam);
             giatritam=myFile1.readStringUntil('\n');
-      giatritam=myFile1.readStringUntil('\n');
     giatritam.toCharArray(char_tam, sizeof(char_tam));
       time_end_int=atoi(char_tam);
                   giatritam=myFile1.readStringUntil('\n');
@@ -99,7 +98,7 @@ boolean read_file_setting(){
       Serial.println(is_sun);
     // close the file:
     myFile1.close();
-    return i ;
+    return 1 ;
   } else {
     // if the file didn't open, print an error:
     Serial.println("error opening test.txt");

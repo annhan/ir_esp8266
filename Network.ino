@@ -565,19 +565,42 @@ void setupWiFiConf(void) {
     content += FPSTR(_legend_html);
     content += F("<div class=\"row\">");
     content += "<li><select name='button' class=\"dropbtn\" >";
-    content += F("<option value=\"0\">User</option>");
+    /*content += F("<option value=\"0\">User</option>");
     content += F("<option value=\"1\">Carrier</option>");
     content += F("<option value=\"2\">Daikin</option>");
     content += F("<option value=\"3\">Electrolux</option>");
     content += F("<option value=\"4\">Hitachi</option>");
     content += F("<option value=\"5\">LG</option>");
     content += F("<option value=\"6\">Misu</option>");
-    content += F("<option value=\"7\">panasonic</option>");
+    content += F("<option value=\"7\">Panasonic</option>");
     content += F("<option value=\"8\">Reetech</option>");
     content += F("<option value=\"9\">Samsung</option>");
-    content += F("<option value=\"a\">Sanyo</option>");
-    content += F("<option value=\"b\">Sharp</option>");
-    content += F("<option value=\"c\">Toshiba</option>");
+    content += F("<option value=\"10\">Sanyo</option>");
+    content += F("<option value=\"11\">Sharp</option>");
+    content += F("<option value=\"12\">Toshiba</option>");*/
+    String id_check="";
+    
+    for (int i = 0; i < 13; i++) {
+      switch (i) {
+        case 0:  id_check = "User";break;
+        case 1:  id_check = "Carrier";break;
+        case 2:  id_check = "Daikin";break;
+        case 3:  id_check = "Electrolux";break;
+        case 4:  id_check = "Hitachi";break;
+        case 5:  id_check = "LG";break;
+        case 6:  id_check = "Misu";break;
+        case 7:  id_check = "Panasonic";break;
+        case 8:  id_check = "Reetech";break;
+        case 9:  id_check = "Samsung";break;
+        case 10:  id_check = "Sanyo";break;
+        case 11:  id_check = "Sharp";break;
+        case 12:  id_check = "Toshiba";break;
+      }
+      if (atoi(WiFiConf.sta_ML) != i)
+      content += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
+      else
+      content += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
+    }
     content += "</select>";
     content += F("</div>");
     content += F("<div class=\"row\">");
@@ -586,6 +609,7 @@ void setupWiFiConf(void) {
     content += FPSTR(_fieldset);
     content += F("</form>");
     content += F("</nav>");
+    /*
     content += F("<nav>");
     content += F("<form method='get' action='set_remote_TV'>");
     content += FPSTR(fieldset);
@@ -594,13 +618,21 @@ void setupWiFiConf(void) {
     content += FPSTR(_legend_html);
     content += F("<div class=\"row\">");
     content += "<li><select name='button1' class=\"dropbtn\">";
-    content += F("<option value=\"0\">User</option>");
-    content += F("<option value=\"1\">LG</option>");
-    content += F("<option value=\"2\">Samsung</option>");
-    content += F("<option value=\"3\">Sony</option>");
-    content += F("<option value=\"4\">Toshiba</option>");
+    for (int i = 0; i < 5; i++) {
+      switch (i) {
+        case 0:  id_check = "User";break;
+        case 1:  id_check = "LG";break;
+        case 2:  id_check = "Samsung";break;
+        case 3:  id_check = "Sony";break;
+        case 4:  id_check = "Toshiba";break;
+      }
+      if (atoi(WiFiConf.sta_TV) != i)
+      content += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
+      else
+      content += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
+    }
     content += "</select>";
-    content += F("</div>");
+    content += F("</div>");*/
     content += F("<div class=\"row\">");
     content += F("<li><input type='submit' id=\"submitbtn\" value='Set TV' onclick='return confirm(\"Save?\");'>");
     content += F("</div>");
@@ -617,14 +649,14 @@ void setupWiFiConf(void) {
 
 
     content += F("<div class=\"row\">");
-    content += "<label for='timebegin' class=\"req\">Time Begin: </label>";
+    content += "<label for='timebegin' class=\"req\">Begin: </label>";
     content += "<input type=\"time\" name=\"timebegin\" value=\"";
     content +=conver_time_int_to_string(time_begin_int);
     content += "\"/>";
 
     content += F("</div>");
     content += F("<div class=\"row\">");
-    content += "<label for='timeend' class=\"req\">Time End: </label>";
+    content += "<label for='timeend' class=\"req\">End: </label>";
     content += "<input type=\"time\" name=\"timeend\" value=\"";
     content +=conver_time_int_to_string(time_end_int);
     content += "\"/>";
@@ -635,15 +667,10 @@ void setupWiFiConf(void) {
     content += "<label for='button' class=\"req\">Temp : </label>";
     content += "<select name='tempset' class=\"dropbtn\" >";
     for (int i = 18; i < 26; i++) {
-      String hienthi = "";
-      if (i < 10) {
-        hienthi = "0" + String(i);
-      }
-      else hienthi = String(i);
       if (i!=temp_set)
-      content += "<option value=\"" + hienthi + "\">" +  hienthi + "*C</option>";
+      content += "<option value=\"" + String(i) + "\">" +  String(i) + "*C</option>";
       else
-      content += "<option value=\"" + hienthi + "\" selected>" +  hienthi + "*C</option>";
+      content += "<option value=\"" + String(i) + "\" selected>" +  String(i) + "*C</option>";
     }
     content += "</select>";
 
@@ -652,7 +679,6 @@ void setupWiFiConf(void) {
     content += F("<div class=\"weekDays-selector\">");
     content += "<label  class=\"req\">Weekday : </label>";
     String thungay = "";
-    String id_check="";
     for (int i = 0; i < 7; i++) {
       switch (i) {
         case 0:
@@ -666,28 +692,28 @@ void setupWiFiConf(void) {
               id_check = "Mon"; 
               break;
         case 2: 
-              if (is_mon) thungay = "Tue\" checked";
+              if (is_tue) thungay = "Tue\" checked";
               else thungay = "Tue\""; 
               id_check = "Tue";
               break;
         case 3:
-        if (is_mon) thungay = "Wed\" checked";
+        if (is_wed) thungay = "Wed\" checked";
               else thungay = "Wed\"";
               id_check = "Wed";
                
               break;
         case 4: 
-        if (is_mon) thungay = "Thu\" checked";
+              if (is_thu) thungay = "Thu\" checked";
               else thungay = "Thu\""; 
               id_check = "Thu";
               break;
         case 5:
-        if (is_mon) thungay = "Fri\" checked";
+        if (is_fri) thungay = "Fri\" checked";
               else thungay = "Fri\""; 
               id_check = "Fri";
               break;
         case 6: 
-              if (is_mon) thungay = "Sat\" checked";
+              if (is_sat) thungay = "Sat\" checked";
               else thungay = "Sat\""; 
               id_check = "Sat";
               break;
@@ -719,12 +745,19 @@ void setupWiFiConf(void) {
     Serial.println(time_end_int);
     Serial.println(temp_set);
     if (server.hasArg("Sun")){Serial.println("OK Sunday");is_sun=1;}
+    else is_sun=0;
     if (server.hasArg("Mon")){Serial.println("OK Monday");is_mon=1;}
+    else is_mon=0;
     if (server.hasArg("Tue")){Serial.println("OK Tueday");is_tue=1;}
+    else is_tue=0;
     if (server.hasArg("Wed")){Serial.println("OK Webday");is_wed=1;}
+    else is_wed=0;
     if (server.hasArg("Thu")){Serial.println("OK Thuday");is_thu=1;}
+    else is_thu=0;
     if (server.hasArg("Fri")){Serial.println("OK Friday");is_fri=1;}
+    else is_fri=0;
     if (server.hasArg("Sat")){Serial.println("OK Satday");is_sat=1;}
+    else is_sat=0;
     write_file_setting();
     server.send(200, F("text/html"), duongdan_ML);
 
@@ -737,14 +770,14 @@ void setupWiFiConf(void) {
     server.send(200, F("text/html"), duongdan_ML);
 
   });
-  server.on("/set_remote_TV",  []() {
+  /*server.on("/set_remote_TV",  []() {
     String data1 = server.arg(F("button"));
     data1.toCharArray(WiFiConf.sta_TV, sizeof(WiFiConf.sta_TV));
     user_using();
     saveWiFiConf();
     server.send(200, F("text/html"), duongdan_TV);
 
-  });
+  });*/
   ///////////////////////
   /*
      POST DATA IR

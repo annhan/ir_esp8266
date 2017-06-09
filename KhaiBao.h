@@ -88,10 +88,10 @@ struct WiFiConfStruct {
   char sta_global3[20];
   char sta_language[3];
   char module_id[32];
-  char sta_ML[2];
-  char sta_TV[2];
-  char sta_MQ[2];
-  char sta_Amply[2];
+  char sta_ML[4];
+  char sta_TV[4];
+  char sta_MQ[4];
+  char sta_Amply[4];
 } WiFiConf = {
   WIFI_CONF_FORMAT,
   "",
