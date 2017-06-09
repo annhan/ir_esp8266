@@ -204,7 +204,6 @@ void loop() {
         demgiay = 1 ;
         gettime_udp();
       }
-
       break ;
     default:
       if (statusmang != 0) {
@@ -254,8 +253,5 @@ void loop() {
     Serial.println(F("Status Motion : 0"));
     _motion_status = 0;
   }
-  
-//String PostData = "{\r\n\"name\": \"\",\r\n\"value\":\"\",\r\n\"invokeScenes\":True\r\n}";
-//Serial.println(PostData.length());
 }
 

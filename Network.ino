@@ -475,7 +475,7 @@ server.on(html_setup_SETHC2, []() {
           content +="</select>";
           content +=F("</div>");
            content += F("<div class=\"row\">");
-          content += F("<li><input type='submit' id=\"submitbtn\" value='Save Quạt' onclick='return confirm(\"Save?\");'>");
+          content += F("<li><input type='submit' id=\"submitbtn\" value='Save Amply' onclick='return confirm(\"Save?\");'>");
           content +=F("</div>");
           content +=FPSTR(_fieldset);
          
@@ -501,7 +501,7 @@ server.on(html_setup_SETHC2, []() {
     server.send(200, F("text/html"), data1);
   });
     server.on("/Savecode_TV", []() {
-    String data1=server.arg(F("button"));
+    String data1=server.arg(F("button1"));
   //  String maker=server.arg(F("maker"));
     data1="TV/User/" +data1;
     String data= writefile(data1);
@@ -509,7 +509,7 @@ server.on(html_setup_SETHC2, []() {
     server.send(200, F("text/html"), data1);
   });
     server.on("/Savecode_Q", []() {
-    String data1=server.arg(F("button"));
+    String data1=server.arg(F("button2"));
   //  String maker=server.arg(F("maker"));
     data1="Quat/User/" +data1;
     String data= writefile(data1);
@@ -517,7 +517,7 @@ server.on(html_setup_SETHC2, []() {
     server.send(200, F("text/html"), data1);
   });
     server.on("/Savecode_Amply", []() {
-    String data1=server.arg(F("button"));
+    String data1=server.arg(F("button3"));
   //  String maker=server.arg(F("maker"));
     data1="Amply/User/" +data1;
     String data= writefile(data1);
@@ -972,6 +972,9 @@ content += FPSTR(begin_title);
     content += F("<h1>mHome - Wifi to IR Controller </h1>");
     content += FPSTR(p_html);
     content +=FPSTR(fieldset);
+    
+    content += F("<li>Today : ");
+    content += conver_day(weekday);
     content += F("<li>Nhiệt độ : ");
     content += String(nhietdo);
     content += F(" *C");

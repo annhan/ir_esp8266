@@ -35,10 +35,13 @@ byte gettime_udp()
     udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
     unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
     unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
-    unsigned long secsSince1900 = highWord << 16 | lowWord;
+    unsigned long secsSince1900 = 0;
+    secsSince1900 = highWord << 16 | lowWord;
     const unsigned long seventyYears = 2208988800UL;
-    if  (secsSince1900 > 2400000000 ){
+    if  ((secsSince1900 > 2400000000) && (secsSince1900 < 6000000000)){
     thoigianthuc = secsSince1900 - seventyYears;
+    long day = thoigianthuc / 86400L;
+    weekday = (day+4) % 7;
     }
     return 1 ;
   }  
@@ -54,5 +57,19 @@ void conver_time(){
   if ( ((motion_time % 3600) / 60) < 10 ) time_ += "0";
   minute = (motion_time  % 3600) / 60 ;
   time_ += minute;
+}
+
+
+String conver_day(int day){
+switch (day){
+  case 0: return "Sunday"; break;
+  case 1: return "Monday"; break;
+  case 2: return "Tuesday"; break;
+  case 3: return "Wednesday"; break;
+  case 4: return "Thursday"; break;
+  case 5: return "Friday"; break;
+  case 6: return "Saturday"; break;
+  default : return "Not" ; break;
+}
 }
 
