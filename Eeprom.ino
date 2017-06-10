@@ -1,6 +1,6 @@
 int waitConnected(void) {
   byte wait = 0;
-    while (wait<10 ) {
+    while (wait<20 ) {
     digitalWrite(status_led, LOW);
     if (WiFi.status() == WL_CONNECTED) {
       //Serial.println("");

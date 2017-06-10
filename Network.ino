@@ -503,32 +503,32 @@ void setupWiFiConf(void) {
   server.on("/Savecode_ML", []() {
     String data1 = server.arg(F("button"));
     //  String maker=server.arg(F("maker"));
-    data1 = "ML/User/" + data1;
-    String data = writefile(data1);
+    data1 = "ML/User/" + data1 + ".txt";
+    String data = write_file_setting(data1 , 3 );
     data1 = data1 + data ;
     server.send(200, F("text/html"), data1);
   });
   server.on("/Savecode_TV", []() {
     String data1 = server.arg(F("button1"));
     //  String maker=server.arg(F("maker"));
-    data1 = "TV/User/" + data1;
-    String data = writefile(data1);
+    data1 = "TV/User/" + data1 + ".txt";
+    String data = write_file_setting(data1 , 3 );
     data1 = data1 + data ;
     server.send(200, F("text/html"), data1);
   });
   server.on("/Savecode_Q", []() {
     String data1 = server.arg(F("button2"));
     //  String maker=server.arg(F("maker"));
-    data1 = "Quat/User/" + data1;
-    String data = writefile(data1);
+    data1 = "Quat/User/" + data1 + ".txt";
+    String data = write_file_setting(data1 , 3 );
     data1 = data1 + data ;
     server.send(200, F("text/html"), data1);
   });
   server.on("/Savecode_Amply", []() {
     String data1 = server.arg(F("button3"));
     //  String maker=server.arg(F("maker"));
-    data1 = "Amply/User/" + data1;
-    String data = writefile(data1);
+    data1 = "Amply/User/" + data1 + ".txt";
+    String data = write_file_setting(data1 , 3 );
     data1 = data1 + data ;
     server.send(200, F("text/html"), data1);
   });
@@ -536,8 +536,8 @@ void setupWiFiConf(void) {
     String type = server.arg(F("type"));
     String maker = server.arg(F("maker"));
     String button = server.arg(F("button"));
-    type = type + "/" + maker + "/" + button ;
-    int chieudai = readfile(type);
+    type = type + "/" + maker + "/" + button + ".txt";
+    int chieudai = read_file_setting(type , 3 );
     Serial.println(chieudai);
     server.send(200, F("text/html"), "OK");
   });
@@ -632,13 +632,13 @@ void setupWiFiConf(void) {
       content += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
     }
     content += "</select>";
-    content += F("</div>");*/
+    content += F("</div>");
     content += F("<div class=\"row\">");
     content += F("<li><input type='submit' id=\"submitbtn\" value='Set TV' onclick='return confirm(\"Save?\");'>");
     content += F("</div>");
     content += FPSTR(_fieldset);
     content += F("</form>");
-    content += F("</nav>");
+    content += F("</nav>");*/
 
     content += F("<form method='get' action='set_schedule'>");
     content += F("<nav>");
@@ -758,7 +758,7 @@ void setupWiFiConf(void) {
     else is_fri=0;
     if (server.hasArg("Sat")){Serial.println("OK Satday");is_sat=1;}
     else is_sat=0;
-    write_file_setting();
+    write_file_setting("Setting/setting.txt",1);
     server.send(200, F("text/html"), duongdan_ML);
 
   });

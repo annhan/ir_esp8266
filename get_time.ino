@@ -40,8 +40,9 @@ byte gettime_udp()
     const unsigned long seventyYears = 2208988800UL;
     if  ((secsSince1900 > 2400000000) && (secsSince1900 < 6000000000)){
     thoigianthuc = secsSince1900 - seventyYears;
-    long day = thoigianthuc / 86400L;
+    unsigned long day = thoigianthuc / 86400L;
     weekday = (day+4) % 7;
+    thoigianthuc=thoigianthuc+ 25200L ; //Cộng với 7h là 7*3600 cho đúng múi giờ +7
     thoigianthuc= thoigianthuc  % 86400L ;
     Serial.println(thoigianthuc);
     }
@@ -52,7 +53,7 @@ byte gettime_udp()
 
 void conver_time(){
   hour = (motion_time  % 86400L) / 3600 ;
-  hour = hour + 7 ;
+  //hour = hour + 7 ;
   hour = hour % 24;
   time_ = hour;
   time_ += " : ";

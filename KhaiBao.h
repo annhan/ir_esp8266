@@ -10,16 +10,22 @@
 #define DHTPin 5
 #define MotionPin 4
 
+static int state_status=0;
+
+const int state_no = 0;
+const int state_not_day = 1;
+const int state_begin = 2;
+const int state_update1 = 3;
+const int state_update2 = 4;
+const int state_update3 = 5;
+const int state_conti = 6;
+const int state_update4 = 7;
+const int state_update5 = 8;
+const int state_wait = 9;
+
 
 String duongdan_ML="User";
 String duongdan_TV="User";
-
-
-
-
-
-
-
 
 byte _motion_status=0;
 unsigned long motion_time=0;
@@ -117,10 +123,16 @@ struct WiFiConfStruct {
  * Thoi gian thuc doc tu server
  */
 
+
+
+unsigned long time_tam_cho_cac_buoc = 600;
 boolean read_setting=0;
+boolean read_setting_state=0;
 int temp_set=0;
+int khoang_time_cach_nhau=300;
 unsigned long time_begin_int=0;
 unsigned long time_end_int=0;
+boolean dung_ngay=false;
 boolean is_mon = 0 ;
 boolean is_tue = 0 ;
 boolean is_wed = 0 ;
