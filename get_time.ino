@@ -78,15 +78,22 @@ switch (day){
 
 
 unsigned long conver_time_string_to_int(String timeget){
+  Serial.print("Thoi gian luu ");
+  Serial.println(timeget);
    int hh, mm ;
     char time_begin_char[10];
     timeget.toCharArray(time_begin_char, sizeof(time_begin_char));
     sscanf(time_begin_char, "%d:%d", &hh, &mm);
+    //os_scanf(time_begin_char, "%d:%d", &hh, &mm);
+    Serial.print(hh);
+    Serial.print(":");
+    Serial.print(mm);
     unsigned long showSecs = (hh * 3600) + (mm * 60);
     return showSecs;
 }
 
 String conver_time_int_to_string(unsigned long timeget){
+  Serial.println(timeget);
     String trave="";
     int gio=timeget / 3600;
     if ( gio < 9)trave += "0" ;
@@ -95,6 +102,7 @@ String conver_time_int_to_string(unsigned long timeget){
     int phut = (timeget  % 3600) / 60 ;
     if (phut <9) trave += "0" ;
     trave += String((timeget  % 3600) / 60 );
+    Serial.println(trave);
     Serial.println(trave);
     return(trave);
 }

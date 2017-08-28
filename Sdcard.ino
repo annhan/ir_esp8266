@@ -47,7 +47,7 @@ String write_file_setting(String namefile, int tt) {
     return (" OK");
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
+    Serial.println("error write test.txt");
     return (" Fail");
   }
 }
@@ -56,10 +56,7 @@ boolean read_file_setting(String namefile, int tt) {
   if (myFile1) {
     char char_tam[30];
     String giatritam = "";
-    Serial.println("test.txt:");
     int i = 1;
-    // read from the file until there's nothing else in it:
-    //while (myFile1.available()) {
     if (tt == 1) {
       giatritam = myFile1.readStringUntil('\n');
       giatritam.toCharArray(char_tam, sizeof(char_tam));

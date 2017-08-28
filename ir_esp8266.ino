@@ -1,3 +1,12 @@
+#ifdef ESP8266
+extern "C" {
+  #include "user_interface.h"
+}
+#endif
+#include <ArduinoJson.h>
+#include <PubSubClient.h>
+#include "sscanf.h"
+#include <EEPROM.h>
 #include "DHT.h"
 #include "variable_http.h"
 #include "KhaiBao.h"
@@ -5,7 +14,9 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <ESP8266mDNS.h>
-#include <EEPROM.h>
+#include <IRremoteESP8266.h>
+#include <IRutils.h>
+
 #include <IRrecv.h>
 #include <IRsend.h>
 #include <ir_Daikin.h>
@@ -13,12 +24,25 @@
 #include <WiFiUdp.h>
 #include <SPI.h>
 #include <SD.h>
+// Port 1883
+
+//*************************
+//  MQTT ******************
+#define mqtt_server "192.168.99.60" //"m13.cloudmqtt.com"
+char mqtt_topic[21];
+#define mqtt_user "mhome"
+#define mqtt_pwd "123456"
+const uint16_t mqtt_port = 1883; //12535; //1883
+//****************************
 File myFile;
 
 
 const int chipSelect = 16;
 
-
+IPAddress ip10;
+IPAddress gateway10;
+IPAddress subnet10;
+IPAddress DNS(8, 8, 8, 8);
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udp;
 IPAddress timeServerIP; // time.nist.gov NTP server address
@@ -53,8 +77,22 @@ void Tach_TCP(String str);
 void nhan_TCP();
 
 ESP8266HTTPUpdateServer httpUpdater;
+
 WiFiClient client;
-IRrecv irrecv(RECV_PIN);
+WiFiClient client1;
+//############################################
+PubSubClient clientmqtt(client1);
+//#############################################
+uint16_t CAPTURE_BUFFER_SIZE = 1400;
+
+// Nr. of milli-Seconds of no-more-data before we consider a message ended.
+// NOTE: Don't exceed MAX_TIMEOUT_MS. Typically 130ms.
+#define TIMEOUT 100U  // Suits most messages, while not swallowing repeats.
+// #define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
+                        // units, but can accidently swallow repeated messages
+                        // in the rawData[] output.
+
+IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT);
 IRsend irsend(Send_PIN);
 IRDaikinESP dakinir(Send_PIN);
 IRMitsubishiAC mitsubir(Send_PIN);
@@ -64,7 +102,7 @@ IRMitsubishiAC mitsubir(Send_PIN);
 ESP8266WebServer server(4999);
 WiFiServer serverTCP(4998);
 decode_results  results;
-irparams_t save;
+//irparams_t save;
 
 /* SETUP
 
@@ -91,7 +129,7 @@ void setup() {
   Serial.println("A");
   hoclenh = 0;
   WiFi.mode(WIFI_AP_STA);
-
+  
   ketnoimang();
   // Serial.println("D");
   statusmang = waitConnected();
@@ -122,13 +160,14 @@ void setup() {
   dakinir.begin();
   mitsubir.begin();
   dht.begin();
-  digitalWrite(status_led, HIGH); //irrecv.enableIRIn();}
+  digitalWrite(status_led, LOW); //irrecv.enableIRIn();}
   irrecv.disableIRIn();
   getHC();
   IPAddress ip = WiFi.localIP();
   timeled = timedelay = millis();
   ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
   _motion_status = 1;
+  WiFi.macAddress(macAddr);
   MDNS.addService("http", "tcp", 4999);
   if (!SD.begin(chipSelect)) {
     Serial.println(F("Card failed, or not present"));
@@ -139,17 +178,29 @@ void setup() {
   user_using();
   state_status = state_no;
   read_setting = read_file_setting("Setting/setting.txt", 1);
-  read_setting_state = read_file_setting("Setting/state.txt", 2);
+  read_setting_state = read_file_setting("Setting/setting.txt", 2);
   udp.begin(localPort);
-
-
   weekday = 8;
+  //save.rawbuf = new uint16_t[irrecv.getBufSize()];
+ // if (save.rawbuf == NULL) {  // Check we allocated the memory successfully.
+  //  Serial.printf("Could not allocate a %d buffer size for the save buffer.\n"
+   //               "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!",
+    //              irrecv.getBufSize());
+  //  ESP.restart();
+ // }
+  //################################
+  snprintf (mqtt_topic, 21, "mIR/%ld", macAddr);
+  Serial.println(mqtt_topic);
+  clientmqtt.setServer(mqtt_server, mqtt_port);
+  clientmqtt.setCallback(callback);
+  lastReconnectAttempt = 0;
+  //##################################
 }
 
 
 int hoc_ir(byte stt) {
   if (stt == 1) {
-    if (irrecv.decode(&results, &save)) {
+    if (irrecv.decode(&results)) {
       serialPrintUint64Hex(results.value);
       //dump(&results);
       dumpInfo(&results);
@@ -161,6 +212,24 @@ int hoc_ir(byte stt) {
 }
 void loop() {
   server.handleClient();
+  //##################
+  // MQTT ############
+  //#################
+   if (!clientmqtt.connected()) {
+    long now = millis();
+    if (now - lastReconnectAttempt > 5000) {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      if (reconnect()) {
+        lastReconnectAttempt = 0;
+      }
+    }
+  } else {
+    // Client connected
+
+    clientmqtt.loop();
+  }
+  //#######################
   switch (WiFi.status())
   {
     case WL_CONNECTED:
@@ -168,15 +237,15 @@ void loop() {
       if (statusmang == 0) {
         statusmang = 1;
         _resetketnoi = 0;
-        digitalWrite(status_led, HIGH);
+        digitalWrite(status_led, LOW);
       }
       else if (hoc_ir(hoclenh) == 1) {
-        digitalWrite(status_led, LOW);
+        digitalWrite(status_led, HIGH);
         _resetketnoi = 100;
         irrecv.resume();
       }
       else if (_resetketnoi == 2) {
-        digitalWrite(status_led, HIGH);
+        digitalWrite(status_led, LOW);
         _resetketnoi = _resetketnoi - 1;
       }
       else if (_resetketnoi > 0) {
@@ -200,6 +269,11 @@ void loop() {
           Serial.print(nhietdo);
           Serial.println(" *C ");
         }
+          
+          char msg[50];  
+          snprintf (msg, 75, "{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[%ld,2.302038]}", macAddr);
+          Serial.println(msg);
+          clientmqtt.publish(mqtt_topic, msg);
       }
       else if (demgiay % 33 == 0) {
         send_udp();
@@ -209,7 +283,7 @@ void loop() {
         demgiay = 1 ;
         gettime_udp();
         if (read_setting == 0) read_setting = read_file_setting("Setting/setting.txt", 1);
-        if (read_setting_state == 0) read_setting_state = read_file_setting("Setting/state.txt", 2);
+        if (read_setting_state == 0) read_setting_state=read_file_setting("Setting/setting.txt", 2);
       }
       break ;
     default:

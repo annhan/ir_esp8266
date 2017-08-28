@@ -36,11 +36,27 @@ void printIP(void) {
   Serial.println(WiFiConf.module_id);
 }
 void ketnoimang() {
+//  #ifdef ESP8266
+ // wifi_station_set_hostname("mIR");
+ // #endif
+  WiFi.hostname("mIR");
+  //byte ip1[4];
   WiFi.begin(WiFiConf.sta_ssid, WiFiConf.sta_pwd);
-  parseBytes(WiFiConf.sta_ip, '.', ip1, 4, 10);
-  parseBytes(WiFiConf.sta_gateway, '.', gateway, 4, 10);
-  parseBytes(WiFiConf.sta_subnet, '.', subnet, 4, 10);
-  WiFi.config(ip1, gateway, subnet);
+  parseBytes1(WiFiConf.sta_ip, '.', 1, 4, 10);
+  parseBytes1(WiFiConf.sta_gateway, '.', 2, 4, 10);
+  parseBytes1(WiFiConf.sta_subnet, '.', 3, 4, 10);
+  
+  Serial.println(ip10[0]);
+  Serial.println(ip10[1]);
+  Serial.println(ip10[2]);
+  Serial.println(ip10[3]);
+  //ip[0]=ip1[0];
+WiFi.config(ip10,gateway10,subnet10,DNS);
+  
+  //parseBytes(WiFiConf.sta_ip, '.', ip1, 4, 10);
+ // parseBytes(WiFiConf.sta_gateway, '.', gateway, 4, 10);
+ // parseBytes(WiFiConf.sta_subnet, '.', subnet, 4, 10);
+ // WiFi.config(ip1,gateway,subnet);
 }
 void printWiFiConf(void) {
   Serial.println(WiFiConf.sta_ssid);
@@ -55,7 +71,7 @@ bool loadWiFiConf() {
       EEPROM.read(WIFI_CONF_START + 3) == wifi_conf_format[3])
   {
     for (unsigned int t = 0; t < sizeof(WiFiConf); t++) {
-      *((char*)&WiFiConf + t) = EEPROM.read(WIFI_CONF_START + t);
+      *((char*)&WiFiConf + t) = EEPROM.read(WIFI_CONF_START + t); //& là địa chỉ  của biến Struc, *là data tức là gán data trong ô nhớ struc bằng eprom đọc dc (char*) là ép kiểu dữ liệu
     }
     printWiFiConf();
     return true;
@@ -71,14 +87,9 @@ void saveWiFiConf(void) {
   printWiFiConf();
 }
 void setDefaultModuleId(char* dst) {
-  
-  uint8_t macAddr[WL_MAC_ADDR_LENGTH];
-  WiFi.macAddress(macAddr);
   sprintf(dst, "%s%02x%02x", NAME_PREF, macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
 }
-void resetModuleId(void) {
-  uint8_t macAddr[WL_MAC_ADDR_LENGTH];
-  WiFi.macAddress(macAddr);
+void resetModuleId(void) {;
   setDefaultModuleId(WiFiConf.module_id);
 }
 void scanWiFi(void) {

@@ -10,6 +10,12 @@
 #define DHTPin 5
 #define MotionPin 4
 
+uint8_t macAddr[6];
+//## MQTT
+#define MQTT_MAX_PACKET_SIZE 512
+long lastReconnectAttempt = 0;
+//###
+
 static int state_status=0;
 
 const int state_no = 0;
@@ -37,8 +43,8 @@ float doam=0;
  *  */
 const char ApiKey[] = "BkxnF0xUl-";
 const char ApiURL[] = "http://fota.vn";
-const char AppVersion[] = "mIR-V0.2";  // Phien ban
-const char timeVersion[] = " 06/06/2017";
+const char AppVersion[] = "mIR-V0.3";  // Phien ban
+const char timeVersion[] = " 23/8/2017-15:00";
 /*
  * Wifi
  */
@@ -77,9 +83,7 @@ const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 #define NAME_PREF "mHome-"
 String network_html;
 #define WIFI_CONF_START 0
-  byte ip1[4];
-  byte gateway[4];
-  byte subnet[4];
+ 
 struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];

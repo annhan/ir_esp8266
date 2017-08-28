@@ -46,7 +46,7 @@ void nhan_TCP(){
 
 void dumpInfo(decode_results *results) {
   if (results->overflow) {
-  //  Serial.println("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
+    Serial.println("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
     return;
   }
   Serial.println(F(""));

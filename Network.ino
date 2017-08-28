@@ -57,7 +57,7 @@ void parseStringRAW(String str) {
   } while (index != -1);
   for (int i = 0; i < count - 1; i++) {
     if (code_array[i] < 1310) {
-      code_array[i] = code_array[i] * USECPERTICK;
+      code_array[i] = code_array[i] * RAWTICK;
     }
     else code_array[i] = 65534;
     // Serial.print(code_array[i]);
@@ -1235,9 +1235,27 @@ void setupWeb(void) {
 //*******************
 // Hafm tach IP.Gateway
 //*******************
-void parseBytes(const char* str, char sep, byte* bytes, int maxBytes, int base) {
+/*
+  byte ip1[4];
+  byte gateway[4];
+  byte subnet[4];
+  void parseBytes(const char* str, char sep, byte* bytes, int maxBytes, int base) {
   for (int i = 0; i < maxBytes; i++) {
-    bytes[i] = strtoul(str, NULL, base);  // Convert byte
+    bytes[i] = strtoul(str, NULL, base);  
+    Serial.println(bytes[i]);
+    str = strchr(str, sep);               
+    if (str == NULL || *str == '\0') {
+      break;                            
+    }
+    str++;                               
+  }
+}*/
+void parseBytes1(const char* str, char sep, int address, int maxBytes, int base) {
+  for (int i = 0; i < maxBytes; i++) {
+    if (address == 1) ip10[i] = strtoul(str, NULL, base);  // Convert byte
+    else if (address == 2) gateway10[i] = strtoul(str, NULL, base);  // Convert byte
+    else if (address == 3) subnet10[i] = strtoul(str, NULL, base);  // Convert byte
+   // Serial.println(bytes[i]);
     str = strchr(str, sep);               // Find next separator
     if (str == NULL || *str == '\0') {
       break;                            // No more separators, exit
@@ -1245,5 +1263,4 @@ void parseBytes(const char* str, char sep, byte* bytes, int maxBytes, int base) 
     str++;                                // Point to next character after separator
   }
 }
-
 
