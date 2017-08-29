@@ -15,56 +15,23 @@ int waitConnected(void) {
     }
   return(0);
 }
-
-/*int waitConnected1(void) {
-  int i=0;
-  while (true ) {
-    digitalWrite(status_led, LOW);
-    if (WiFi.status() == WL_CONNECTED) {
-      return (1);
-    }
-    delay(400);
-    digitalWrite(status_led, HIGH);
-    delay(400);
-    i++;
-    if (i>70){ESP.restart();return (0);}
-  }
-  return (0);
-}*/
-
 void printIP(void) {
   Serial.println(WiFiConf.module_id);
 }
 void ketnoimang() {
-//  #ifdef ESP8266
- // wifi_station_set_hostname("mIR");
- // #endif
   WiFi.hostname("mIR");
-  //byte ip1[4];
+  WiFi.setAutoReconnect(true);
   WiFi.begin(WiFiConf.sta_ssid, WiFiConf.sta_pwd);
   parseBytes1(WiFiConf.sta_ip, '.', 1, 4, 10);
   parseBytes1(WiFiConf.sta_gateway, '.', 2, 4, 10);
   parseBytes1(WiFiConf.sta_subnet, '.', 3, 4, 10);
-  
-  Serial.println(ip10[0]);
-  Serial.println(ip10[1]);
-  Serial.println(ip10[2]);
-  Serial.println(ip10[3]);
-  //ip[0]=ip1[0];
-WiFi.config(ip10,gateway10,subnet10,DNS);
-  
-  //parseBytes(WiFiConf.sta_ip, '.', ip1, 4, 10);
- // parseBytes(WiFiConf.sta_gateway, '.', gateway, 4, 10);
- // parseBytes(WiFiConf.sta_subnet, '.', subnet, 4, 10);
- // WiFi.config(ip1,gateway,subnet);
+  WiFi.config(ip10,gateway10,subnet10,DNS);
 }
 void printWiFiConf(void) {
-  Serial.println(WiFiConf.sta_ssid);
-
-
+  //Serial.println(WiFiConf.sta_ssid);
 }
 bool loadWiFiConf() {
-  Serial.println(F("loading WiFiConf"));
+  //Serial.println(F("loading WiFiConf"));
   if (EEPROM.read(WIFI_CONF_START + 0) == wifi_conf_format[0] &&
       EEPROM.read(WIFI_CONF_START + 1) == wifi_conf_format[1] &&
       EEPROM.read(WIFI_CONF_START + 2) == wifi_conf_format[2] &&
@@ -102,7 +69,7 @@ void scanWiFi(void) {
   for (int i = 0; i < founds; ++i)
   {
     // Print SSID and RSSI for each network found
-    Serial.println(WiFi.SSID(i));
+    //Serial.println(WiFi.SSID(i));
     network_html += F("<li>");
     network_html += WiFi.SSID(i);
     network_html += F(" (");
@@ -114,8 +81,6 @@ void scanWiFi(void) {
   }
   network_html +=F("</fieldset>");
   network_html += F("</ol>");
-  
-    
 }
 
 

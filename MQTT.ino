@@ -1,6 +1,6 @@
 const int BUFFER_SIZE = 1200;
-const char* on_cmd = "ON";
-const char* off_cmd = "OFF";
+const char* send_cmd = "SendIR";
+const char* get_cmd = "Get_infor";
 
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -21,9 +21,7 @@ boolean reconnect() {
   Serial.println("Reconnecting");
   //if (clientmqtt.connect("arduinoClient",mqtt_user, mqtt_pwd)) {
     if (clientmqtt.connect("arduinoClient")) {
-    // Once connected, publish an announcement...
     clientmqtt.publish(mqtt_topic,"hello world");
-    // ... and resubscribe
     clientmqtt.subscribe(mqtt_topic);
   }
   return clientmqtt.connected();
@@ -31,32 +29,24 @@ boolean reconnect() {
 
 bool processJson(char* message) {
   StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
-
   JsonObject& root = jsonBuffer.parseObject(message);
-
-  if (!root.success()) {
-    Serial.println("parseObject() failed");
-    return false;
-  }
-  const char* sensor = root["sensor"];
-  long time = root["time"];
-  long latitude = root["data"][0];
-  double longitude = root["data"][1];
-
-  // Print values.
-  Serial.println(sensor);
-  Serial.println(time);
-  Serial.println(latitude);
-  Serial.println(longitude, 6);
-  if (root.containsKey("state")) {
-    if (strcmp(root["state"], on_cmd) == 0) {
-     
+  if (!root.success()) {Serial.println("parseObject() failed");return false;} 
+  if (root.containsKey("command")) {
+    if (strcmp(root["command"], send_cmd) == 0)
+    { String type=root["para"]["type"].as<String>();
+      String remote=root["para"]["remote"].as<String>();
+      String button=root["para"]["button"].as<String>();
+      Serial.println(remote);
+      Serial.println(button);
+      type = type + "/" + remote + "/" + button + ".txt";
+    int chieudai = read_file_setting(type , 3 );
     }
-    else if (strcmp(root["state"], off_cmd) == 0) {
-      
+    else if (strcmp(root["command"], get_cmd) == 0) 
+    {     char msg[75];  
+          snprintf (msg, 75, "{\"ip\":\"%X.%X.%X.%X\",\"temp\":%d.%02d,\"hum\":%d.%02d}",ip[0],ip[1],ip[2],ip[3], (int)nhietdo, (int)(nhietdo * 10.0) % 10,(int)doam, (int)(doam * 10.0) % 10); //%ld
+          Serial.println(msg);
+          clientmqtt.publish(mqtt_topic, msg);
     }
   }
-
-  // If "flash" is included, treat RGB and brightness differently
   return true;
 }

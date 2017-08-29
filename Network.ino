@@ -1252,7 +1252,7 @@ void setupWeb(void) {
 }*/
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base) {
   for (int i = 0; i < maxBytes; i++) {
-    if (address == 1) ip10[i] = strtoul(str, NULL, base);  // Convert byte
+    if (address == 1) ip10[i] = strtoul(str, NULL, base);  // Convert byte  ip10
     else if (address == 2) gateway10[i] = strtoul(str, NULL, base);  // Convert byte
     else if (address == 3) subnet10[i] = strtoul(str, NULL, base);  // Convert byte
    // Serial.println(bytes[i]);

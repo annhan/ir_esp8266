@@ -3,6 +3,9 @@
  * Check update phien ban tren FOTA
  * 
 */
+
+
+
 void update_fota(){
     delay(5000);
   HTTPClient http;

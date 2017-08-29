@@ -40,6 +40,7 @@ File myFile;
 const int chipSelect = 16;
 
 IPAddress ip10;
+IPAddress ip ;
 IPAddress gateway10;
 IPAddress subnet10;
 IPAddress DNS(8, 8, 8, 8);
@@ -58,7 +59,6 @@ void update_fota();
 void dumpInfo(decode_results *results);
 void parseStringRAW(String str);
 void parseStringGC(String str);
-//void delay_comang(int thoigian) ;
 void getHC();
 void printIP(void);
 int waitConnected(void);
@@ -88,10 +88,6 @@ uint16_t CAPTURE_BUFFER_SIZE = 1400;
 // Nr. of milli-Seconds of no-more-data before we consider a message ended.
 // NOTE: Don't exceed MAX_TIMEOUT_MS. Typically 130ms.
 #define TIMEOUT 100U  // Suits most messages, while not swallowing repeats.
-// #define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
-                        // units, but can accidently swallow repeated messages
-                        // in the rawData[] output.
-
 IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT);
 IRsend irsend(Send_PIN);
 IRDaikinESP dakinir(Send_PIN);
@@ -102,8 +98,6 @@ IRMitsubishiAC mitsubir(Send_PIN);
 ESP8266WebServer server(4999);
 WiFiServer serverTCP(4998);
 decode_results  results;
-//irparams_t save;
-
 /* SETUP
 
 */
@@ -117,7 +111,7 @@ void setup() {
   Serial.println(F("Startup"));
   pinMode(MotionPin, INPUT);
   irsend.begin();
-  if (!loadWiFiConf()) {
+  if (!loadWiFiConf()){
     resetModuleId();
     saveWiFiConf();
   }
@@ -129,21 +123,14 @@ void setup() {
   Serial.println("A");
   hoclenh = 0;
   WiFi.mode(WIFI_AP_STA);
-  
   ketnoimang();
-  // Serial.println("D");
   statusmang = waitConnected();
-  // Serial.println("E");
   if (WiFi.status() == WL_CONNECTED) {
     update_fota();
     Serial.println("Connect");
     WiFi.softAP(WiFiConf.module_id, wifi_password, 6, 1);
   }
   else {
-    //WiFi.disconnect();
-
-    // delay(500);
-    //WiFi.mode(WIFI_AP);
     Serial.println("Not connetted wifi");
     WiFi.softAP(WiFiConf.module_id, wifi_password);
   }
@@ -163,7 +150,7 @@ void setup() {
   digitalWrite(status_led, LOW); //irrecv.enableIRIn();}
   irrecv.disableIRIn();
   getHC();
-  IPAddress ip = WiFi.localIP();
+  ip = WiFi.localIP();
   timeled = timedelay = millis();
   ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
   _motion_status = 1;
@@ -171,8 +158,6 @@ void setup() {
   MDNS.addService("http", "tcp", 4999);
   if (!SD.begin(chipSelect)) {
     Serial.println(F("Card failed, or not present"));
-    // don't do anything more:
-    return;
   }
   Serial.println(F("card initialized."));
   user_using();
@@ -181,15 +166,8 @@ void setup() {
   read_setting_state = read_file_setting("Setting/setting.txt", 2);
   udp.begin(localPort);
   weekday = 8;
-  //save.rawbuf = new uint16_t[irrecv.getBufSize()];
- // if (save.rawbuf == NULL) {  // Check we allocated the memory successfully.
-  //  Serial.printf("Could not allocate a %d buffer size for the save buffer.\n"
-   //               "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!",
-    //              irrecv.getBufSize());
-  //  ESP.restart();
- // }
   //################################
-  snprintf (mqtt_topic, 21, "mIR/%ld", macAddr);
+  snprintf (mqtt_topic, 21, "mIR/%02x%02x%02x%02x%02x%02x",macAddr[WL_MAC_ADDR_LENGTH - 5], macAddr[WL_MAC_ADDR_LENGTH - 6],macAddr[WL_MAC_ADDR_LENGTH - 4], macAddr[WL_MAC_ADDR_LENGTH - 3],macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
   Serial.println(mqtt_topic);
   clientmqtt.setServer(mqtt_server, mqtt_port);
   clientmqtt.setCallback(callback);
@@ -214,26 +192,25 @@ void loop() {
   server.handleClient();
   //##################
   // MQTT ############
-  //#################
-   if (!clientmqtt.connected()) {
-    long now = millis();
-    if (now - lastReconnectAttempt > 5000) {
-      lastReconnectAttempt = now;
-      // Attempt to reconnect
-      if (reconnect()) {
-        lastReconnectAttempt = 0;
+        if (!clientmqtt.connected()) {
+        long now = millis();
+        if (now - lastReconnectAttempt > 5000) {
+          lastReconnectAttempt = now;
+          // Attempt to reconnect
+          if (reconnect()) {
+            lastReconnectAttempt = 0;
+          }
+        }
+      } else {
+        clientmqtt.loop();
       }
-    }
-  } else {
-    // Client connected
-
-    clientmqtt.loop();
-  }
+  //#################
   //#######################
   switch (WiFi.status())
   {
     case WL_CONNECTED:
       // if (hoclenh == 1) {
+
       if (statusmang == 0) {
         statusmang = 1;
         _resetketnoi = 0;
@@ -257,9 +234,7 @@ void loop() {
         demgiay++ ;
         float H = dht.readHumidity();
         float T = dht.readTemperature();
-        if (isnan(H) || isnan(T)) {
-          Serial.println(F("Failed to read from DHT sensor!"));
-        }
+        if (isnan(H) || isnan(T)) {Serial.println(F("Failed to read from DHT sensor!"));}
         else {
           doam = H;
           nhietdo = T;
@@ -270,8 +245,10 @@ void loop() {
           Serial.println(" *C ");
         }
           
-          char msg[50];  
-          snprintf (msg, 75, "{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[%ld,2.302038]}", macAddr);
+          char msg[75];  
+         // snprintf (msg, 75, "{\"ip\":\"%i.%i.%i.%i\",\"temp\":%d.%02d,\"hum\":%d.%02d}",ip[0],ip[1],ip[2],ip[3], (int)nhietdo, (int)(nhietdo * 10.0) % 10,(int)doam, (int)(doam * 10.0) % 10); //%ld
+          snprintf (msg, 100, "{\"ip\":\"%i.%i.%i.%i\",\"command\":\"SendIR\",\"para\":{\"type\":\"ML\",\"remote\":\"Daikin\",\"button\":\"ON\"}}",ip[0],ip[1],ip[2],ip[3]);
+          //snprintf (msg, 75, "{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[%d.%02d,%d.%02d]}", (int)nhietdo, (int)(nhietdo * 10.0) % 10,(int)doam, (int)(doam * 10.0) % 10); //%ld
           Serial.println(msg);
           clientmqtt.publish(mqtt_topic, msg);
       }
@@ -301,11 +278,7 @@ void loop() {
       }
       _resetketnoi = _resetketnoi + 1;
       if (_resetketnoi >= 65000) {
-        Serial.println("A");
         digitalWrite(status_led, HIGH );
-        //pinMode(status_led, INPUT);
-        // delay(1000);
-        // ESP.eraseConfig();
         ESP.reset();
       }
       break;
@@ -317,11 +290,8 @@ void loop() {
   }
   if (digitalRead(MotionPin) == 1) {
     if (_motion_status == 0) {
-
       if (thoigianthuc - motion_time > 5 ) {
-
         Serial.println(F("Status Motion : 1"));
-
         _motion_status = 1;
         motion_time = thoigianthuc;
         conver_time();
@@ -393,7 +363,7 @@ void loop() {
         String file = "ML/" + duongdan_ML + "/" + String(temp_set) + ".txt";
         read_file_setting(file , 3 );
         state_status = state_conti;
-        write_file_setting("Setting/state.txt", 2);
+        write_file_setting(F("Setting/state.txt"), 2);
       }
       //Tăng nhiệt độ cách 15 phút
       break;
@@ -459,7 +429,7 @@ void loop() {
          
             khoang_time_cach_nhau = ( time_end_int + 86400) - time_begin_int ;
             khoang_time_cach_nhau = khoang_time_cach_nhau / 8 ;
-            Serial.print("Khoảng thoi gian cach nhau ");
+            Serial.print("Khoang thoi gian cach nhau ");
             Serial.println(khoang_time_cach_nhau);
             //ON ML
             String file = "ML/" + duongdan_ML + "/ON.txt" ;
@@ -470,7 +440,7 @@ void loop() {
         else if (thoigianthuc < time_end_int) {
           khoang_time_cach_nhau = time_end_int - time_begin_int ;
           khoang_time_cach_nhau = khoang_time_cach_nhau / 8 ;
-          Serial.print("Khoảng thoi gian cach nhau ");
+          Serial.print("Khoang thoi gian cach nhau ");
           Serial.println(khoang_time_cach_nhau);
           //ON ML
           String file = "ML/" + duongdan_ML + "/ON.txt" ;
