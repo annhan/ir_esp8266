@@ -12,6 +12,8 @@
 
 uint8_t macAddr[6];
 //## MQTT
+boolean IR_leaning_MQTT=false;
+String noiluu_MQTT="Amply/User/sassss.txt";
 #define MQTT_MAX_PACKET_SIZE 512
 long lastReconnectAttempt = 0;
 //###
