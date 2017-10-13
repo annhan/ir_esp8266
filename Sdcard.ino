@@ -45,11 +45,11 @@ String write_file_setting(String namefile, int tt) {
         break;
     }
     myFile1.close();
-    Serial.println("done.");
+    NHAN_Debug("done.");
     return (" OK");
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error write test.txt");
+    NHAN_Debug("error write test.txt");
     return (" Fail");
   }
 }
@@ -85,16 +85,7 @@ boolean read_file_setting(String namefile, int tt) {
                   is_sun = giatritam.toInt();
                   i++;
                   // }
-                  Serial.println(time_begin_int);
-                  Serial.println(time_end_int);
-                  Serial.println(temp_set);
-                  Serial.println(is_mon);
-                  Serial.println(is_tue);
-                  Serial.println(is_wed);
-                  Serial.println(is_thu);
-                  Serial.println(is_fri);
-                  Serial.println(is_sat);
-                  Serial.println(is_sun);
+
                   break;
               case 2:
                   giatritam = myFile1.readStringUntil('\n');
@@ -107,7 +98,7 @@ boolean read_file_setting(String namefile, int tt) {
                   break;
               case 3:
                   String ir_code_str = "";
-                  Serial.println("test.txt:");
+                  NHAN_Debug("test.txt:");
                   ir_code_str = myFile1.readStringUntil('\n');
                   i++;
                   Serial.println(ir_code_str);
@@ -140,16 +131,16 @@ boolean read_file_setting(String namefile, int tt) {
       is_sun = giatritam.toInt();
       i++;
       // }
-      Serial.println(time_begin_int);
-      Serial.println(time_end_int);
-      Serial.println(temp_set);
-      Serial.println(is_mon);
-      Serial.println(is_tue);
-      Serial.println(is_wed);
-      Serial.println(is_thu);
-      Serial.println(is_fri);
-      Serial.println(is_sat);
-      Serial.println(is_sun);
+      NHAN_Debug(time_begin_int);
+      NHAN_Debug(time_end_int);
+      NHAN_Debug(temp_set);
+      NHAN_Debug(is_mon);
+      NHAN_Debug(is_tue);
+      NHAN_Debug(is_wed);
+      NHAN_Debug(is_thu);
+      NHAN_Debug(is_fri);
+      NHAN_Debug(is_sat);
+      NHAN_Debug(is_sun);
     }
     else if (tt == 2) {
       giatritam = myFile1.readStringUntil('\n');
@@ -162,10 +153,10 @@ boolean read_file_setting(String namefile, int tt) {
     }
     else if (tt == 3) {
       String ir_code_str = "";
-      Serial.println("test.txt:");
+      NHAN_Debug("test.txt:");
       ir_code_str = myFile1.readStringUntil('\n');
       i++;
-      Serial.println(ir_code_str);
+      NHAN_Debug(ir_code_str);
       parseStringRAW(ir_code_str);
     }*/
     // close the file:
@@ -173,7 +164,7 @@ boolean read_file_setting(String namefile, int tt) {
     return 1 ;
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
+    NHAN_Debug("error opening test.txt");
     return 0;
   }
 }

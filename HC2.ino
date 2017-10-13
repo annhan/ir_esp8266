@@ -131,7 +131,6 @@ void SetVariHC(String vari,String giatri) {
   value += F("\",\"value\":\"");
   value += giatri;
   value += F("\",\"invokeScenes\":true}");
-  Serial.println(value);
   int chieudai=value.length();
   Serial.println(chieudai);
   String url = "http://" + String(WiFiConf.sta_iphc2) + "/api/globalVariables/" + vari;
@@ -145,7 +144,6 @@ void SetVariHC(String vari,String giatri) {
   http.addHeader("NULL", "NULL");
   int httpCode = http.PUT(value); //Send the request
   String payload = http.getString(); //Get the response payload
-  Serial.println(payload);
   http.writeToStream(&Serial);
   http.end();
 }

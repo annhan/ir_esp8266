@@ -99,6 +99,18 @@ IRMitsubishiAC mitsubir(Send_PIN);
 ESP8266WebServer server(4999);
 WiFiServer serverTCP(4998);
 decode_results  results;
+
+/*
+ * FUNCTION DEBUG
+ */
+void NHAN_Debug(char* nd){
+#ifdef DEBUG
+  Serial.println(nd);
+#endif
+}
+
+
+ 
 /* SETUP
 
 */
@@ -109,7 +121,7 @@ void setup() {
   Serial.begin(115200);
   EEPROM.begin(1024);
   delay(10);
-  Serial.println(F("Startup"));
+  NHAN_Debug("Startup");
   pinMode(MotionPin, INPUT);
   irsend.begin();
   if (!loadWiFiConf()){
@@ -117,11 +129,9 @@ void setup() {
     saveWiFiConf();
   }
   motion_time = EEPROMReadlong(1000);
-  Serial.println(motion_time);
   conver_time();
-  Serial.println(time_);
   scanWiFi();
-  Serial.println("A");
+  NHAN_Debug("A");
   hoclenh = 0;
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(WiFiConf.module_id, wifi_password);
@@ -129,43 +139,40 @@ void setup() {
   statusmang = waitConnected();
   if (WiFi.status() == WL_CONNECTED) {
     update_fota();
-    Serial.println("Get HC");
+    NHAN_Debug("Get HC");
     getHC();
-    Serial.println("Connect");
+    NHAN_Debug("Connect");
     WiFi.softAPdisconnect(true);
    // WiFi.softAP(WiFiConf.module_id, wifi_password, 6, 1);
   }
   //else {
-    //Serial.println("Not connetted wifi");
+    //NHAN_Debug("Not connetted wifi");
     
  // }
 
   printIP();
   httpUpdater.setup(&server, update_path, update_username, update_password);
-  Serial.println(WiFi.localIP());
   setupWeb();
-#ifdef DEBUG
-  Serial.println("WIfi conf setting");
-#endif
+
   setupWiFiConf();
-  Serial.println("Server begin");
+  NHAN_Debug("Server begin");
   server.begin();
   //server.setNoDelay(true);
-  Serial.println("MDNS");
+  NHAN_Debug("MDNS");
   MDNS.begin("mIR");
-  Serial.println("TCP Server");
+  NHAN_Debug("TCP Server");
   serverTCP.begin();
   serverTCP.setNoDelay(true);
-  Serial.println("Daikin");
+  NHAN_Debug("Daikin");
   dakinir.begin();
-  Serial.println("Mit");
+  NHAN_Debug("Mit");
   mitsubir.begin();
-  Serial.println("DHT");
+  NHAN_Debug("DHT");
   dht.begin();
-  Serial.println("Disable");
+  NHAN_Debug("Disable");
   digitalWrite(status_led, LOW);
   irrecv.disableIRIn();
-  Serial.println("Local IP");
+  NHAN_Debug("Local IP");
   ip = WiFi.localIP();
   timeled = timedelay = millis();
   ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
@@ -173,9 +180,9 @@ void setup() {
   WiFi.macAddress(macAddr);
   MDNS.addService("http", "tcp", 4999);
   if (!SD.begin(chipSelect)) {
-    Serial.println(F("Card failed, or not present"));
+    NHAN_Debug("Card failed, or not present");
   }
-  Serial.println(F("card initialized."));
+  NHAN_Debug("card initialized.");
   user_using();
   state_status = state_no;
   read_setting = read_file_setting("Setting/setting.txt", 1);
@@ -184,7 +191,7 @@ void setup() {
   weekday = 8;
   //################################
   snprintf (WiFiConf.sta_mqtt_topic, 32, "mIR/%02x%02x%02x%02x%02x%02x",macAddr[WL_MAC_ADDR_LENGTH - 5], macAddr[WL_MAC_ADDR_LENGTH - 6],macAddr[WL_MAC_ADDR_LENGTH - 4], macAddr[WL_MAC_ADDR_LENGTH - 3],macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
-  Serial.println(WiFiConf.sta_mqtt_topic);
+  NHAN_Debug(WiFiConf.sta_mqtt_topic);
   clientmqtt.setServer(WiFiConf.sta_mqtt_address, WiFiConf.sta_mqtt_port);
   clientmqtt.setCallback(callback);
   lastReconnectAttempt = 0;
@@ -250,19 +257,15 @@ void loop() {
         demgiay++ ;
         float H = dht.readHumidity();
         float T = dht.readTemperature();
-        if (isnan(H) || isnan(T)) {Serial.println(F("Failed to read from DHT sensor!"));}
+        if (isnan(H) || isnan(T)) {NHAN_Debug("Failed to read from DHT sensor!");}
         else {
           doam = H;
           nhietdo = T;
-          Serial.print("H: ");
-          Serial.print(doam);
-          Serial.print(" %\t T: ");
-          Serial.print(nhietdo);
-          Serial.println(" *C ");
+
         }
           char msg[75];  
           snprintf (msg, 100, "{\"ip\":\"%i.%i.%i.%i\",\"command\":\"SendIR\",\"para\":{\"type\":\"ML\",\"remote\":\"Daikin\",\"button\":\"ON\"}}",ip[0],ip[1],ip[2],ip[3]);
-          Serial.println(msg);
+          NHAN_Debug(msg);
           clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
       }
       else if (demgiay % 33 == 0) {
@@ -304,17 +307,16 @@ void loop() {
   if (digitalRead(MotionPin) == 1) {
     if (_motion_status == 0) {
       if (thoigianthuc - motion_time > 5 ) {
-        Serial.println(F("Status Motion : 1"));
+        NHAN_Debug("Status Motion : 1");
         _motion_status = 1;
         motion_time = thoigianthuc;
         conver_time();
-        Serial.println(time_);
         EEPROMWritelong(1000, motion_time);
       }
     }
   }
   else if (_motion_status == 1) {
-    Serial.println(F("Status Motion : 0"));
+    NHAN_Debug("Status Motion : 0");
     _motion_status = 0;
   }
 
@@ -434,7 +436,7 @@ void loop() {
     case state_no:
       if (!dung_ngay) {
         state_status = state_not_day;
-        Serial.println("Không dung ngay dieu khien");
+        NHAN_Debug("Không dung ngay dieu khien");
       }
       else if (thoigianthuc > time_begin_int) {
         //ON ML nhiệt độ thấp nhất
@@ -442,7 +444,7 @@ void loop() {
          
             khoang_time_cach_nhau = ( time_end_int + 86400) - time_begin_int ;
             khoang_time_cach_nhau = khoang_time_cach_nhau / 8 ;
-            Serial.print("Khoang thoi gian cach nhau ");
+            //Serial.print("Khoang thoi gian cach nhau ");
             Serial.println(khoang_time_cach_nhau);
             //ON ML
             String file = "ML/" + duongdan_ML + "/ON.txt" ;
@@ -453,7 +455,7 @@ void loop() {
         else if (thoigianthuc < time_end_int) {
           khoang_time_cach_nhau = time_end_int - time_begin_int ;
           khoang_time_cach_nhau = khoang_time_cach_nhau / 8 ;
-          Serial.print("Khoang thoi gian cach nhau ");
+          //Serial.print("Khoang thoi gian cach nhau ");
           Serial.println(khoang_time_cach_nhau);
           //ON ML
           String file = "ML/" + duongdan_ML + "/ON.txt" ;
@@ -465,7 +467,7 @@ void loop() {
     case state_not_day:
       if (dung_ngay) {
         state_status = state_no;
-        Serial.println("dung ngay dk");
+        NHAN_Debug("dung ngay dk");
       }
       // kết thúc điều khiển
       break;

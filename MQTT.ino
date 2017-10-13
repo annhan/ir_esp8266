@@ -13,7 +13,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     message[i] = (char)payload[i];
   }
   message[length] = '\0';
-  Serial.println(message);
+  NHAN_Debug(message);
     if (!processJson(message)) {
     return;
   }
@@ -22,7 +22,7 @@ boolean reconnect() {
   Serial.print("Reconnecting : ");
   if (statusmang==1){
         if (WiFiConf.sta_mqtt_user[0]!='x'){  
-                Serial.println("Co User");
+                NHAN_Debug("Co User");
                 if (clientmqtt.connect("arduinoClient",WiFiConf.sta_mqtt_user, WiFiConf.sta_mqtt_pass)) {
                  // if (clientmqtt.connect("arduinoClient")) {
                   clientmqtt.publish(WiFiConf.sta_mqtt_topic,"Reconnect");
@@ -30,7 +30,7 @@ boolean reconnect() {
                 }
         }
         else
-        {        Serial.println("Khong User");
+        {        NHAN_Debug("Khong User");
                 if (clientmqtt.connect("arduinoClient")) {
                  // if (clientmqtt.connect("arduinoClient")) {
                   clientmqtt.publish(WiFiConf.sta_mqtt_topic,"Reconnect");
@@ -44,7 +44,7 @@ boolean reconnect() {
 bool processJson(char* message) {
   StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(message);
-  if (!root.success()) {Serial.println("parseObject() failed");return false;} 
+  if (!root.success()) {NHAN_Debug("parseObject() failed");return false;} 
   if (root.containsKey("command")) {
     if (strcmp(root["command"], send_cmd) == 0)
     { String type=root["para"]["type"].as<String>();
@@ -76,11 +76,6 @@ bool processJson(char* message) {
       time_begin_int=conver_time_string_to_int(time_begin);
       time_end_int=conver_time_string_to_int(time_end);
       temp_set= tempt.toInt();
-      Serial.println(time_begin);
-      Serial.println(time_begin_int);
-      Serial.println(time_end);
-      Serial.println(time_end_int);
-      Serial.println(temp_set);
       String sche=root["para"]["sche"][0].as<String>();
       is_sun=sche.toInt();
       sche=root["para"]["sche"][1].as<String>();
@@ -100,13 +95,13 @@ bool processJson(char* message) {
     else if (strcmp(root["command"], getsche_cmd) == 0) 
     {     char msg[75];  
           snprintf (msg, 100, "{\"ip\":\"%X.%X.%X.%X\",\"TB\":%d,\"TE\":%d,\"temp\":%d.%02d,\"sche\":[%d,%d,%d,%d,%d,%d,%d]}",ip[0],ip[1],ip[2],ip[3],time_begin_int ,time_end_int ,(int)temp_set, (int)(temp_set * 10.0) % 10,is_sun,is_mon,is_tue,is_wed,is_thu,is_fri,is_sat); //%ld
-          Serial.println(msg);
+          NHAN_Debug(msg);
           clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
     }
     else if (strcmp(root["command"], get_cmd) == 0) 
     {     char msg[75];  
           snprintf (msg, 75, "{\"ip\":\"%X.%X.%X.%X\",\"T\":%d.%02d,\"H\":%d.%02d,\"M\":%d}",ip[0],ip[1],ip[2],ip[3], (int)nhietdo, (int)(nhietdo * 10.0) % 10,(int)doam, (int)(doam * 10.0) % 10,1); //%ld
-          Serial.println(msg);
+          NHAN_Debug(msg);
           clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
     }
   }

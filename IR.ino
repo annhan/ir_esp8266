@@ -46,10 +46,9 @@ void nhan_TCP(){
 
 void dumpInfo(decode_results *results) {
   if (results->overflow) {
-    Serial.println("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
+    NHAN_Debug("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
     return;
   }
-  Serial.println(F(""));
   Serial.print(F("uint16_t rawData["));              // variable type
   Serial.print(results->rawlen - 1, DEC);  // array size
   Serial.print(F("] = {"));                   // Start declaration
@@ -113,7 +112,7 @@ void serialPrintUint64Hex(uint64_t value) {
   serialPrintUint64Hex(results->value);
   Serial.print(" (");
   Serial.print(results->bits, DEC);
-  Serial.println(" bits)");
+  NHAN_Debug(" bits)");
  // Serial.print("Raw (");
  // Serial.print(count, DEC);
  // Serial.print("): ");
@@ -129,6 +128,6 @@ void serialPrintUint64Hex(uint64_t value) {
    // }
    // Serial.print(" ");
   //}
- // Serial.println();
+ // NHAN_Debug();
 }*/
 
