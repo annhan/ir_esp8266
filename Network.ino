@@ -138,6 +138,24 @@ void setupWiFiConf(void) {
     content1 += FPSTR(_p_html);
     content1 += FPSTR(get_html);
     content1 += F("'set_wifi_conf'>");
+    
+    content1 += F("<div class=\"row\">");
+    content1 += "<li><select name='button' class=\"dropbtn\" >";
+    String id_check="";
+    
+    for (int i = 0; i < 2; i++) {
+      switch (i) {
+        case 0:  id_check = "DHCP";break;
+        case 1:  id_check = "Static IP";break;
+      }
+      if (atoi(WiFiConf.sta_DHCP) != i)
+      content1 += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
+      else
+      content1 += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
+    }
+    content1 += "</select>";
+    content1 += F("</div>");
+    
     content1 += F("<div class=\"row\">");
     content1 += FPSTR(label1_html);
     content1 += F("'ssid' class=\"req\">SSID : </label>");
@@ -302,6 +320,76 @@ void setupWiFiConf(void) {
     }
     Serial.println(hoclenh);
 
+  });
+  server.on("/mqtt_conf", []() {
+    String content = FPSTR(header); content += FPSTR(begin_title);
+    String   content1 = F("<p>Wifi Connected: ");
+    content1 += WiFiConf.sta_ssid;
+    content1 += F("</br>IP Address: ");
+    content1 += ipStr;
+    content1 += F(" ( ");
+    content1 += WiFiConf.module_id;
+    content1 += F(".local");
+    content1 += F(" )</p>");
+    content1 += F("<p>");
+     content1 += F("</p><form method='get' action='set_mqtt_conf'>");
+    content1 += F("<li><label for='mqtt_server' class=\"req\">MQTT Server : </label><input name='mqtt_server' class=\"txt\" id='mqtt_server' maxlength=32 value=") ;
+    content1 += String(WiFiConf.sta_mqtt_address) ;
+    content1 +=  F(" ><br /><br />");
+
+    content1 += F("<li><label for='mqtt_port' class=\"req\">Port : </label> <input class=\"txt\" name='mqtt_port' id='mqtt_port' value=");
+    content1 += String(WiFiConf.sta_mqtt_port);
+    content1 += F("><br /><br />");
+
+    content1 += F("<li><label for='mqtt_user' class=\"req\">User : </label> <input name='mqtt_user' class=\"txt\" id='mqtt_user' value=");
+    content1 += String(WiFiConf.sta_mqtt_user) ;
+    content1 +=  F(" ><br /><br />");
+    
+    content1 += F("<li><label for='mqtt_pass' class=\"req\">Pass : </label> <input  name='mqtt_pass' class=\"txt\" id='mqtt_pass' value=") ;
+    content1 += String(WiFiConf.sta_mqtt_pass) ;
+    content1 += F("><br /><br />");
+        content1 += F("<li><label for='mqtt_topic' class=\"req\">Topic : </label> <input  name='mqtt_topic' class=\"txt\" id='mqtt_topic' value=");
+    content1 +=  String(WiFiConf.sta_mqtt_topic);
+    content1 += F("><br /><br />");
+    content += "mHome - Wifi Setup";
+    content += F("</title></head><body>");
+   /* if (WiFiConf.sta_language[0]=='1'){
+    
+    content += F("<h1>Cài Đặt MQTT</h1>");
+    content += content1;
+    content += F("<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Thay Đổi Cài Đặt?\");'></form>");
+    }
+    else
+    {*/
+    content += F("<h1>MQTT Setting</h1>");
+    content += content1;
+   content += F("<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
+    //}
+    content += F(" </p>");
+    content += F("</body></html>");
+    server.send(200, F("text/html"), content);
+  });
+   server.on("/set_mqtt_conf", []() {
+    String new_server = server.arg("mqtt_server");
+    String new_port = server.arg("mqtt_port");
+    String new_user = server.arg("mqtt_user");
+    String new_pass = server.arg("mqtt_pass");
+    String new_topic = server.arg("mqtt_topic");
+    if (new_user==""){new_user="x";}
+    if (new_pass==""){new_pass="x";}
+      new_server.toCharArray(WiFiConf.sta_mqtt_address, sizeof(WiFiConf.sta_mqtt_address));
+      int chieudai_mqtt=new_port.length();
+      char tarray[chieudai_mqtt+1];      
+      new_port.toCharArray(tarray, sizeof(tarray));
+      WiFiConf.sta_mqtt_port = atoi(tarray);
+      new_user.toCharArray(WiFiConf.sta_mqtt_user, sizeof(WiFiConf.sta_mqtt_user));
+      new_pass.toCharArray(WiFiConf.sta_mqtt_pass, sizeof(WiFiConf.sta_mqtt_pass));
+      new_topic.toCharArray(WiFiConf.sta_mqtt_topic, sizeof(WiFiConf.sta_mqtt_topic));
+
+      saveWiFiConf();
+      String content = F("OK...Reboot Device");
+    server.send(200, "text/html", content);
+    ESP.reset();
   });
   server.on(html_setup_leaningir, []() {
 
@@ -974,7 +1062,9 @@ void setupWiFiConf(void) {
   });
   //////////////
   server.on(html_setup_setwifi, HTTP_GET, []() {
-
+    String data1 = server.arg(F("button"));
+    data1.toCharArray(WiFiConf.sta_DHCP, sizeof(WiFiConf.sta_DHCP));
+    Serial.println(WiFiConf.sta_DHCP);
     String new_ssid = server.arg(F("ssid"));
     String new_pwd = server.arg(F("pwd"));
     String new_ip = server.arg(F("ip"));
@@ -1178,12 +1268,18 @@ void setupWeb(void) {
       content += F(" )");
     }
     content += FPSTR(_fieldset);
+    
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);
     content += F("'/IR'>IR Leaning");
     content += FPSTR(_legend_html);
     content += F("<li>Description: This section is for learning IR code from IR remotes.");
     content += F("<li>Each successful learning code should be copied to use with Fibaro HC2 later");
+    content += FPSTR(_fieldset);
+        content += FPSTR(fieldset);
+    content += FPSTR(legend_html);
+    content += F("'/mqtt_conf'>MQTT Setting");
+    content += FPSTR(_legend_html);
     content += FPSTR(_fieldset);
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);

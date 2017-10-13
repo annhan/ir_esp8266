@@ -19,13 +19,19 @@ void printIP(void) {
   Serial.println(WiFiConf.module_id);
 }
 void ketnoimang() {
+  
   WiFi.hostname("mIR");
+  boolean kq=scanWiFireturn();
+  if (kq){
   WiFi.setAutoReconnect(true);
   WiFi.begin(WiFiConf.sta_ssid, WiFiConf.sta_pwd);
-  parseBytes1(WiFiConf.sta_ip, '.', 1, 4, 10);
-  parseBytes1(WiFiConf.sta_gateway, '.', 2, 4, 10);
-  parseBytes1(WiFiConf.sta_subnet, '.', 3, 4, 10);
-  WiFi.config(ip10,gateway10,subnet10,DNS);
+  if (atoi(WiFiConf.sta_DHCP) == 1){
+      parseBytes1(WiFiConf.sta_ip, '.', 1, 4, 10);
+      parseBytes1(WiFiConf.sta_gateway, '.', 2, 4, 10);
+      parseBytes1(WiFiConf.sta_subnet, '.', 3, 4, 10);
+      WiFi.config(ip10,gateway10,subnet10,DNS);
+  }
+  }
 }
 void printWiFiConf(void) {
   //Serial.println(WiFiConf.sta_ssid);
@@ -82,7 +88,19 @@ void scanWiFi(void) {
   network_html +=F("</fieldset>");
   network_html += F("</ol>");
 }
-
+boolean scanWiFireturn(void) {
+  int founds = WiFi.scanNetworks();
+  char ten_wifi[32];
+  for (int i = 0; i < founds; ++i)
+  {  
+    WiFi.SSID(i).toCharArray(ten_wifi, sizeof(ten_wifi));
+   if (strstr(ten_wifi,WiFiConf.sta_ssid) != NULL){Serial.println("Co wifi cung ten");return true;}   
+  // if (ten_wifi==WiFiConf.sta_ssid){Serial.println("Co wifi cung ten");return true;}  
+    Serial.println( WiFi.SSID(i));
+    
+  }
+  return false;
+}
 
 
 void EEPROMWritelong(int address, unsigned long value)

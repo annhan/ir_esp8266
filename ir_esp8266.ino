@@ -11,6 +11,7 @@ extern "C" {
 #include "variable_http.h"
 #include "KhaiBao.h"
 #include <ESP8266httpUpdate.h>
+#include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <ESP8266mDNS.h>
@@ -25,14 +26,14 @@ extern "C" {
 #include <SPI.h>
 #include <SD.h>
 // Port 1883
-
+#define DEBUG
 //*************************
 //  MQTT ******************
-#define mqtt_server "192.168.99.60" //"m13.cloudmqtt.com"
-char mqtt_topic[21];
-#define mqtt_user "mhome"
-#define mqtt_pwd "123456"
-const uint16_t mqtt_port = 1883; //12535; //1883
+//#define mqtt_server "192.168.99.60" //"m13.cloudmqtt.com"
+//char mqtt_topic[21];
+//#define mqtt_user "mhome"
+//#define mqtt_pwd "123456"
+//const uint16_t mqtt_port = 1883; //12535; //1883
 //****************************
 File myFile;
 
@@ -123,33 +124,48 @@ void setup() {
   Serial.println("A");
   hoclenh = 0;
   WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(WiFiConf.module_id, wifi_password);
   ketnoimang();
   statusmang = waitConnected();
   if (WiFi.status() == WL_CONNECTED) {
     update_fota();
+    Serial.println("Get HC");
+    getHC();
     Serial.println("Connect");
-    WiFi.softAP(WiFiConf.module_id, wifi_password, 6, 1);
+    WiFi.softAPdisconnect(true);
+   // WiFi.softAP(WiFiConf.module_id, wifi_password, 6, 1);
   }
-  else {
-    Serial.println("Not connetted wifi");
-    WiFi.softAP(WiFiConf.module_id, wifi_password);
-  }
+  //else {
+    //Serial.println("Not connetted wifi");
+    
+ // }
 
   printIP();
   httpUpdater.setup(&server, update_path, update_username, update_password);
   Serial.println(WiFi.localIP());
   setupWeb();
+#ifdef DEBUG
+  Serial.println("WIfi conf setting");
+#endif
   setupWiFiConf();
+  Serial.println("Server begin");
   server.begin();
-  MDNS.begin(WiFiConf.module_id);
-
+  //server.setNoDelay(true);
+  Serial.println("MDNS");
+  MDNS.begin("mIR");
+  Serial.println("TCP Server");
   serverTCP.begin();
+  serverTCP.setNoDelay(true);
+  Serial.println("Daikin");
   dakinir.begin();
+  Serial.println("Mit");
   mitsubir.begin();
+  Serial.println("DHT");
   dht.begin();
-  digitalWrite(status_led, LOW); //irrecv.enableIRIn();}
+  Serial.println("Disable");
+  digitalWrite(status_led, LOW);
   irrecv.disableIRIn();
-  getHC();
+  Serial.println("Local IP");
   ip = WiFi.localIP();
   timeled = timedelay = millis();
   ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
@@ -167,9 +183,9 @@ void setup() {
   udp.begin(localPort);
   weekday = 8;
   //################################
-  snprintf (mqtt_topic, 21, "mIR/%02x%02x%02x%02x%02x%02x",macAddr[WL_MAC_ADDR_LENGTH - 5], macAddr[WL_MAC_ADDR_LENGTH - 6],macAddr[WL_MAC_ADDR_LENGTH - 4], macAddr[WL_MAC_ADDR_LENGTH - 3],macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
-  Serial.println(mqtt_topic);
-  clientmqtt.setServer(mqtt_server, mqtt_port);
+  snprintf (WiFiConf.sta_mqtt_topic, 32, "mIR/%02x%02x%02x%02x%02x%02x",macAddr[WL_MAC_ADDR_LENGTH - 5], macAddr[WL_MAC_ADDR_LENGTH - 6],macAddr[WL_MAC_ADDR_LENGTH - 4], macAddr[WL_MAC_ADDR_LENGTH - 3],macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
+  Serial.println(WiFiConf.sta_mqtt_topic);
+  clientmqtt.setServer(WiFiConf.sta_mqtt_address, WiFiConf.sta_mqtt_port);
   clientmqtt.setCallback(callback);
   lastReconnectAttempt = 0;
   //##################################
@@ -196,7 +212,6 @@ void loop() {
         long now = millis();
         if (now - lastReconnectAttempt > 5000) {
           lastReconnectAttempt = now;
-          // Attempt to reconnect
           if (reconnect()) {
             lastReconnectAttempt = 0;
           }
@@ -212,6 +227,8 @@ void loop() {
       // if (hoclenh == 1) {
 
       if (statusmang == 0) {
+        WiFi.softAPdisconnect(true);
+        getHC();
         statusmang = 1;
         _resetketnoi = 0;
         digitalWrite(status_led, LOW);
@@ -230,7 +247,6 @@ void loop() {
       }
       nhan_TCP();
       if (demgiay % 10 == 0) {
-        SetVariHC("NHAN", String(demgiay));
         demgiay++ ;
         float H = dht.readHumidity();
         float T = dht.readTemperature();
@@ -244,13 +260,10 @@ void loop() {
           Serial.print(nhietdo);
           Serial.println(" *C ");
         }
-          
           char msg[75];  
-         // snprintf (msg, 75, "{\"ip\":\"%i.%i.%i.%i\",\"temp\":%d.%02d,\"hum\":%d.%02d}",ip[0],ip[1],ip[2],ip[3], (int)nhietdo, (int)(nhietdo * 10.0) % 10,(int)doam, (int)(doam * 10.0) % 10); //%ld
           snprintf (msg, 100, "{\"ip\":\"%i.%i.%i.%i\",\"command\":\"SendIR\",\"para\":{\"type\":\"ML\",\"remote\":\"Daikin\",\"button\":\"ON\"}}",ip[0],ip[1],ip[2],ip[3]);
-          //snprintf (msg, 75, "{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[%d.%02d,%d.%02d]}", (int)nhietdo, (int)(nhietdo * 10.0) % 10,(int)doam, (int)(doam * 10.0) % 10); //%ld
           Serial.println(msg);
-          clientmqtt.publish(mqtt_topic, msg);
+          clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
       }
       else if (demgiay % 33 == 0) {
         send_udp();
@@ -265,6 +278,7 @@ void loop() {
       break ;
     default:
       if (statusmang != 0) {
+        WiFi.softAPdisconnect(false);
         statusmang = 0;
         _resetketnoi = 0;
       }
@@ -274,7 +288,6 @@ void loop() {
         else denled = 0;
         digitalWrite(status_led, denled );
         timeled = millis();
-        Serial.println("DISCONNECT");
       }
       _resetketnoi = _resetketnoi + 1;
       if (_resetketnoi >= 65000) {
