@@ -739,14 +739,14 @@ void setupWiFiConf(void) {
     content += F("<div class=\"row\">");
     content += "<label for='timebegin' class=\"req\">Begin: </label>";
     content += "<input type=\"time\" name=\"timebegin\" value=\"";
-    content +=conver_time_int_to_string(time_begin_int);
+    content +=conver_time_int_to_string(HG1.time_begin_int);
     content += "\"/>";
 
     content += F("</div>");
     content += F("<div class=\"row\">");
     content += "<label for='timeend' class=\"req\">End: </label>";
     content += "<input type=\"time\" name=\"timeend\" value=\"";
-    content +=conver_time_int_to_string(time_end_int);
+    content +=conver_time_int_to_string(HG1.time_end_int);
     content += "\"/>";
     content += F("</div>");
 
@@ -755,7 +755,7 @@ void setupWiFiConf(void) {
     content += "<label for='button' class=\"req\">Temp : </label>";
     content += "<select name='tempset' class=\"dropbtn\" >";
     for (int i = 18; i < 26; i++) {
-      if (i!=temp_set)
+      if (i!=HG1.temp_set)
       content += "<option value=\"" + String(i) + "\">" +  String(i) + "*C</option>";
       else
       content += "<option value=\"" + String(i) + "\" selected>" +  String(i) + "*C</option>";
@@ -770,38 +770,38 @@ void setupWiFiConf(void) {
     for (int i = 0; i < 7; i++) {
       switch (i) {
         case 0:
-              if (is_sun) thungay = "Sun\" checked";
+              if (HG1.is_sun) thungay = "Sun\" checked";
               else thungay = "Sun\"";
               id_check = "Sun";
               break;
         case 1:
-              if (is_mon) thungay = "Mon\" checked";
+              if (HG1.is_mon) thungay = "Mon\" checked";
               else thungay = "Mon\"";
               id_check = "Mon"; 
               break;
         case 2: 
-              if (is_tue) thungay = "Tue\" checked";
+              if (HG1.is_tue) thungay = "Tue\" checked";
               else thungay = "Tue\""; 
               id_check = "Tue";
               break;
         case 3:
-        if (is_wed) thungay = "Wed\" checked";
+        if (HG1.is_wed) thungay = "Wed\" checked";
               else thungay = "Wed\"";
               id_check = "Wed";
                
               break;
         case 4: 
-              if (is_thu) thungay = "Thu\" checked";
+              if (HG1.is_thu) thungay = "Thu\" checked";
               else thungay = "Thu\""; 
               id_check = "Thu";
               break;
         case 5:
-        if (is_fri) thungay = "Fri\" checked";
+        if (HG1.is_fri) thungay = "Fri\" checked";
               else thungay = "Fri\""; 
               id_check = "Fri";
               break;
         case 6: 
-              if (is_sat) thungay = "Sat\" checked";
+              if (HG1.is_sat) thungay = "Sat\" checked";
               else thungay = "Sat\""; 
               id_check = "Sat";
               break;
@@ -824,23 +824,23 @@ void setupWiFiConf(void) {
     time_begin = server.arg(F("timebegin"));
     time_end = server.arg(F("timeend"));
     String tempt = server.arg(F("tempset"));
-    time_begin_int=conver_time_string_to_int(time_begin);
-    time_end_int=conver_time_string_to_int(time_end);
-    temp_set= tempt.toInt();
-    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");is_sun=1;}
-    else is_sun=0;
-    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");is_mon=1;}
-    else is_mon=0;
-    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");is_tue=1;}
-    else is_tue=0;
-    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");is_wed=1;}
-    else is_wed=0;
-    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");is_thu=1;}
-    else is_thu=0;
-    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");is_fri=1;}
-    else is_fri=0;
-    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");is_sat=1;}
-    else is_sat=0;
+    HG1.time_begin_int=conver_time_string_to_int(time_begin);
+    HG1.time_end_int=conver_time_string_to_int(time_end);
+    HG1.temp_set= tempt.toInt();
+    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");HG1.is_sun=1;}
+    else HG1.is_sun=0;
+    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");HG1.is_mon=1;}
+    else HG1.is_mon=0;
+    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");HG1.is_tue=1;}
+    else HG1.is_tue=0;
+    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");HG1.is_wed=1;}
+    else HG1.is_wed=0;
+    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");HG1.is_thu=1;}
+    else HG1.is_thu=0;
+    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");HG1.is_fri=1;}
+    else HG1.is_fri=0;
+    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");HG1.is_sat=1;}
+    else HG1.is_sat=0;
     write_file_setting("Setting/setting.txt",1);
     server.send(200, F("text/html"), duongdan_ML);
 

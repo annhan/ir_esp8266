@@ -5,33 +5,87 @@ String write_file_setting(String namefile, int tt) {
   if (myFile1) {
     switch (tt){
     case 1:
-        myFile1.print(time_begin_int);
+        myFile1.print(HG1.time_begin_int);
         myFile1.println("");
-        myFile1.print(time_end_int);
+        myFile1.print(HG1.time_end_int);
         myFile1.println("");
-        myFile1.print(temp_set);
+        myFile1.print(HG1.temp_set);
         myFile1.println("");
-        myFile1.print(is_mon);
+        myFile1.print(HG1.is_mon);
         myFile1.println("");
-        myFile1.print(is_tue);
+        myFile1.print(HG1.is_tue);
         myFile1.println("");
-        myFile1.print(is_wed);
+        myFile1.print(HG1.is_wed);
         myFile1.println("");
-        myFile1.print(is_thu);
+        myFile1.print(HG1.is_thu);
         myFile1.println("");
-        myFile1.print(is_fri);
+        myFile1.print(HG1.is_fri);
         myFile1.println("");
-        myFile1.print(is_sat);
+        myFile1.print(HG1.is_sat);
         myFile1.println("");
-        myFile1.print(is_sun);
-        myFile1.println("\n");
+        myFile1.print(HG1.is_sun);
+        myFile1.println("");
+                myFile1.print(HG2.time_begin_int);
+        myFile1.println("");
+        myFile1.print(HG2.time_end_int);
+        myFile1.println("");
+        myFile1.print(HG2.temp_set);
+        myFile1.println("");
+        myFile1.print(HG2.is_mon);
+        myFile1.println("");
+        myFile1.print(HG2.is_tue);
+        myFile1.println("");
+        myFile1.print(HG2.is_wed);
+        myFile1.println("");
+        myFile1.print(HG2.is_thu);
+        myFile1.println("");
+        myFile1.print(HG2.is_fri);
+        myFile1.println("");
+        myFile1.print(HG2.is_sat);
+        myFile1.println("");
+        myFile1.print(HG2.is_sun);
+        myFile1.println("");
+                myFile1.print(HG3.time_begin_int);
+        myFile1.println("");
+        myFile1.print(HG3.time_end_int);
+        myFile1.println("");
+        myFile1.print(HG3.temp_set);
+        myFile1.println("");
+        myFile1.print(HG3.is_mon);
+        myFile1.println("");
+        myFile1.print(HG3.is_tue);
+        myFile1.println("");
+        myFile1.print(HG3.is_wed);
+        myFile1.println("");
+        myFile1.print(HG3.is_thu);
+        myFile1.println("");
+        myFile1.print(HG3.is_fri);
+        myFile1.println("");
+        myFile1.print(HG3.is_sat);
+        myFile1.println("");
+        myFile1.print(HG3.is_sun);
+        myFile1.println("");
         break;
     case 2:
-        myFile1.print(state_status);
+        myFile1.print(HG1.state_status);
         myFile1.println("");
-        myFile1.print(khoang_time_cach_nhau);
+        myFile1.print(HG1.khoang_time_cach_nhau);
         myFile1.println("");
-        myFile1.print(time_tam_cho_cac_buoc);
+        myFile1.print(HG1.time_tam_cho_cac_buoc);
+        myFile1.println("");
+        
+                myFile1.print(HG2.state_status);
+        myFile1.println("");
+        myFile1.print(HG2.khoang_time_cach_nhau);
+        myFile1.println("");
+        myFile1.print(HG2.time_tam_cho_cac_buoc);
+        myFile1.println("");
+        
+                myFile1.print(HG3.state_status);
+        myFile1.println("");
+        myFile1.print(HG3.khoang_time_cach_nhau);
+        myFile1.println("");
+        myFile1.print(HG3.time_tam_cho_cac_buoc);
         myFile1.println("");
         break;
     case 3:
@@ -61,40 +115,104 @@ boolean read_file_setting(String namefile, int tt) {
     int i = 1;
     switch (tt){
               case 1:
+                  
                   giatritam = myFile1.readStringUntil('\n');
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  time_begin_int = atoi(char_tam);
+                  HG1.time_begin_int = atoi(char_tam);
                   giatritam = myFile1.readStringUntil('\n');
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  time_end_int = atoi(char_tam);
+                  HG1.time_end_int = atoi(char_tam);
                   giatritam = myFile1.readStringUntil('\n');
-                  temp_set = giatritam.toInt();
+                  HG1.temp_set = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  is_mon = giatritam.toInt();
+                  HG1.is_mon = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  is_tue = giatritam.toInt();
+                  HG1.is_tue = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  is_wed = giatritam.toInt();
+                  HG1.is_wed = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  is_thu = giatritam.toInt();
+                  HG1.is_thu = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  is_fri = giatritam.toInt();
+                  HG1.is_fri = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  is_sat = giatritam.toInt();
+                  HG1.is_sat = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  is_sun = giatritam.toInt();
+                  HG1.is_sun = giatritam.toInt();
+
+                                    giatritam = myFile1.readStringUntil('\n');
+                  giatritam.toCharArray(char_tam, sizeof(char_tam));
+                  HG2.time_begin_int = atoi(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam.toCharArray(char_tam, sizeof(char_tam));
+                  HG2.time_end_int = atoi(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.temp_set = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.is_mon = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.is_tue = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.is_wed = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.is_thu = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.is_fri = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.is_sat = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.is_sun = giatritam.toInt();
+
+                                    giatritam = myFile1.readStringUntil('\n');
+                  giatritam.toCharArray(char_tam, sizeof(char_tam));
+                  HG3.time_begin_int = atoi(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam.toCharArray(char_tam, sizeof(char_tam));
+                  HG3.time_end_int = atoi(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.temp_set = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.is_mon = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.is_tue = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.is_wed = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.is_thu = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.is_fri = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.is_sat = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.is_sun = giatritam.toInt();
                   i++;
                   // }
 
                   break;
               case 2:
+       
                   giatritam = myFile1.readStringUntil('\n');
-                  state_status = giatritam.toInt();
+                  HG1.state_status = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
-                  khoang_time_cach_nhau = giatritam.toInt();
+                  HG1.khoang_time_cach_nhau = giatritam.toInt();
                   giatritam = myFile1.readStringUntil('\n');
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  time_tam_cho_cac_buoc = atoi(char_tam);
+                  HG1.time_tam_cho_cac_buoc = atoi(char_tam);
+
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.state_status = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.khoang_time_cach_nhau = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam.toCharArray(char_tam, sizeof(char_tam));
+                  HG2. time_tam_cho_cac_buoc = atoi(char_tam);
+
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.state_status = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.khoang_time_cach_nhau = giatritam.toInt();
+                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam.toCharArray(char_tam, sizeof(char_tam));
+                  HG3.time_tam_cho_cac_buoc = atoi(char_tam);
                   break;
               case 3:
                   String ir_code_str = "";
@@ -106,60 +224,6 @@ boolean read_file_setting(String namefile, int tt) {
                   break;
 
     } 
-    /*if (tt == 1) {
-      giatritam = myFile1.readStringUntil('\n');
-      giatritam.toCharArray(char_tam, sizeof(char_tam));
-      time_begin_int = atoi(char_tam);
-      giatritam = myFile1.readStringUntil('\n');
-      giatritam.toCharArray(char_tam, sizeof(char_tam));
-      time_end_int = atoi(char_tam);
-      giatritam = myFile1.readStringUntil('\n');
-      temp_set = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      is_mon = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      is_tue = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      is_wed = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      is_thu = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      is_fri = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      is_sat = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      is_sun = giatritam.toInt();
-      i++;
-      // }
-      NHAN_Debug(time_begin_int);
-      NHAN_Debug(time_end_int);
-      NHAN_Debug(temp_set);
-      NHAN_Debug(is_mon);
-      NHAN_Debug(is_tue);
-      NHAN_Debug(is_wed);
-      NHAN_Debug(is_thu);
-      NHAN_Debug(is_fri);
-      NHAN_Debug(is_sat);
-      NHAN_Debug(is_sun);
-    }
-    else if (tt == 2) {
-      giatritam = myFile1.readStringUntil('\n');
-      state_status = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      khoang_time_cach_nhau = giatritam.toInt();
-      giatritam = myFile1.readStringUntil('\n');
-      giatritam.toCharArray(char_tam, sizeof(char_tam));
-      time_tam_cho_cac_buoc = atoi(char_tam);
-    }
-    else if (tt == 3) {
-      String ir_code_str = "";
-      NHAN_Debug("test.txt:");
-      ir_code_str = myFile1.readStringUntil('\n');
-      i++;
-      NHAN_Debug(ir_code_str);
-      parseStringRAW(ir_code_str);
-    }*/
-    // close the file:
     myFile1.close();
     return 1 ;
   } else {
