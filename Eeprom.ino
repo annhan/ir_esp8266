@@ -17,6 +17,9 @@ int waitConnected(void) {
 }
 void printIP(void) {
   NHAN_Debug(WiFiConf.module_id);
+  NHAN_Debug(WiFiConf.sta_ip);
+  Serial.println(WiFi.localIP());
+  
 }
 void ketnoimang() {
   

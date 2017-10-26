@@ -74,7 +74,7 @@ String write_file_setting(String namefile, int tt) {
         myFile1.print(HG1.time_tam_cho_cac_buoc);
         myFile1.println("");
         
-                myFile1.print(HG2.state_status);
+        myFile1.print(HG2.state_status);
         myFile1.println("");
         myFile1.print(HG2.khoang_time_cach_nhau);
         myFile1.println("");
@@ -97,9 +97,12 @@ String write_file_setting(String namefile, int tt) {
         myFile1.print(json_ts);
         myFile1.println("\n");
         break;
+    case 4:  //ghi motion time
+        myFile1.print(motion_time);
+        myFile1.println("\n");
+        break;
     }
     myFile1.close();
-    NHAN_Debug("done.");
     return (" OK");
   } else {
     // if the file didn't open, print an error:
@@ -115,74 +118,78 @@ boolean read_file_setting(String namefile, int tt) {
     int i = 1;
     switch (tt){
               case 1:
-                  
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
+
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG1.time_begin_int = atoi(char_tam);
-                  giatritam = myFile1.readStringUntil('\n');
+                  HG1.time_begin_int = atol(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
+
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG1.time_end_int = atoi(char_tam);
-                  giatritam = myFile1.readStringUntil('\n');
+                  HG1.time_end_int = atol(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
+
                   HG1.temp_set = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
+
                   HG1.is_mon = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
+                  
                   HG1.is_tue = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG1.is_wed = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG1.is_thu = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG1.is_fri = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG1.is_sat = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG1.is_sun = giatritam.toInt();
 
-                                    giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG2.time_begin_int = atoi(char_tam);
-                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.time_begin_int = atol(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG2.time_end_int = atoi(char_tam);
-                  giatritam = myFile1.readStringUntil('\n');
+                  HG2.time_end_int = atol(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.temp_set = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.is_mon = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.is_tue = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.is_wed = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.is_thu = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.is_fri = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.is_sat = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.is_sun = giatritam.toInt();
 
-                                    giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG3.time_begin_int = atoi(char_tam);
-                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.time_begin_int = atol(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG3.time_end_int = atoi(char_tam);
-                  giatritam = myFile1.readStringUntil('\n');
+                  HG3.time_end_int = atol(char_tam);
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.temp_set = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.is_mon = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.is_tue = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.is_wed = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.is_thu = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.is_fri = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.is_sat = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.is_sun = giatritam.toInt();
                   i++;
                   // }
@@ -190,29 +197,34 @@ boolean read_file_setting(String namefile, int tt) {
                   break;
               case 2:
        
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG1.state_status = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG1.khoang_time_cach_nhau = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG1.time_tam_cho_cac_buoc = atoi(char_tam);
+                  HG1.time_tam_cho_cac_buoc = atol(char_tam);
 
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.state_status = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG2.khoang_time_cach_nhau = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG2. time_tam_cho_cac_buoc = atoi(char_tam);
+                  HG2. time_tam_cho_cac_buoc = atol(char_tam);
 
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.state_status = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   HG3.khoang_time_cach_nhau = giatritam.toInt();
-                  giatritam = myFile1.readStringUntil('\n');
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
                   giatritam.toCharArray(char_tam, sizeof(char_tam));
-                  HG3.time_tam_cho_cac_buoc = atoi(char_tam);
+                  HG3.time_tam_cho_cac_buoc = atol(char_tam);
+                  break;
+              case 4:
+                  giatritam = myFile1.readStringUntil('\n');Serial.println(giatritam);
+                  giatritam.toCharArray(char_tam, sizeof(char_tam));
+                  motion_time = atol(char_tam);
                   break;
               case 3:
                   String ir_code_str = "";

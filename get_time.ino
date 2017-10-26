@@ -11,8 +11,6 @@ unsigned long sendNTPpacket(IPAddress & address)
   packetBuffer[14]  = 49;
   packetBuffer[15]  = 52;
 
-  // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp:
   udp.beginPacket(address, 123); //NTP requests are to port 123
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
@@ -21,8 +19,6 @@ unsigned long sendNTPpacket(IPAddress & address)
 void send_udp(){
   WiFi.hostByName(ntpServerName, timeServerIP); 
   sendNTPpacket(timeServerIP); // send an NTP packet to a time server
- // Serial.print("IP : ");
-  //NHAN_Debug(timeServerIP);
 }
 byte gettime_udp()
 {

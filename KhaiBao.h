@@ -138,6 +138,7 @@ struct WiFiConfStruct {
  */
 boolean read_setting=0;
 boolean read_setting_state=0;
+boolean read_setting_motion=0;
 /*
 unsigned long time_tam_cho_cac_buoc = 600;
 int temp_set=0;

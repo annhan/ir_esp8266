@@ -36,7 +36,6 @@ boolean reconnect() {
         else
         {        NHAN_Debug("Khong User");
                 if (clientmqtt.connect("arduinoClient")) {
-                 // if (clientmqtt.connect("arduinoClient")) {
                   clientmqtt.publish(WiFiConf.sta_mqtt_topic,"Reconnect");
                   clientmqtt.subscribe(WiFiConf.sta_mqtt_topic);
                 }

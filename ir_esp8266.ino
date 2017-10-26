@@ -131,11 +131,13 @@ void setup() {
     resetModuleId();
     saveWiFiConf();
   }
-  motion_time = EEPROMReadlong(1000);
+ // motion_time = EEPROMReadlong(1000);
   conver_time();
   scanWiFi();
   NHAN_Debug("A");
   hoclenh = 0;
+  WiFi.setAutoConnect(false);
+  WiFi.setAutoReconnect(false);
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(WiFiConf.module_id, wifi_password);
   ketnoimang();
@@ -191,7 +193,8 @@ void setup() {
   HG2.state_status = state_no;
   HG3.state_status = state_no;
   read_setting = read_file_setting("Setting/setting.txt", 1);
-  read_setting_state = read_file_setting("Setting/setting.txt", 2);
+  read_setting_state = read_file_setting("Setting/state.txt", 2);
+  read_setting_motion = read_file_setting("Setting/Motion.txt", 4);
   udp.begin(localPort);
   weekday = 8;
   //################################
@@ -281,7 +284,8 @@ void loop() {
         demgiay = 1 ;
         gettime_udp();
         if (read_setting == 0) read_setting = read_file_setting("Setting/setting.txt", 1);
-        if (read_setting_state == 0) read_setting_state=read_file_setting("Setting/setting.txt", 2);
+        if (read_setting_state == 0) read_setting_state=read_file_setting("Setting/state.txt", 2);  
+        if (read_setting_motion == 0) read_setting_motion=read_file_setting("Setting/Motion.txt", 4);  
       }
       break ;
     default:
@@ -311,12 +315,12 @@ void loop() {
   }
   if (digitalRead(MotionPin) == 1) {
     if (_motion_status == 0) {
-      if (thoigianthuc - motion_time > 5 ) {
+      if (thoigianthuc - motion_time > 20 ) {
         NHAN_Debug("Status Motion : 1");
         _motion_status = 1;
         motion_time = thoigianthuc;
         conver_time();
-        EEPROMWritelong(1000, motion_time);
+        write_file_setting("Setting/Motion.txt", 4);
       }
     }
   }
@@ -441,7 +445,7 @@ void loop() {
     case state_no:
       if (!HG1.dung_ngay) {
         HG1.state_status = state_not_day;
-        NHAN_Debug("Không dung ngay dieu khien");
+        NHAN_Debug("Không dung ngay dieu khien 1");
       }
       else if (thoigianthuc > HG1.time_begin_int) {
         //ON ML nhiệt độ thấp nhất
@@ -576,7 +580,7 @@ void loop() {
     case state_no:
       if (!HG2.dung_ngay) {
         HG2.state_status = state_not_day;
-        NHAN_Debug("Không dung ngay dieu khien");
+        NHAN_Debug("Không dung ngay dieu khien 2");
       }
       else if (thoigianthuc > HG2.time_begin_int) {
         //ON ML nhiệt độ thấp nhất
@@ -607,7 +611,7 @@ void loop() {
     case state_not_day:
       if (HG2.dung_ngay) {
         HG2.state_status = state_no;
-        NHAN_Debug("dung ngay dk");
+        NHAN_Debug("dung ngay dk 2");
       }
       // kết thúc điều khiển
       break;
@@ -711,7 +715,7 @@ void loop() {
     case state_no:
       if (!HG3.dung_ngay) {
         HG3.state_status = state_not_day;
-        NHAN_Debug("Không dung ngay dieu khien");
+        NHAN_Debug("Không dung ngay dieu khien 3");
       }
       else if (thoigianthuc > HG3.time_begin_int) {
         //ON ML nhiệt độ thấp nhất
@@ -742,7 +746,7 @@ void loop() {
     case state_not_day:
       if (HG3.dung_ngay) {
         HG3.state_status = state_no;
-        NHAN_Debug("dung ngay dk");
+        NHAN_Debug("dung ngay dk 3");
       }
       // kết thúc điều khiển
       break;
