@@ -18,7 +18,7 @@ String noiluu_MQTT="Amply/User/sassss.txt";
 long lastReconnectAttempt = 0;
 //###
 
-static int state_status=0;
+
 
 const int state_no = 0;
 const int state_not_day = 1;
@@ -70,10 +70,6 @@ int statusmang=0;
 String ts;
 String json_ts="38000";
 uint16_t *code_array;
-//int chieudai_ir = 1100 ;
-//uint16_t irSignal[1100];  // SAMSUNG E0E040BF
-//int chieudai = 0;
-
 
 int demgiay=0;
 unsigned long timeled=0;
@@ -104,9 +100,15 @@ struct WiFiConfStruct {
   char sta_TV[4];
   char sta_MQ[4];
   char sta_Amply[4];
+    char sta_mqtt_address[64];
+  uint16_t sta_mqtt_port;
+  char sta_mqtt_user[64];
+  char sta_mqtt_pass[64];
+  char sta_mqtt_topic[32];
+  char sta_DHCP[4];
 } WiFiConf = {
   WIFI_CONF_FORMAT,
-  "",
+  "aaaa",
   "",
   "192.168.1.240",
   "192.168.1.1",
@@ -118,20 +120,27 @@ struct WiFiConfStruct {
   "",
   "0",
   "",
-    "0",
   "0",
   "0",
-  "0"
+  "0",
+  "0",
+  "mhome-nhamau.ddns.net",
+  1883,
+  "x",
+  "x",
+  "IN_MQTT",
+  "1"
 };
 
 
 /*
  * Thoi gian thuc doc tu server
  */
-
-unsigned long time_tam_cho_cac_buoc = 600;
 boolean read_setting=0;
 boolean read_setting_state=0;
+boolean read_setting_motion=0;
+/*
+unsigned long time_tam_cho_cac_buoc = 600;
 int temp_set=0;
 int khoang_time_cach_nhau=300;
 unsigned long time_begin_int=0;
@@ -144,6 +153,23 @@ boolean is_thu = 0 ;
 boolean is_fri = 0 ;
 boolean is_sat = 0 ;
 boolean is_sun = 0 ;
+*/
+struct Hengiostruct {
+    int state_status=0;
+    unsigned long time_tam_cho_cac_buoc = 600;
+    int temp_set=0;
+    int khoang_time_cach_nhau=300;
+    unsigned long time_begin_int=0;
+    unsigned long time_end_int=0;
+    boolean dung_ngay=false;
+    boolean is_mon = 0 ;
+    boolean is_tue = 0 ;
+    boolean is_wed = 0 ;
+    boolean is_thu = 0 ;
+    boolean is_fri = 0 ;
+    boolean is_sat = 0 ;
+    boolean is_sun = 0 ;
+};
 
 unsigned long thoigianthuc=0;
 String time_ ;

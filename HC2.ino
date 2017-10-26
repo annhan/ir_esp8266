@@ -123,60 +123,57 @@ void SetVariHC(String vari,String giatri) {
             }
       }
       int encodedLen = base64_enc_len(vitricat-1);
-      char encoded[encodedLen];
-      base64_encode(encoded, WiFiConf.sta_passhc, vitricat);
-     int chieudai = 51 + vari.length()+giatri.length();
- if (client.connect(WiFiConf.sta_iphc2,80)) {
-      client.print(F("PUT /api/globalVariables/"));  
-      client.print(vari); 
-      client.println(" HTTP/1.1"); 
-      client.print(F("Host: "));  
-      client.println(String(WiFiConf.sta_iphc2)); 
-      client.print(F("Authorization: Basic "));  
-      client.println(String(encoded)); 
-      client.println(F("Content-Type: application/json"));
-      client.print(F("Content-Length: "));
-      client.println(chieudai);
-      client.println();
-      client.print(F("{\r\n\"name\": \""));
-      client.print(vari);
-      client.print(F("\",\r\n\"value\":\""));
-      client.print(giatri);
-      client.println(F("\",\r\n\"invokeScenes\":true\r\n}"));
-      client.stop(); 
-}
-else{Serial.println(F("Can't connect HC2")); }
+  char encoded[encodedLen];
+  base64_encode(encoded, WiFiConf.sta_passhc, vitricat);     
+  HTTPClient http;
+  String value= F("{\"name\":\"");
+  value += vari;
+  value += F("\",\"value\":\"");
+  value += giatri;
+  value += F("\",\"invokeScenes\":true}");
+  int chieudai=value.length();
+  Serial.println(chieudai);
+  String url = "http://" + String(WiFiConf.sta_iphc2) + "/api/globalVariables/" + vari;
+  //String mahoa= "Basic " + String(encoded);
+  http.begin(url);
+  http.setAuthorization(encoded);
+  Serial.println(encoded);
+  http.addHeader("Host:", String(WiFiConf.sta_iphc2));
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("Content-Length: ", String(chieudai));
+  http.addHeader("NULL", "NULL");
+  int httpCode = http.PUT(value); //Send the request
+  String payload = http.getString(); //Get the response payload
+  http.writeToStream(&Serial);
+  http.end();
 }
 void getHC() {
-  if (!client.connect(WiFiConf.sta_iphc2,80)) {  
-     SerialHC2=F("connection failed");      
-    return;
+    int vitricat=0;
+      for (byte tam=0;tam<sizeof(WiFiConf.sta_passhc);tam++){
+            if (WiFiConf.sta_passhc[tam]=='#'){
+                  vitricat=tam;
+                  break;
+            }
+      }
+      int encodedLen = base64_enc_len(vitricat-1);
+      char encoded[encodedLen];
+      base64_encode(encoded, WiFiConf.sta_passhc, vitricat);   
+  HTTPClient http;
+  String url = "http://" + String(WiFiConf.sta_iphc2) + "/api/settings/info";
+  http.begin(url);
+  http.setAuthorization(encoded);
+  http.addHeader("Host:", String(WiFiConf.sta_iphc2));
+  http.addHeader("NULL", "NULL");
+  int httpCode = http.GET(); //Send the request
+  String payload = http.getString(); //Get the response payload
+  if (payload.length()>70) {
+      payload.replace("{","");
+      payload.replace("}","");
+      payload.replace("\""," ");
+      payload.remove(76);
+    SerialHC2=payload;Serial.println(SerialHC2);
   }
-  String url = F("/api/settings/info");
-  client.print("GET " + url + " HTTP/1.1\r\n" +
-               "Host: "+String(WiFiConf.sta_iphc2)+"\r\n" + 
-               "Connection: close\r\n\r\n");
-  timeout = millis();
-  while (client.available() == 0) {
-    delay(10);
-    if (millis() - timeout > 5000) {
-      client.stop();    
-      SerialHC2=F("HC2 not connected.");
-      return;
-    }
-  }
-  
-  // Read all the lines of the reply from server and print them to Serial
-  while(client.available()){
-    delay(5);
-    String line = client.readStringUntil('\r');
-     if (line.length()>70) {
-      line.replace("{","");
-      line.replace("}","");
-      line.replace("\""," ");
-      line.remove(76);
-    SerialHC2=line;Serial.println(SerialHC2);}
-    
-  }
+  http.writeToStream(&Serial);
+  http.end();
 }
 

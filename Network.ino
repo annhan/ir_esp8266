@@ -40,7 +40,7 @@ void parseStringRAW(String str) {
   if (code_array == NULL) {  // malloc failed, so give up.
     Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",
                   count * sizeof(uint16_t), ESP.getFreeHeap());
-    Serial.println("Giving up & forcing a reboot.");
+    NHAN_Debug("Giving up & forcing a reboot.");
     ESP.restart();  // Reboot.
     delay(500);  // Wait for the restart to happen.
     return;  // Should never get here, but just in case.
@@ -63,7 +63,7 @@ void parseStringRAW(String str) {
     // Serial.print(code_array[i]);
     //Serial.print(",");
   }//
-  // Serial.println("");
+  // NHAN_Debug("");
   irsend.sendRaw(code_array, count - 1, code_array[count - 1] / (1000));
   free(code_array);  // Free up the memory allocated.
 }
@@ -84,7 +84,7 @@ void parseStringGC(String str) {
   // Check we malloc'ed successfully.
   if (code_array == NULL) {  // malloc failed, so give up.
     // Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",count * sizeof(uint16_t), ESP.getFreeHeap());
-    // Serial.println("Giving up & forcing a reboot.");
+    // NHAN_Debug("Giving up & forcing a reboot.");
     ESP.restart();  // Reboot.
     delay(500);  // Wait for the restart to happen.
     return;  // Should never get here, but just in case.
@@ -138,6 +138,24 @@ void setupWiFiConf(void) {
     content1 += FPSTR(_p_html);
     content1 += FPSTR(get_html);
     content1 += F("'set_wifi_conf'>");
+    
+    content1 += F("<div class=\"row\">");
+    content1 += "<li><select name='button' class=\"dropbtn\" >";
+    String id_check="";
+    
+    for (int i = 0; i < 2; i++) {
+      switch (i) {
+        case 0:  id_check = "DHCP";break;
+        case 1:  id_check = "Static IP";break;
+      }
+      if (atoi(WiFiConf.sta_DHCP) != i)
+      content1 += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
+      else
+      content1 += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
+    }
+    content1 += "</select>";
+    content1 += F("</div>");
+    
     content1 += F("<div class=\"row\">");
     content1 += FPSTR(label1_html);
     content1 += F("'ssid' class=\"req\">SSID : </label>");
@@ -302,6 +320,76 @@ void setupWiFiConf(void) {
     }
     Serial.println(hoclenh);
 
+  });
+  server.on("/mqtt_conf", []() {
+    String content = FPSTR(header); content += FPSTR(begin_title);
+    String   content1 = F("<p>Wifi Connected: ");
+    content1 += WiFiConf.sta_ssid;
+    content1 += F("</br>IP Address: ");
+    content1 += ipStr;
+    content1 += F(" ( ");
+    content1 += WiFiConf.module_id;
+    content1 += F(".local");
+    content1 += F(" )</p>");
+    content1 += F("<p>");
+     content1 += F("</p><form method='get' action='set_mqtt_conf'>");
+    content1 += F("<li><label for='mqtt_server' class=\"req\">MQTT Server : </label><input name='mqtt_server' class=\"txt\" id='mqtt_server' maxlength=32 value=") ;
+    content1 += String(WiFiConf.sta_mqtt_address) ;
+    content1 +=  F(" ><br /><br />");
+
+    content1 += F("<li><label for='mqtt_port' class=\"req\">Port : </label> <input class=\"txt\" name='mqtt_port' id='mqtt_port' value=");
+    content1 += String(WiFiConf.sta_mqtt_port);
+    content1 += F("><br /><br />");
+
+    content1 += F("<li><label for='mqtt_user' class=\"req\">User : </label> <input name='mqtt_user' class=\"txt\" id='mqtt_user' value=");
+    content1 += String(WiFiConf.sta_mqtt_user) ;
+    content1 +=  F(" ><br /><br />");
+    
+    content1 += F("<li><label for='mqtt_pass' class=\"req\">Pass : </label> <input  name='mqtt_pass' class=\"txt\" id='mqtt_pass' value=") ;
+    content1 += String(WiFiConf.sta_mqtt_pass) ;
+    content1 += F("><br /><br />");
+        content1 += F("<li><label for='mqtt_topic' class=\"req\">Topic : </label> <input  name='mqtt_topic' class=\"txt\" id='mqtt_topic' value=");
+    content1 +=  String(WiFiConf.sta_mqtt_topic);
+    content1 += F("><br /><br />");
+    content += "mHome - Wifi Setup";
+    content += F("</title></head><body>");
+   /* if (WiFiConf.sta_language[0]=='1'){
+    
+    content += F("<h1>Cài Đặt MQTT</h1>");
+    content += content1;
+    content += F("<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Thay Đổi Cài Đặt?\");'></form>");
+    }
+    else
+    {*/
+    content += F("<h1>MQTT Setting</h1>");
+    content += content1;
+   content += F("<input type='submit' id=\"submitbtn\" value='OK' onclick='return confirm(\"Change Settings?\");'></form>");
+    //}
+    content += F(" </p>");
+    content += F("</body></html>");
+    server.send(200, F("text/html"), content);
+  });
+   server.on("/set_mqtt_conf", []() {
+    String new_server = server.arg("mqtt_server");
+    String new_port = server.arg("mqtt_port");
+    String new_user = server.arg("mqtt_user");
+    String new_pass = server.arg("mqtt_pass");
+    String new_topic = server.arg("mqtt_topic");
+    if (new_user==""){new_user="x";}
+    if (new_pass==""){new_pass="x";}
+      new_server.toCharArray(WiFiConf.sta_mqtt_address, sizeof(WiFiConf.sta_mqtt_address));
+      int chieudai_mqtt=new_port.length();
+      char tarray[chieudai_mqtt+1];      
+      new_port.toCharArray(tarray, sizeof(tarray));
+      WiFiConf.sta_mqtt_port = atoi(tarray);
+      new_user.toCharArray(WiFiConf.sta_mqtt_user, sizeof(WiFiConf.sta_mqtt_user));
+      new_pass.toCharArray(WiFiConf.sta_mqtt_pass, sizeof(WiFiConf.sta_mqtt_pass));
+      new_topic.toCharArray(WiFiConf.sta_mqtt_topic, sizeof(WiFiConf.sta_mqtt_topic));
+
+      saveWiFiConf();
+      String content = F("OK...Reboot Device");
+    server.send(200, "text/html", content);
+    ESP.reset();
   });
   server.on(html_setup_leaningir, []() {
 
@@ -557,6 +645,8 @@ void setupWiFiConf(void) {
     content += duongdan_ML;
     content += F("<li>Remote TV : ");
     content += duongdan_TV;
+    String id_check="";
+    /*
     content += F("<form method='get' action='set_remote_ML'>");
     content += F("<nav>");
     content += FPSTR(fieldset);
@@ -565,20 +655,7 @@ void setupWiFiConf(void) {
     content += FPSTR(_legend_html);
     content += F("<div class=\"row\">");
     content += "<li><select name='button' class=\"dropbtn\" >";
-    /*content += F("<option value=\"0\">User</option>");
-    content += F("<option value=\"1\">Carrier</option>");
-    content += F("<option value=\"2\">Daikin</option>");
-    content += F("<option value=\"3\">Electrolux</option>");
-    content += F("<option value=\"4\">Hitachi</option>");
-    content += F("<option value=\"5\">LG</option>");
-    content += F("<option value=\"6\">Misu</option>");
-    content += F("<option value=\"7\">Panasonic</option>");
-    content += F("<option value=\"8\">Reetech</option>");
-    content += F("<option value=\"9\">Samsung</option>");
-    content += F("<option value=\"10\">Sanyo</option>");
-    content += F("<option value=\"11\">Sharp</option>");
-    content += F("<option value=\"12\">Toshiba</option>");*/
-    String id_check="";
+    
     
     for (int i = 0; i < 13; i++) {
       switch (i) {
@@ -608,37 +685,10 @@ void setupWiFiConf(void) {
     content += F("</div>");
     content += FPSTR(_fieldset);
     content += F("</form>");
+
+    
     content += F("</nav>");
-    /*
-    content += F("<nav>");
-    content += F("<form method='get' action='set_remote_TV'>");
-    content += FPSTR(fieldset);
-    content += FPSTR(legend_html);
-    content += F(">TV");
-    content += FPSTR(_legend_html);
-    content += F("<div class=\"row\">");
-    content += "<li><select name='button1' class=\"dropbtn\">";
-    for (int i = 0; i < 5; i++) {
-      switch (i) {
-        case 0:  id_check = "User";break;
-        case 1:  id_check = "LG";break;
-        case 2:  id_check = "Samsung";break;
-        case 3:  id_check = "Sony";break;
-        case 4:  id_check = "Toshiba";break;
-      }
-      if (atoi(WiFiConf.sta_TV) != i)
-      content += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
-      else
-      content += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
-    }
-    content += "</select>";
-    content += F("</div>");
-    content += F("<div class=\"row\">");
-    content += F("<li><input type='submit' id=\"submitbtn\" value='Set TV' onclick='return confirm(\"Save?\");'>");
-    content += F("</div>");
-    content += FPSTR(_fieldset);
-    content += F("</form>");
-    content += F("</nav>");*/
+*/
 
     content += F("<form method='get' action='set_schedule'>");
     content += F("<nav>");
@@ -651,14 +701,15 @@ void setupWiFiConf(void) {
     content += F("<div class=\"row\">");
     content += "<label for='timebegin' class=\"req\">Begin: </label>";
     content += "<input type=\"time\" name=\"timebegin\" value=\"";
-    content +=conver_time_int_to_string(time_begin_int);
+    content +=conver_time_int_to_string(HG1.time_begin_int);
     content += "\"/>";
 
     content += F("</div>");
+    
     content += F("<div class=\"row\">");
     content += "<label for='timeend' class=\"req\">End: </label>";
     content += "<input type=\"time\" name=\"timeend\" value=\"";
-    content +=conver_time_int_to_string(time_end_int);
+    content +=conver_time_int_to_string(HG1.time_end_int);
     content += "\"/>";
     content += F("</div>");
 
@@ -667,7 +718,7 @@ void setupWiFiConf(void) {
     content += "<label for='button' class=\"req\">Temp : </label>";
     content += "<select name='tempset' class=\"dropbtn\" >";
     for (int i = 18; i < 26; i++) {
-      if (i!=temp_set)
+      if (i!=HG1.temp_set)
       content += "<option value=\"" + String(i) + "\">" +  String(i) + "*C</option>";
       else
       content += "<option value=\"" + String(i) + "\" selected>" +  String(i) + "*C</option>";
@@ -682,38 +733,38 @@ void setupWiFiConf(void) {
     for (int i = 0; i < 7; i++) {
       switch (i) {
         case 0:
-              if (is_sun) thungay = "Sun\" checked";
+              if (HG1.is_sun) thungay = "Sun\" checked";
               else thungay = "Sun\"";
               id_check = "Sun";
               break;
         case 1:
-              if (is_mon) thungay = "Mon\" checked";
+              if (HG1.is_mon) thungay = "Mon\" checked";
               else thungay = "Mon\"";
               id_check = "Mon"; 
               break;
         case 2: 
-              if (is_tue) thungay = "Tue\" checked";
+              if (HG1.is_tue) thungay = "Tue\" checked";
               else thungay = "Tue\""; 
               id_check = "Tue";
               break;
         case 3:
-        if (is_wed) thungay = "Wed\" checked";
+        if (HG1.is_wed) thungay = "Wed\" checked";
               else thungay = "Wed\"";
               id_check = "Wed";
                
               break;
         case 4: 
-              if (is_thu) thungay = "Thu\" checked";
+              if (HG1.is_thu) thungay = "Thu\" checked";
               else thungay = "Thu\""; 
               id_check = "Thu";
               break;
         case 5:
-        if (is_fri) thungay = "Fri\" checked";
+        if (HG1.is_fri) thungay = "Fri\" checked";
               else thungay = "Fri\""; 
               id_check = "Fri";
               break;
         case 6: 
-              if (is_sat) thungay = "Sat\" checked";
+              if (HG1.is_sat) thungay = "Sat\" checked";
               else thungay = "Sat\""; 
               id_check = "Sat";
               break;
@@ -727,7 +778,315 @@ void setupWiFiConf(void) {
     content += F("<div class=\"row\">");
     content += F("<li><input type='submit' id=\"submitbtn\" onclick='return confirm(\"Save?\");'>");
     content += F("</div>");
+    content += FPSTR(_fieldset);
     content += F("</form>");
+
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+  server.on("/remote_save2", []() {
+
+    String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
+    content = FPSTR(header); content += FPSTR(begin_title);
+    //content =  F("<meta http-equiv='refresh' content='5'><style>body {background-color:lightgrey}h1 {color:blue}p {color:black}</style><link rel=\"shortcut icon\" href=\"data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAADLy8sAHYsbACCNGADK28UADIEHAHOubwAShQoA//7/AObz6ADn8+gA6fPoAOzz6ADGxsYAXa5eAL7gugAghxAAtbyyABFmCAD09vEAN5ctADuPMAA4ly0AxuG9AKvXqQA2lzYAJ4cZADuXNgAikCIAKIwoAHS1cwDs++YAAHgAAKrKpwAAewAAj8WQACCHEQDa6tgAtbyzAMTcwQA4jzEAOpEuAFCkSwAYZgkAa7JiAIK9ggBAmDoAQJY9AA6FDADQ5NAApMalAC2PKQCozagA9PXwAPT48AAvbScAF2YKAGywZgBtsGYA4+3iAMviywA/mDsARpgyAM/jzgBkkGEA0eXLAC6KJAA2dDMAotCgAEWbRAA5iiQAv9+6AKmr3AAQZQgA8vXxAPn48QA+mDMAsdayAJ7DngChxKEANnQ0ACiRKABlkGIAq7iqAAB3AAAAegAAjsSQAHm5eQDKycoAw9vBAGGxYgB/mqMAhJesAPr6+AC21qoA/v/+AJqamgBygMIASpxAAMjIyADv8PYAYLBgANrr1gCUx5EAZ61gAGitYADQy9EAKGpOACOPJAD7+/wAJI8kAPv9+QDo8OUA/v//AI24iQD///8AWaxVAC+MJABerFUAXaleAF6pXgB5tHUA2uvXAPX16wDPys8AxOLGANHL0gAnhB8Agr1+AJqh1AAOfAgAzOHMAIe+gQCLvoEA6O7pAHK0bQCrt6oAMI4iAC6QKAAtlCsAS5s/AF+rXAB4t3YAwdrBAMrIygDv+e8A3O3eAM/K0ADf4uoAdJdxAHWXcQAniBoAbqtuAP3+9QAMhgwAoc6fAHO0bgAvjiMAFYYMAI28jgBGn0MAyMfIAGOrXQB4uHoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAyPe4c/NhEqT5QlaaAAX3JyXiITc5oWDmYpS11ycgByXIw8ZXJycnJycnxFg3JiclZESXJycnJycnJyOkEXfSScCXIvG1BtbW1rnYVAPRB4m3JyGgRxMU1OnoFycimVLlhycllTjXJycpAccnJmQpYLcnJkHx8zcnIeAnJyRjcPenJyDVNUBnJjgGBHchZIFDAHIAEoHWxyk1tqWnJDNjmDcm+KdCxycm4FK5hydVE7MhJyl34hGAeff3JyeRVScndoB3JyjpkfTHJyNC1VknIKYWcScnKRA3JyCIuhcFdycgl2iYQ+SjUmhoiiXHIMcnJycoI4JyMZLngkcnJyDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"/><meta charset='UTF-8'><title>");
+    content += F("mHome - IR Learn");
+    content += FPSTR(title_html);
+    content += F("<h1>Set Remote</h1>");
+    content += F("<li>Remote ML : ");
+    content += duongdan_ML;
+    content += F("<li>Remote TV : ");
+    content += duongdan_TV;
+    String id_check="";
+    String thungay="";
+    /*
+    content += F("<form method='get' action='set_remote_ML'>");
+    content += F("<nav>");
+    content += FPSTR(fieldset);
+    content += FPSTR(legend_html);
+    content += F(">Máy Lạnh");
+    content += FPSTR(_legend_html);
+    content += F("<div class=\"row\">");
+    content += "<li><select name='button' class=\"dropbtn\" >";
+    
+    
+    for (int i = 0; i < 13; i++) {
+      switch (i) {
+        case 0:  id_check = "User";break;
+        case 1:  id_check = "Carrier";break;
+        case 2:  id_check = "Daikin";break;
+        case 3:  id_check = "Electrolux";break;
+        case 4:  id_check = "Hitachi";break;
+        case 5:  id_check = "LG";break;
+        case 6:  id_check = "Misu";break;
+        case 7:  id_check = "Panasonic";break;
+        case 8:  id_check = "Reetech";break;
+        case 9:  id_check = "Samsung";break;
+        case 10:  id_check = "Sanyo";break;
+        case 11:  id_check = "Sharp";break;
+        case 12:  id_check = "Toshiba";break;
+      }
+      if (atoi(WiFiConf.sta_ML) != i)
+      content += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
+      else
+      content += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
+    }
+    content += "</select>";
+    content += F("</div>");
+    content += F("<div class=\"row\">");
+    content += F("<li><input type='submit' id=\"submitbtn\" value='Set ML' onclick='return confirm(\"Save?\");'>");
+    content += F("</div>");
+    content += FPSTR(_fieldset);
+    content += F("</form>");
+
+    
+    content += F("</nav>");
+*/
+    content += F("<form method='get' action='set_schedule2'>");
+    content += F("<nav>");
+    content += FPSTR(fieldset);
+    content += FPSTR(legend_html);
+    content += F(">Schedule 3");
+    content += FPSTR(_legend_html);
+
+
+    content += F("<div class=\"row\">");
+    content += "<label for='timebegin' class=\"req\">Begin: </label>";
+    content += "<input type=\"time\" name=\"timebegin\" value=\"";
+    content +=conver_time_int_to_string(HG3.time_begin_int);
+    content += "\"/>";
+
+    content += F("</div>");
+    
+    content += F("<div class=\"row\">");
+    content += "<label for='timeend' class=\"req\">End: </label>";
+    content += "<input type=\"time\" name=\"timeend\" value=\"";
+    content +=conver_time_int_to_string(HG3.time_end_int);
+    content += "\"/>";
+    content += F("</div>");
+
+
+    content += F("<div class=\"row\">");
+    content += "<label for='button' class=\"req\">Temp : </label>";
+    content += "<select name='tempset' class=\"dropbtn\" >";
+    for (int i = 18; i < 26; i++) {
+      if (i!=HG3.temp_set)
+      content += "<option value=\"" + String(i) + "\">" +  String(i) + "*C</option>";
+      else
+      content += "<option value=\"" + String(i) + "\" selected>" +  String(i) + "*C</option>";
+    }
+    content += "</select>";
+
+    content += F("</div>");
+
+    content += F("<div class=\"weekDays-selector\">");
+    content += "<label  class=\"req\">Weekday : </label>";
+    for (int i = 0; i < 7; i++) {
+      switch (i) {
+        case 0:
+              if (HG3.is_sun) thungay = "Sun\" checked";
+              else thungay = "Sun\"";
+              id_check = "Sun";
+              break;
+        case 1:
+              if (HG3.is_mon) thungay = "Mon\" checked";
+              else thungay = "Mon\"";
+              id_check = "Mon"; 
+              break;
+        case 2: 
+              if (HG3.is_tue) thungay = "Tue\" checked";
+              else thungay = "Tue\""; 
+              id_check = "Tue";
+              break;
+        case 3:
+        if (HG3.is_wed) thungay = "Wed\" checked";
+              else thungay = "Wed\"";
+              id_check = "Wed";
+               
+              break;
+        case 4: 
+              if (HG3.is_thu) thungay = "Thu\" checked";
+              else thungay = "Thu\""; 
+              id_check = "Thu";
+              break;
+        case 5:
+        if (HG3.is_fri) thungay = "Fri\" checked";
+              else thungay = "Fri\""; 
+              id_check = "Fri";
+              break;
+        case 6: 
+              if (HG3.is_sat) thungay = "Sat\" checked";
+              else thungay = "Sat\""; 
+              id_check = "Sat";
+              break;
+      }
+      content += "<input type=\"checkbox\" id=\"" + thungay + " name=\"" + id_check ;
+      content += "\" value=\"OK\"/>";
+      content += "<label for=\"" + id_check + "\">" + id_check ;
+      content += "</label>";
+    }
+    content += F("</div>");
+    content += F("<div class=\"row\">");
+    content += F("<li><input type='submit' id=\"submitbtn\" onclick='return confirm(\"Save?\");'>");
+    content += F("</div>");
+    content += FPSTR(_fieldset);
+    content += F("</form>");
+
+
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+  server.on("/remote_save1", []() {
+
+    String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
+    content = FPSTR(header); content += FPSTR(begin_title);
+    //content =  F("<meta http-equiv='refresh' content='5'><style>body {background-color:lightgrey}h1 {color:blue}p {color:black}</style><link rel=\"shortcut icon\" href=\"data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAADLy8sAHYsbACCNGADK28UADIEHAHOubwAShQoA//7/AObz6ADn8+gA6fPoAOzz6ADGxsYAXa5eAL7gugAghxAAtbyyABFmCAD09vEAN5ctADuPMAA4ly0AxuG9AKvXqQA2lzYAJ4cZADuXNgAikCIAKIwoAHS1cwDs++YAAHgAAKrKpwAAewAAj8WQACCHEQDa6tgAtbyzAMTcwQA4jzEAOpEuAFCkSwAYZgkAa7JiAIK9ggBAmDoAQJY9AA6FDADQ5NAApMalAC2PKQCozagA9PXwAPT48AAvbScAF2YKAGywZgBtsGYA4+3iAMviywA/mDsARpgyAM/jzgBkkGEA0eXLAC6KJAA2dDMAotCgAEWbRAA5iiQAv9+6AKmr3AAQZQgA8vXxAPn48QA+mDMAsdayAJ7DngChxKEANnQ0ACiRKABlkGIAq7iqAAB3AAAAegAAjsSQAHm5eQDKycoAw9vBAGGxYgB/mqMAhJesAPr6+AC21qoA/v/+AJqamgBygMIASpxAAMjIyADv8PYAYLBgANrr1gCUx5EAZ61gAGitYADQy9EAKGpOACOPJAD7+/wAJI8kAPv9+QDo8OUA/v//AI24iQD///8AWaxVAC+MJABerFUAXaleAF6pXgB5tHUA2uvXAPX16wDPys8AxOLGANHL0gAnhB8Agr1+AJqh1AAOfAgAzOHMAIe+gQCLvoEA6O7pAHK0bQCrt6oAMI4iAC6QKAAtlCsAS5s/AF+rXAB4t3YAwdrBAMrIygDv+e8A3O3eAM/K0ADf4uoAdJdxAHWXcQAniBoAbqtuAP3+9QAMhgwAoc6fAHO0bgAvjiMAFYYMAI28jgBGn0MAyMfIAGOrXQB4uHoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAyPe4c/NhEqT5QlaaAAX3JyXiITc5oWDmYpS11ycgByXIw8ZXJycnJycnxFg3JiclZESXJycnJycnJyOkEXfSScCXIvG1BtbW1rnYVAPRB4m3JyGgRxMU1OnoFycimVLlhycllTjXJycpAccnJmQpYLcnJkHx8zcnIeAnJyRjcPenJyDVNUBnJjgGBHchZIFDAHIAEoHWxyk1tqWnJDNjmDcm+KdCxycm4FK5hydVE7MhJyl34hGAeff3JyeRVScndoB3JyjpkfTHJyNC1VknIKYWcScnKRA3JyCIuhcFdycgl2iYQ+SjUmhoiiXHIMcnJycoI4JyMZLngkcnJyDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"/><meta charset='UTF-8'><title>");
+    content += F("mHome - IR Learn");
+    content += FPSTR(title_html);
+    content += F("<h1>Set Remote</h1>");
+    content += F("<li>Remote ML : ");
+    content += duongdan_ML;
+    content += F("<li>Remote TV : ");
+    content += duongdan_TV;
+    String id_check="";
+    String thungay="";
+    /*
+    content += F("<form method='get' action='set_remote_ML'>");
+    content += F("<nav>");
+    content += FPSTR(fieldset);
+    content += FPSTR(legend_html);
+    content += F(">Máy Lạnh");
+    content += FPSTR(_legend_html);
+    content += F("<div class=\"row\">");
+    content += "<li><select name='button' class=\"dropbtn\" >";
+    
+    
+    for (int i = 0; i < 13; i++) {
+      switch (i) {
+        case 0:  id_check = "User";break;
+        case 1:  id_check = "Carrier";break;
+        case 2:  id_check = "Daikin";break;
+        case 3:  id_check = "Electrolux";break;
+        case 4:  id_check = "Hitachi";break;
+        case 5:  id_check = "LG";break;
+        case 6:  id_check = "Misu";break;
+        case 7:  id_check = "Panasonic";break;
+        case 8:  id_check = "Reetech";break;
+        case 9:  id_check = "Samsung";break;
+        case 10:  id_check = "Sanyo";break;
+        case 11:  id_check = "Sharp";break;
+        case 12:  id_check = "Toshiba";break;
+      }
+      if (atoi(WiFiConf.sta_ML) != i)
+      content += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
+      else
+      content += "<option value=\"" + String(i) + "\" selected>" +  id_check + "</option>";
+    }
+    content += "</select>";
+    content += F("</div>");
+    content += F("<div class=\"row\">");
+    content += F("<li><input type='submit' id=\"submitbtn\" value='Set ML' onclick='return confirm(\"Save?\");'>");
+    content += F("</div>");
+    content += FPSTR(_fieldset);
+    content += F("</form>");
+
+    
+    content += F("</nav>");
+*/
+
+    
+//################################ Sche 2
+
+content += F("<form method='get' action='set_schedule1'>");
+    content += F("<nav>");
+    content += FPSTR(fieldset);
+    content += FPSTR(legend_html);
+    content += F(">Schedule");
+    content += FPSTR(_legend_html);
+
+
+    content += F("<div class=\"row\">");
+    content += "<label for='timebegin' class=\"req\">Begin: </label>";
+    content += "<input type=\"time\" name=\"timebegin\" value=\"";
+    content +=conver_time_int_to_string(HG2.time_begin_int);
+    content += "\"/>";
+
+    content += F("</div>");
+    
+    content += F("<div class=\"row\">");
+    content += "<label for='timeend' class=\"req\">End: </label>";
+    content += "<input type=\"time\" name=\"timeend\" value=\"";
+    content +=conver_time_int_to_string(HG2.time_end_int);
+    content += "\"/>";
+    content += F("</div>");
+
+
+    content += F("<div class=\"row\">");
+    content += "<label for='button' class=\"req\">Temp : </label>";
+    content += "<select name='tempset' class=\"dropbtn\" >";
+    for (int i = 18; i < 26; i++) {
+      if (i!=HG2.temp_set)
+      content += "<option value=\"" + String(i) + "\">" +  String(i) + "*C</option>";
+      else
+      content += "<option value=\"" + String(i) + "\" selected>" +  String(i) + "*C</option>";
+    }
+    content += "</select>";
+
+    content += F("</div>");
+
+    content += F("<div class=\"weekDays-selector\">");
+    content += "<label  class=\"req\">Weekday : </label>";
+
+    for (int i = 0; i < 7; i++) {
+      switch (i) {
+        case 0:
+              if (HG2.is_sun) thungay = "Sun\" checked";
+              else thungay = "Sun\"";
+              id_check = "Sun";
+              break;
+        case 1:
+              if (HG2.is_mon) thungay = "Mon\" checked";
+              else thungay = "Mon\"";
+              id_check = "Mon"; 
+              break;
+        case 2: 
+              if (HG2.is_tue) thungay = "Tue\" checked";
+              else thungay = "Tue\""; 
+              id_check = "Tue";
+              break;
+        case 3:
+        if (HG2.is_wed) thungay = "Wed\" checked";
+              else thungay = "Wed\"";
+              id_check = "Wed";
+               
+              break;
+        case 4: 
+              if (HG2.is_thu) thungay = "Thu\" checked";
+              else thungay = "Thu\""; 
+              id_check = "Thu";
+              break;
+        case 5:
+        if (HG2.is_fri) thungay = "Fri\" checked";
+              else thungay = "Fri\""; 
+              id_check = "Fri";
+              break;
+        case 6: 
+              if (HG2.is_sat) thungay = "Sat\" checked";
+              else thungay = "Sat\""; 
+              id_check = "Sat";
+              break;
+      }
+      content += "<input type=\"checkbox\" id=\"" + thungay + " name=\"" + id_check ;
+      content += "\" value=\"OK\"/>";
+      content += "<label for=\"" + id_check + "\">" + id_check ;
+      content += "</label>";
+    }
+    content += F("</div>");
+    content += F("<div class=\"row\">");
+    content += F("<li><input type='submit' id=\"submitbtn\" onclick='return confirm(\"Save?\");'>");
+    content += F("</div>");
+    content += FPSTR(_fieldset);
+    content += F("</form>");
+
 
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
@@ -736,28 +1095,73 @@ void setupWiFiConf(void) {
     time_begin = server.arg(F("timebegin"));
     time_end = server.arg(F("timeend"));
     String tempt = server.arg(F("tempset"));
-    time_begin_int=conver_time_string_to_int(time_begin);
-    time_end_int=conver_time_string_to_int(time_end);
-    temp_set= tempt.toInt();
-    Serial.println(time_begin);
-    Serial.println(time_begin_int);
-    Serial.println(time_end);
-    Serial.println(time_end_int);
-    Serial.println(temp_set);
-    if (server.hasArg("Sun")){Serial.println("OK Sunday");is_sun=1;}
-    else is_sun=0;
-    if (server.hasArg("Mon")){Serial.println("OK Monday");is_mon=1;}
-    else is_mon=0;
-    if (server.hasArg("Tue")){Serial.println("OK Tueday");is_tue=1;}
-    else is_tue=0;
-    if (server.hasArg("Wed")){Serial.println("OK Webday");is_wed=1;}
-    else is_wed=0;
-    if (server.hasArg("Thu")){Serial.println("OK Thuday");is_thu=1;}
-    else is_thu=0;
-    if (server.hasArg("Fri")){Serial.println("OK Friday");is_fri=1;}
-    else is_fri=0;
-    if (server.hasArg("Sat")){Serial.println("OK Satday");is_sat=1;}
-    else is_sat=0;
+    HG1.time_begin_int=conver_time_string_to_int(time_begin);
+    HG1.time_end_int=conver_time_string_to_int(time_end);
+    HG1.temp_set= tempt.toInt();
+    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");HG1.is_sun=1;}
+    else HG1.is_sun=0;
+    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");HG1.is_mon=1;}
+    else HG1.is_mon=0;
+    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");HG1.is_tue=1;}
+    else HG1.is_tue=0;
+    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");HG1.is_wed=1;}
+    else HG1.is_wed=0;
+    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");HG1.is_thu=1;}
+    else HG1.is_thu=0;
+    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");HG1.is_fri=1;}
+    else HG1.is_fri=0;
+    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");HG1.is_sat=1;}
+    else HG1.is_sat=0;
+    write_file_setting("Setting/setting.txt",1);
+    server.send(200, F("text/html"), duongdan_ML);
+
+  });
+    server.on("/set_schedule1",  []() {
+    time_begin = server.arg(F("timebegin"));
+    time_end = server.arg(F("timeend"));
+    String tempt = server.arg(F("tempset"));
+    HG2.time_begin_int=conver_time_string_to_int(time_begin);
+    HG2.time_end_int=conver_time_string_to_int(time_end);
+    HG2.temp_set= tempt.toInt();
+    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");HG2.is_sun=1;}
+    else HG2.is_sun=0;
+    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");HG2.is_mon=1;}
+    else HG2.is_mon=0;
+    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");HG2.is_tue=1;}
+    else HG2.is_tue=0;
+    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");HG2.is_wed=1;}
+    else HG2.is_wed=0;
+    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");HG2.is_thu=1;}
+    else HG2.is_thu=0;
+    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");HG2.is_fri=1;}
+    else HG2.is_fri=0;
+    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");HG2.is_sat=1;}
+    else HG2.is_sat=0;
+    write_file_setting("Setting/setting.txt",1);
+    server.send(200, F("text/html"), duongdan_ML);
+
+  });
+    server.on("/set_schedule2",  []() {
+    time_begin = server.arg(F("timebegin"));
+    time_end = server.arg(F("timeend"));
+    String tempt = server.arg(F("tempset"));
+    HG3.time_begin_int=conver_time_string_to_int(time_begin);
+    HG3.time_end_int=conver_time_string_to_int(time_end);
+    HG3.temp_set= tempt.toInt();
+    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");HG3.is_sun=1;}
+    else HG3.is_sun=0;
+    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");HG3.is_mon=1;}
+    else HG3.is_mon=0;
+    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");HG3.is_tue=1;}
+    else HG3.is_tue=0;
+    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");HG3.is_wed=1;}
+    else HG3.is_wed=0;
+    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");HG3.is_thu=1;}
+    else HG3.is_thu=0;
+    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");HG3.is_fri=1;}
+    else HG3.is_fri=0;
+    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");HG3.is_sat=1;}
+    else HG3.is_sat=0;
     write_file_setting("Setting/setting.txt",1);
     server.send(200, F("text/html"), duongdan_ML);
 
@@ -795,7 +1199,7 @@ void setupWiFiConf(void) {
     String content = "";
     if (data1.length() < 12) {
       content += F("Not OK");
-      Serial.println(" ");
+      NHAN_Debug(" ");
     }
     else {
       data1 += ",";
@@ -881,7 +1285,7 @@ void setupWiFiConf(void) {
     else if (mode1 == "heat") dakinir.setMode(DAIKIN_HEAT);
     else if (mode1 == "silent") dakinir.setMode(DAIKIN_SILENT);
     if (status == "OFF") {
-      Serial.println(F("OFF Daikin"));
+      NHAN_Debug("OFF Daikin");
       dakinir.off();
       dakinir.setFan(temp.toInt());
       dakinir.setTemp(25);
@@ -955,7 +1359,7 @@ void setupWiFiConf(void) {
     else if (mode1 == "heat") mitsubir.setMode(MITSUBISHI_AC_HEAT);
     else if (mode1 == "silent") mitsubir.setMode(DAIKIN_SILENT);
     if (status == "OFF") {
-      Serial.println(F("OFF Misu"));
+      NHAN_Debug("OFF Misu");
       mitsubir.off();
       mitsubir.setFan(temp.toInt());
       mitsubir.setTemp(25);
@@ -974,7 +1378,9 @@ void setupWiFiConf(void) {
   });
   //////////////
   server.on(html_setup_setwifi, HTTP_GET, []() {
-
+    String data1 = server.arg(F("button"));
+    data1.toCharArray(WiFiConf.sta_DHCP, sizeof(WiFiConf.sta_DHCP));
+    NHAN_Debug(WiFiConf.sta_DHCP);
     String new_ssid = server.arg(F("ssid"));
     String new_pwd = server.arg(F("pwd"));
     String new_ip = server.arg(F("ip"));
@@ -1178,12 +1584,18 @@ void setupWeb(void) {
       content += F(" )");
     }
     content += FPSTR(_fieldset);
+    
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);
     content += F("'/IR'>IR Leaning");
     content += FPSTR(_legend_html);
     content += F("<li>Description: This section is for learning IR code from IR remotes.");
     content += F("<li>Each successful learning code should be copied to use with Fibaro HC2 later");
+    content += FPSTR(_fieldset);
+        content += FPSTR(fieldset);
+    content += FPSTR(legend_html);
+    content += F("'/mqtt_conf'>MQTT Setting");
+    content += FPSTR(_legend_html);
     content += FPSTR(_fieldset);
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);
@@ -1196,7 +1608,13 @@ void setupWeb(void) {
 
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);
-    content += F("'/remote_save'>Setting Remote");
+    content += F("'/remote_save'>Setting Schema1");
+    content += FPSTR(_legend_html);
+        content += FPSTR(legend_html);
+    content += F("'/remote_save1'>Setting Schema2");
+    content += FPSTR(_legend_html);
+        content += FPSTR(legend_html);
+    content += F("'/remote_save2'>Setting Schema3");
     content += FPSTR(_legend_html);
     content += FPSTR(_fieldset);
     content += FPSTR(fieldset);
@@ -1242,7 +1660,7 @@ void setupWeb(void) {
   void parseBytes(const char* str, char sep, byte* bytes, int maxBytes, int base) {
   for (int i = 0; i < maxBytes; i++) {
     bytes[i] = strtoul(str, NULL, base);  
-    Serial.println(bytes[i]);
+    NHAN_Debug(bytes[i]);
     str = strchr(str, sep);               
     if (str == NULL || *str == '\0') {
       break;                            
@@ -1255,7 +1673,7 @@ void parseBytes1(const char* str, char sep, int address, int maxBytes, int base)
     if (address == 1) ip10[i] = strtoul(str, NULL, base);  // Convert byte  ip10
     else if (address == 2) gateway10[i] = strtoul(str, NULL, base);  // Convert byte
     else if (address == 3) subnet10[i] = strtoul(str, NULL, base);  // Convert byte
-   // Serial.println(bytes[i]);
+   // NHAN_Debug(bytes[i]);
     str = strchr(str, sep);               // Find next separator
     if (str == NULL || *str == '\0') {
       break;                            // No more separators, exit

@@ -3,35 +3,43 @@ int waitConnected(void) {
     while (wait<20 ) {
     digitalWrite(status_led, LOW);
     if (WiFi.status() == WL_CONNECTED) {
-      //Serial.println("");
-      Serial.println(F("WiFi connected"));
+      //NHAN_Debug("");
+      NHAN_Debug("WiFi connected");
       return (1);
     }
     wait++;
     delay(300);
     digitalWrite(status_led, HIGH);
     delay(300);
-   // Serial.println(wait);
+   // NHAN_Debug(wait);
     }
   return(0);
 }
 void printIP(void) {
-  Serial.println(WiFiConf.module_id);
+  NHAN_Debug(WiFiConf.module_id);
+  NHAN_Debug(WiFiConf.sta_ip);
+  Serial.println(WiFi.localIP());
+  
 }
 void ketnoimang() {
+  
   WiFi.hostname("mIR");
-  WiFi.setAutoReconnect(true);
-  WiFi.begin(WiFiConf.sta_ssid, WiFiConf.sta_pwd);
-  parseBytes1(WiFiConf.sta_ip, '.', 1, 4, 10);
-  parseBytes1(WiFiConf.sta_gateway, '.', 2, 4, 10);
-  parseBytes1(WiFiConf.sta_subnet, '.', 3, 4, 10);
-  WiFi.config(ip10,gateway10,subnet10,DNS);
+  boolean kq=scanWiFireturn();
+  if (kq){
+      WiFi.begin(WiFiConf.sta_ssid, WiFiConf.sta_pwd);
+      if (atoi(WiFiConf.sta_DHCP) == 1){
+          parseBytes1(WiFiConf.sta_ip, '.', 1, 4, 10);
+          parseBytes1(WiFiConf.sta_gateway, '.', 2, 4, 10);
+          parseBytes1(WiFiConf.sta_subnet, '.', 3, 4, 10);
+          WiFi.config(ip10,gateway10,subnet10,DNS);
+      }
+  }
 }
 void printWiFiConf(void) {
-  //Serial.println(WiFiConf.sta_ssid);
+  //NHAN_Debug(WiFiConf.sta_ssid);
 }
 bool loadWiFiConf() {
-  //Serial.println(F("loading WiFiConf"));
+  //NHAN_Debug(F("loading WiFiConf"));
   if (EEPROM.read(WIFI_CONF_START + 0) == wifi_conf_format[0] &&
       EEPROM.read(WIFI_CONF_START + 1) == wifi_conf_format[1] &&
       EEPROM.read(WIFI_CONF_START + 2) == wifi_conf_format[2] &&
@@ -69,7 +77,7 @@ void scanWiFi(void) {
   for (int i = 0; i < founds; ++i)
   {
     // Print SSID and RSSI for each network found
-    //Serial.println(WiFi.SSID(i));
+    //NHAN_Debug(WiFi.SSID(i));
     network_html += F("<li>");
     network_html += WiFi.SSID(i);
     network_html += F(" (");
@@ -82,7 +90,17 @@ void scanWiFi(void) {
   network_html +=F("</fieldset>");
   network_html += F("</ol>");
 }
-
+boolean scanWiFireturn(void) {
+  int founds = WiFi.scanNetworks();
+  char ten_wifi[32];
+  for (int i = 0; i < founds; ++i)
+  {  
+    WiFi.SSID(i).toCharArray(ten_wifi, sizeof(ten_wifi));
+   if (strstr(ten_wifi,WiFiConf.sta_ssid) != NULL){NHAN_Debug("Co wifi cung ten");return true;}   
+    
+  }
+  return false;
+}
 
 
 void EEPROMWritelong(int address, unsigned long value)
@@ -113,7 +131,7 @@ void EEPROMWritelong(int address, unsigned long value)
       }     
 
 void user_using(){
-  Serial.println(WiFiConf.sta_ML);
+  NHAN_Debug(WiFiConf.sta_ML);
   if (String(WiFiConf.sta_ML) == "0") duongdan_ML="User";
   else if (String(WiFiConf.sta_ML) == "1") duongdan_ML="Carrier";
   else if (String(WiFiConf.sta_ML) == "2") duongdan_ML="Daikin";

@@ -11,8 +11,6 @@ unsigned long sendNTPpacket(IPAddress & address)
   packetBuffer[14]  = 49;
   packetBuffer[15]  = 52;
 
-  // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp:
   udp.beginPacket(address, 123); //NTP requests are to port 123
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
@@ -21,14 +19,12 @@ unsigned long sendNTPpacket(IPAddress & address)
 void send_udp(){
   WiFi.hostByName(ntpServerName, timeServerIP); 
   sendNTPpacket(timeServerIP); // send an NTP packet to a time server
- // Serial.print("IP : ");
-  //Serial.println(timeServerIP);
 }
 byte gettime_udp()
 {
   int cb = udp.parsePacket();
   if (!cb) {
-        Serial.println(F("no packet yet"));
+        NHAN_Debug("no packet yet");
         return 0;
   }
   else {
@@ -44,7 +40,6 @@ byte gettime_udp()
     weekday = (day+4) % 7;
     thoigianthuc=thoigianthuc+ 25200L ; //Cộng với 7h là 7*3600 cho đúng múi giờ +7
     thoigianthuc= thoigianthuc  % 86400L ;
-    Serial.println(thoigianthuc);
     }
     return 1 ;
   }  
@@ -78,22 +73,16 @@ switch (day){
 
 
 unsigned long conver_time_string_to_int(String timeget){
-  Serial.print("Thoi gian luu ");
-  Serial.println(timeget);
    int hh, mm ;
     char time_begin_char[10];
     timeget.toCharArray(time_begin_char, sizeof(time_begin_char));
     sscanf(time_begin_char, "%d:%d", &hh, &mm);
     //os_scanf(time_begin_char, "%d:%d", &hh, &mm);
-    Serial.print(hh);
-    Serial.print(":");
-    Serial.print(mm);
     unsigned long showSecs = (hh * 3600) + (mm * 60);
     return showSecs;
 }
 
 String conver_time_int_to_string(unsigned long timeget){
-  Serial.println(timeget);
     String trave="";
     int gio=timeget / 3600;
     if ( gio < 9)trave += "0" ;
@@ -102,8 +91,6 @@ String conver_time_int_to_string(unsigned long timeget){
     int phut = (timeget  % 3600) / 60 ;
     if (phut <9) trave += "0" ;
     trave += String((timeget  % 3600) / 60 );
-    Serial.println(trave);
-    Serial.println(trave);
     return(trave);
 }
 
