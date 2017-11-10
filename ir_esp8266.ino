@@ -198,11 +198,14 @@ void setup() {
   udp.begin(localPort);
   weekday = 8;
   //################################
+  if (WiFiConf.sta_mqtt_port > 0){
   snprintf (WiFiConf.sta_mqtt_topic, 32, "mIR/%02x%02x%02x%02x%02x%02x",macAddr[WL_MAC_ADDR_LENGTH - 5], macAddr[WL_MAC_ADDR_LENGTH - 6],macAddr[WL_MAC_ADDR_LENGTH - 4], macAddr[WL_MAC_ADDR_LENGTH - 3],macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
   NHAN_Debug(WiFiConf.sta_mqtt_topic);
   clientmqtt.setServer(WiFiConf.sta_mqtt_address, WiFiConf.sta_mqtt_port);
   clientmqtt.setCallback(callback);
   lastReconnectAttempt = 0;
+  }
+  else Serial.println("Not using MQTT");
   //##################################
 }
 
@@ -223,6 +226,7 @@ void loop() {
   server.handleClient();
   //##################
   // MQTT ############
+  if (WiFiConf.sta_mqtt_port > 0){
         if (!clientmqtt.connected()) {
         long now = millis();
         if (now - lastReconnectAttempt > 5000) {
@@ -234,6 +238,7 @@ void loop() {
       } else {
         clientmqtt.loop();
       }
+  }
   //#################
   //#######################
   switch (WiFi.status())
@@ -355,7 +360,7 @@ void loop() {
         String file = "ML/" + duongdan_ML + "/18.txt";
         read_file_setting(file , 3 );
         HG1.state_status = state_update1;
-        write_file_setting("Setting/state.txt", 2);
+        write_file_setting("Setting/state.txt", 3);
       }
       //Tăng nhiệt độ cách 15 phút
       break;
@@ -366,7 +371,7 @@ void loop() {
         String file = "ML/" + duongdan_ML + "/19.txt";
         read_file_setting(file , 3 );
         HG1.state_status = state_update2;
-        write_file_setting("Setting/state.txt", 2);
+        write_file_setting("Setting/state.txt", 4);
       }
       //Tăng nhiệt độ cách 15 phút
       break;
@@ -377,7 +382,7 @@ void loop() {
         String file = "ML/" + duongdan_ML + "/20.txt";
         read_file_setting(file , 3 );
         HG1.state_status = state_update3;
-        write_file_setting("Setting/state.txt", 2);
+        write_file_setting("Setting/state.txt", 5);
       }
       break;
     case state_update3:
@@ -435,22 +440,24 @@ void loop() {
       HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau * 7;
       HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
+        if (thoigianthuc > HG1.time_end_int){
+         Serial.println("TAM 8");
         String file = "ML/" + duongdan_ML + "/OFF.txt";
         read_file_setting(file , 3 );
-        HG1.state_status = state_wait;
+        HG1.state_status = state_no;
         write_file_setting("Setting/state.txt", 2);
+      }
       }
       // kết thúc điều khiển
       break;
     case state_no:
       if (!HG1.dung_ngay) {
         HG1.state_status = state_not_day;
-        NHAN_Debug("Không dung ngay dieu khien 1");
+        NHAN_Debug("Không dung ngay dieu khien 2");
       }
-      else if (thoigianthuc > HG1.time_begin_int) {
         //ON ML nhiệt độ thấp nhất
-        if (HG1.time_begin_int > HG1.time_end_int) {
-         
+      else if (HG1.time_begin_int > HG1.time_end_int) {
+            if ((thoigianthuc < HG1.time_end_int)||(thoigianthuc > HG1.time_begin_int))  {
             HG1.khoang_time_cach_nhau = ( HG1.time_end_int + 86400) - HG1.time_begin_int ;
             HG1.khoang_time_cach_nhau = HG1.khoang_time_cach_nhau / 8 ;
             //Serial.print("Khoang thoi gian cach nhau ");
@@ -459,9 +466,10 @@ void loop() {
             String file = "ML/" + duongdan_ML + "/ON.txt" ;
             read_file_setting(file , 3 );
             HG1.state_status = state_begin;
-          
+            write_file_setting("Setting/state.txt", 2);
+            }
         }
-        else if (thoigianthuc < HG1.time_end_int) {
+      else if ((thoigianthuc < HG1.time_end_int)&&(thoigianthuc > HG1.time_begin_int)) {
           HG1.khoang_time_cach_nhau = HG1.time_end_int - HG1.time_begin_int ;
           HG1.khoang_time_cach_nhau = HG1.khoang_time_cach_nhau / 8 ;
           //Serial.print("Khoang thoi gian cach nhau ");
@@ -470,8 +478,9 @@ void loop() {
           String file = "ML/" + duongdan_ML + "/ON.txt" ;
           read_file_setting(file , 3 );
           HG1.state_status = state_begin;
+          write_file_setting("Setting/state.txt", 2);
         }
-      }
+      
       break;
     case state_not_day:
       if (HG1.dung_ngay) {
@@ -487,6 +496,7 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau / 4;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+         Serial.println("TAM 3");
         String file = "ML/" + duongdan_ML + "/18.txt";
         read_file_setting(file , 3 );
         HG2.state_status = state_update1;
@@ -498,6 +508,7 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau / 3;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+        Serial.println("TAM 4");
         String file = "ML/" + duongdan_ML + "/19.txt";
         read_file_setting(file , 3 );
         HG2.state_status = state_update2;
@@ -509,6 +520,7 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau / 2;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+        Serial.println("TAM 5");
         String file = "ML/" + duongdan_ML + "/20.txt";
         read_file_setting(file , 3 );
         HG2.state_status = state_update3;
@@ -519,6 +531,7 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+        Serial.println("TAM 6");
         String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set) + ".txt";
         read_file_setting(file , 3 );
         HG2.state_status = state_conti;
@@ -530,6 +543,7 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc + 900;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+        Serial.println("TAM 5");
         if (float(HG2.temp_set) - nhietdo > 1) {
           String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set + 1) + ".txt";
           read_file_setting(file , 3 );
@@ -549,6 +563,7 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau * 6;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+        Serial.println("TAM 6");
         String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set + 1) + ".txt";
         read_file_setting(file , 3 );
         HG2.state_status = state_update5;
@@ -560,6 +575,7 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau * 7;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+        Serial.println("TAM 7");
         String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set + 2) + ".txt";
         read_file_setting(file , 3 );
         HG2.state_status = state_wait;
@@ -570,10 +586,13 @@ void loop() {
       HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau * 7;
       HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
+        if (thoigianthuc > HG2.time_end_int){
+         Serial.println("TAM 8");
         String file = "ML/" + duongdan_ML + "/OFF.txt";
         read_file_setting(file , 3 );
-        HG2.state_status = state_wait;
+        HG2.state_status = state_no;
         write_file_setting("Setting/state.txt", 2);
+      }
       }
       // kết thúc điều khiển
       break;
@@ -582,10 +601,9 @@ void loop() {
         HG2.state_status = state_not_day;
         NHAN_Debug("Không dung ngay dieu khien 2");
       }
-      else if (thoigianthuc > HG2.time_begin_int) {
         //ON ML nhiệt độ thấp nhất
-        if (HG2.time_begin_int > HG2.time_end_int) {
-         
+      else if (HG2.time_begin_int > HG2.time_end_int) {
+            if ((thoigianthuc < HG2.time_end_int)||(thoigianthuc > HG2.time_begin_int))  {
             HG2.khoang_time_cach_nhau = ( HG2.time_end_int + 86400) - HG2.time_begin_int ;
             HG2.khoang_time_cach_nhau = HG2.khoang_time_cach_nhau / 8 ;
             //Serial.print("Khoang thoi gian cach nhau ");
@@ -594,9 +612,10 @@ void loop() {
             String file = "ML/" + duongdan_ML + "/ON.txt" ;
             read_file_setting(file , 3 );
             HG2.state_status = state_begin;
-          
+            write_file_setting("Setting/state.txt", 2);
+            }
         }
-        else if (thoigianthuc < HG2.time_end_int) {
+        else if ((thoigianthuc < HG2.time_end_int)&&(thoigianthuc > HG2.time_begin_int)) {
           HG2.khoang_time_cach_nhau = HG2.time_end_int - HG2.time_begin_int ;
           HG2.khoang_time_cach_nhau = HG2.khoang_time_cach_nhau / 8 ;
           //Serial.print("Khoang thoi gian cach nhau ");
@@ -605,8 +624,9 @@ void loop() {
           String file = "ML/" + duongdan_ML + "/ON.txt" ;
           read_file_setting(file , 3 );
           HG2.state_status = state_begin;
+          write_file_setting("Setting/state.txt", 2);
         }
-      }
+      
       break;
     case state_not_day:
       if (HG2.dung_ngay) {
@@ -705,22 +725,24 @@ void loop() {
       HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau * 7;
       HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
       if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
+        if (thoigianthuc > HG3.time_end_int){
+         Serial.println("TAM 8");
         String file = "ML/" + duongdan_ML + "/OFF.txt";
         read_file_setting(file , 3 );
-        HG3.state_status = state_wait;
+        HG3.state_status = state_no;
         write_file_setting("Setting/state.txt", 2);
+      }
       }
       // kết thúc điều khiển
       break;
     case state_no:
       if (!HG3.dung_ngay) {
         HG3.state_status = state_not_day;
-        NHAN_Debug("Không dung ngay dieu khien 3");
+        NHAN_Debug("Không dung ngay dieu khien 2");
       }
-      else if (thoigianthuc > HG3.time_begin_int) {
         //ON ML nhiệt độ thấp nhất
-        if (HG3.time_begin_int > HG3.time_end_int) {
-         
+      else if (HG3.time_begin_int > HG3.time_end_int) {
+            if ((thoigianthuc < HG3.time_end_int)||(thoigianthuc > HG3.time_begin_int))  {
             HG3.khoang_time_cach_nhau = ( HG3.time_end_int + 86400) - HG3.time_begin_int ;
             HG3.khoang_time_cach_nhau = HG3.khoang_time_cach_nhau / 8 ;
             //Serial.print("Khoang thoi gian cach nhau ");
@@ -729,9 +751,10 @@ void loop() {
             String file = "ML/" + duongdan_ML + "/ON.txt" ;
             read_file_setting(file , 3 );
             HG3.state_status = state_begin;
-          
+            write_file_setting("Setting/state.txt", 2);
+            }
         }
-        else if (thoigianthuc < HG3.time_end_int) {
+        else if ((thoigianthuc < HG3.time_end_int)&&(thoigianthuc > HG3.time_begin_int)) {
           HG3.khoang_time_cach_nhau = HG3.time_end_int - HG3.time_begin_int ;
           HG3.khoang_time_cach_nhau = HG3.khoang_time_cach_nhau / 8 ;
           //Serial.print("Khoang thoi gian cach nhau ");
@@ -740,8 +763,9 @@ void loop() {
           String file = "ML/" + duongdan_ML + "/ON.txt" ;
           read_file_setting(file , 3 );
           HG3.state_status = state_begin;
+          write_file_setting("Setting/state.txt", 2);
         }
-      }
+      
       break;
     case state_not_day:
       if (HG3.dung_ngay) {

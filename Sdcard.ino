@@ -104,9 +104,19 @@ String write_file_setting(String namefile, int tt) {
     }
     myFile1.close();
     return (" OK");
+    digitalWrite(status_led, HIGH);
+    delay(200);
+    digitalWrite(status_led, LOW);
   } else {
     // if the file didn't open, print an error:
     NHAN_Debug("error write test.txt");
+        digitalWrite(status_led, HIGH);
+    delay(200);
+    digitalWrite(status_led, LOW);
+    delay(200);
+    digitalWrite(status_led, HIGH);
+    delay(200);
+    digitalWrite(status_led, LOW);
     return (" Fail");
   }
 }
