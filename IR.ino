@@ -16,7 +16,7 @@ void Tach_TCP(String str) {
     else{
       parseStringRAW(str);      
     }
-    Serial.println(strtokIndx);
+    DEBUG_PRINTLN(strtokIndx);
 }
 /* NHáº­n TCP
  *  
@@ -46,17 +46,18 @@ void nhan_TCP(){
 
 void dumpInfo(decode_results *results) {
   if (results->overflow) {
-    NHAN_Debug("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
+    DEBUG_PRINTLN("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
     return;
   }
-  Serial.print(F("uint16_t rawData["));              // variable type
-  Serial.print(results->rawlen - 1, DEC);  // array size
-  Serial.print(F("] = {"));                   // Start declaration
+  DEBUG_PRINT(F("uint16_t rawData["));              // variable type
+  DEBUG_PRINT(results->rawlen - 1);  // array size
+ // DEBUG_PRINT(results->rawlen - 1,DEC);
+  DEBUG_PRINT(F("] = {"));                   // Start declaration
   for (uint16_t i = 1; i < results->rawlen; i++) {
-    Serial.print(results->rawbuf[i], DEC);
-   if (i < results->rawlen - 1) Serial.print(F(","));  // ',' not needed on last one
+    DEBUG_PRINT(results->rawbuf[i]);
+   if (i < results->rawlen - 1) DEBUG_PRINT(F(","));  // ',' not needed on last one
   }
-  Serial.print(F("};"));  //
+  DEBUG_PRINT(F("};"));  //
  if (IR_leaning_MQTT){
   IR_leaning_MQTT=false;
   String data = write_file_setting(noiluu_MQTT , 3 );
@@ -74,60 +75,8 @@ void  dumpCode (decode_results *results)
 
 
 void serialPrintUint64Hex(uint64_t value) {
-  // Serial.print() can't handle printing long longs. (uint64_t)
+  // DEBUG_PRINT() can't handle printing long longs. (uint64_t)
   // So we have to print the top and bottom halves separately.
-  if (value >> 32)
-    Serial.print((uint32_t) (value >> 32), HEX);
-  Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
 }
-/*void dump(decode_results *results) {
-  // Dumps out the decode_results structure.
-  // Call this after IRrecv::decode()
-  uint16_t count = results->rawlen;
-  if (results->decode_type == UNKNOWN) {
-    Serial.print("Unknown encoding: ");
-  } else if (results->decode_type == NEC) {
-    Serial.print("Decoded NEC: ");
-  } else if (results->decode_type == SONY) {
-    Serial.print("Decoded SONY: ");
-  } else if (results->decode_type == RC5) {
-    Serial.print("Decoded RC5: ");
-  } else if (results->decode_type == RC5X) {
-    Serial.print("Decoded RC5X: ");
-  } else if (results->decode_type == RC6) {
-    Serial.print("Decoded RC6: ");
-  } else if (results->decode_type == PANASONIC) {
-    Serial.print("Decoded PANASONIC - Address: ");
-    Serial.print(results->address, HEX);
-    Serial.print(" Value: ");
-  } else if (results->decode_type == LG) {
-    Serial.print("Decoded LG: ");
-  } else if (results->decode_type == JVC) {
-    Serial.print("Decoded JVC: ");
-  } else if (results->decode_type == AIWA_RC_T501) {
-    Serial.print("Decoded AIWA RC T501: ");
-  } else if (results->decode_type == WHYNTER) {
-    Serial.print("Decoded Whynter: ");
-  }
-  serialPrintUint64Hex(results->value);
-  Serial.print(" (");
-  Serial.print(results->bits, DEC);
-  NHAN_Debug(" bits)");
- // Serial.print("Raw (");
- // Serial.print(count, DEC);
- // Serial.print("): ");
 
- // for (uint16_t i = 1; i < count; i++) {
-  //  if (i % 100 == 0)
-   //   yield();  // Preemptive yield every 100th entry to feed the WDT.
- //   if (i & 1) {
-  //    Serial.print(results->rawbuf[i] * USECPERTICK, DEC);
-  //  } else {
-   //   Serial.write('-');
-   //   Serial.print((uint32_t) results->rawbuf[i] * USECPERTICK, DEC);
-   // }
-   // Serial.print(" ");
-  //}
- // NHAN_Debug();
-}*/
 

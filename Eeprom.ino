@@ -3,22 +3,22 @@ int waitConnected(void) {
     while (wait<20 ) {
     digitalWrite(status_led, LOW);
     if (WiFi.status() == WL_CONNECTED) {
-      //NHAN_Debug("");
-      NHAN_Debug("WiFi connected");
+      //DEBUG_PRINTLN("");
+      DEBUG_PRINTLN("WiFi connected");
       return (1);
     }
     wait++;
     delay(300);
     digitalWrite(status_led, HIGH);
     delay(300);
-   // NHAN_Debug(wait);
+   // DEBUG_PRINTLN(wait);
     }
   return(0);
 }
 void printIP(void) {
-  NHAN_Debug(WiFiConf.module_id);
-  NHAN_Debug(WiFiConf.sta_ip);
-  Serial.println(WiFi.localIP());
+  DEBUG_PRINTLN(WiFiConf.module_id);
+  DEBUG_PRINTLN(WiFiConf.sta_ip);
+  DEBUG_PRINTLN(WiFi.localIP());
   
 }
 void ketnoimang() {
@@ -36,10 +36,10 @@ void ketnoimang() {
   }
 }
 void printWiFiConf(void) {
-  //NHAN_Debug(WiFiConf.sta_ssid);
+  //DEBUG_PRINTLN(WiFiConf.sta_ssid);
 }
 bool loadWiFiConf() {
-  //NHAN_Debug(F("loading WiFiConf"));
+  //DEBUG_PRINTLN(F("loading WiFiConf"));
   if (EEPROM.read(WIFI_CONF_START + 0) == wifi_conf_format[0] &&
       EEPROM.read(WIFI_CONF_START + 1) == wifi_conf_format[1] &&
       EEPROM.read(WIFI_CONF_START + 2) == wifi_conf_format[2] &&
@@ -77,7 +77,7 @@ void scanWiFi(void) {
   for (int i = 0; i < founds; ++i)
   {
     // Print SSID and RSSI for each network found
-    //NHAN_Debug(WiFi.SSID(i));
+    //DEBUG_PRINTLN(WiFi.SSID(i));
     network_html += F("<li>");
     network_html += WiFi.SSID(i);
     network_html += F(" (");
@@ -96,7 +96,7 @@ boolean scanWiFireturn(void) {
   for (int i = 0; i < founds; ++i)
   {  
     WiFi.SSID(i).toCharArray(ten_wifi, sizeof(ten_wifi));
-   if (strstr(ten_wifi,WiFiConf.sta_ssid) != NULL){NHAN_Debug("Co wifi cung ten");return true;}   
+   if (strstr(ten_wifi,WiFiConf.sta_ssid) != NULL){DEBUG_PRINTLN("Co wifi cung ten");return true;}   
     
   }
   return false;
@@ -131,7 +131,7 @@ void EEPROMWritelong(int address, unsigned long value)
       }     
 
 void user_using(){
-  NHAN_Debug(WiFiConf.sta_ML);
+  DEBUG_PRINTLN(WiFiConf.sta_ML);
   if (String(WiFiConf.sta_ML) == "0") duongdan_ML="User";
   else if (String(WiFiConf.sta_ML) == "1") duongdan_ML="Carrier";
   else if (String(WiFiConf.sta_ML) == "2") duongdan_ML="Daikin";

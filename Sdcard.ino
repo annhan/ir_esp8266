@@ -109,7 +109,7 @@ String write_file_setting(String namefile, int tt) {
     digitalWrite(status_led, LOW);
   } else {
     // if the file didn't open, print an error:
-    NHAN_Debug("error write test.txt");
+    DEBUG_PRINTLN("error write test.txt");
         digitalWrite(status_led, HIGH);
     delay(200);
     digitalWrite(status_led, LOW);
@@ -238,7 +238,7 @@ boolean read_file_setting(String namefile, int tt) {
                   break;
               case 3:
                   String ir_code_str = "";
-                  NHAN_Debug("test.txt:");
+                  DEBUG_PRINTLN("test.txt:");
                   ir_code_str = myFile1.readStringUntil('\n');
                   i++;
                   Serial.println(ir_code_str);
@@ -250,7 +250,7 @@ boolean read_file_setting(String namefile, int tt) {
     return 1 ;
   } else {
     // if the file didn't open, print an error:
-    NHAN_Debug("error opening test.txt");
+    DEBUG_PRINTLN("error opening test.txt");
     return 0;
   }
 }
