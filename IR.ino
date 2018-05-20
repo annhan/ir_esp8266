@@ -57,7 +57,7 @@ void dumpInfo(decode_results *results) {
     DEBUG_PRINT(results->rawbuf[i]);
    if (i < results->rawlen - 1) DEBUG_PRINT(F(","));  // ',' not needed on last one
   }
-  DEBUG_PRINT(F("};"));  //
+  DEBUG_PRINTLN(F("};"));  //
  if (IR_leaning_MQTT){
   IR_leaning_MQTT=false;
   String data = write_file_setting(noiluu_MQTT , 3 );

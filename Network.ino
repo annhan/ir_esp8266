@@ -1273,7 +1273,7 @@ content += F("<form method='get' action='set_schedule1'>");
       #define DAIKIN_POWERFUL       0b00000010
       #define DAIKIN_SILENT         0b00100000
     */
-    String status = server.arg(F("status"));
+   /* String status = server.arg(F("status"));
     String temp = server.arg(F("temp"));
     String fan = server.arg(F("fan"));
     String mode1 = server.arg(F("mode"));
@@ -1300,13 +1300,12 @@ content += F("<form method='get' action='set_schedule1'>");
       dakinir.setSwingHorizontal(0);
     }
     // Now send the IR signal.
-    dakinir.send();
+    dakinir.send()*/
     server.send(200, F("text/html"), status_html_ok);
     // ESP.restart();
   });
-  /*
-     Send MISUBISI
-  */
+  
+
   server.on(html_setup_sendmisu, HTTP_GET,  []() {
     /*#define DAIKIN_COOL                0b011
       #define MITSUBISHI_AC_AUTO        0x20U
@@ -1351,10 +1350,10 @@ content += F("<form method='get' action='set_schedule1'>");
            break;
 
       }*/
-    if (mode1 == "Cool") mitsubir.setMode(MITSUBISHI_AC_COOL);
+    /*if (mode1 == "Cool") mitsubir.setMode(MITSUBISHI_AC_COOL);
     else if (mode1 == "fan") mitsubir.setMode(MITSUBISHI_AC_FAN_AUTO);
     else if (mode1 == "auto") mitsubir.setMode(MITSUBISHI_AC_AUTO);
-    else if (mode1 == "powerful") mitsubir.setMode(DAIKIN_POWERFUL);
+    else if (mode1 == "powerful") mitsubir.setMode(DAIKIN_BYTE_POWERFUL);
     else if (mode1 == "dry") mitsubir.setMode(MITSUBISHI_AC_DRY);
     else if (mode1 == "heat") mitsubir.setMode(MITSUBISHI_AC_HEAT);
     else if (mode1 == "silent") mitsubir.setMode(DAIKIN_SILENT);
@@ -1372,7 +1371,7 @@ content += F("<form method='get' action='set_schedule1'>");
       mitsubir.setVane(MITSUBISHI_AC_VANE_AUTO);
     }
     // Now send the IR signal.
-    mitsubir.send();
+    mitsubir.send();*/
     server.send(200, F("text/html"), status_html_ok);
     // ESP.restart();
   });

@@ -22,7 +22,6 @@ void printIP(void) {
   
 }
 void ketnoimang() {
-  
   WiFi.hostname("mIR");
   boolean kq=scanWiFireturn();
   if (kq){

@@ -1,14 +1,14 @@
 #define Send_PIN  15
 #define RECV_PIN  2
 
-#define status_led  0
+#define status_led  0 //13 //0
 
 //#define DHTTYPE DHT11   // DHT 11
 //#define DHTTYPE DHT21   // DHT 21 (AM2301)
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 
 #define DHTPin 5
-#define MotionPin 4
+//#define MotionPin 4
 
 uint8_t macAddr[6];
 //## MQTT
@@ -17,9 +17,6 @@ String noiluu_MQTT="Amply/User/sassss.txt";
 #define MQTT_MAX_PACKET_SIZE 512
 long lastReconnectAttempt = 0;
 //###
-
-
-
 const int state_no = 0;
 const int state_not_day = 1;
 const int state_begin = 2;
@@ -45,8 +42,8 @@ float doam=0;
  *  */
 const char ApiKey[] = "BkxnF0xUl-";
 const char ApiURL[] = "http://fota.vn";
-const char AppVersion[] = "mIR-V0.3";  // Phien ban
-const char timeVersion[] = " 23/8/2017-15:00";
+const char AppVersion[] = "mIR-V0.4";  // Phien ban
+const char timeVersion[] = " 9/4/2018-15:00";
 /*
  * Wifi
  */

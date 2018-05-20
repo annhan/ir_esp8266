@@ -1,3 +1,5 @@
+// RAWSTICK la 50
+
 #ifdef ESP8266
 extern "C" {
   #include "user_interface.h"
@@ -29,7 +31,7 @@ extern "C" {
 #define DEBUG
 #ifdef DEBUG
  #define DEBUG_PRINTLN(x)  Serial.println (x)
- #define DEBUG_PRINT(x)  Serial.println (x)
+ #define DEBUG_PRINT(x)  Serial.print (x)
 #else
   #define DEBUG_PRINTLN(x)
  #define DEBUG_PRINT(x)
@@ -87,10 +89,8 @@ WiFiClient client1;
 PubSubClient clientmqtt(client1);
 //#############################################
 uint16_t CAPTURE_BUFFER_SIZE = 1400;
-// Nr. of milli-Seconds of no-more-data before we consider a message ended.
-// NOTE: Don't exceed MAX_TIMEOUT_MS. Typically 130ms.
 #define TIMEOUT 100U  // Suits most messages, while not swallowing repeats.
-IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT);
+IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT,true);
 IRsend irsend(Send_PIN);
 IRDaikinESP dakinir(Send_PIN);
 IRMitsubishiAC mitsubir(Send_PIN);
@@ -105,7 +105,7 @@ decode_results  results;
 /* SETUP
 
 */
-  struct Hengiostruct HG1;        // Declare QuyenSach1 of type Book
+  struct Hengiostruct HG1;        
   struct Hengiostruct HG2;
   struct Hengiostruct HG3; 
 void setup() {
@@ -116,8 +116,9 @@ void setup() {
   EEPROM.begin(1024);
   delay(10);
   DEBUG_PRINTLN("Startup");
- 
+#ifdef notFibaro
   pinMode(MotionPin, INPUT);
+#endif
   irsend.begin();
   if (!loadWiFiConf()){
     resetModuleId();
@@ -126,7 +127,6 @@ void setup() {
  // motion_time = EEPROMReadlong(1000);
   conver_time();
   scanWiFi();
-  DEBUG_PRINTLN("A");
   hoclenh = 0;
   WiFi.setAutoConnect(false);
   WiFi.setAutoReconnect(false);
@@ -170,6 +170,7 @@ void setup() {
   _motion_status = 1;
   WiFi.macAddress(macAddr);
   MDNS.addService("http", "tcp", 4999);
+#ifdef notFibaro
   if (!SD.begin(chipSelect)) {
     DEBUG_PRINTLN("Card failed, or not present");
   }
@@ -178,13 +179,9 @@ void setup() {
   HG1.state_status = state_no;
   HG2.state_status = state_no;
   HG3.state_status = state_no;
-#ifdef notFibaro
   read_setting = read_file_setting("Setting/setting.txt", 1);
   read_setting_state = read_file_setting("Setting/state.txt", 2);
   read_setting_motion = read_file_setting("Setting/Motion.txt", 4);
-#endif
-  udp.begin(localPort);
-  weekday = 8;
   //################################
   if (WiFiConf.sta_mqtt_port > 0){
   snprintf (WiFiConf.sta_mqtt_topic, 32, "mIR/%02x%02x%02x%02x%02x%02x",macAddr[WL_MAC_ADDR_LENGTH - 5], macAddr[WL_MAC_ADDR_LENGTH - 6],macAddr[WL_MAC_ADDR_LENGTH - 4], macAddr[WL_MAC_ADDR_LENGTH - 3],macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
@@ -194,6 +191,9 @@ void setup() {
   lastReconnectAttempt = 0;
   }
   else DEBUG_PRINTLN("Not using MQTT");
+#endif
+  udp.begin(localPort);
+  weekday = 8;
 }
 
 
@@ -213,6 +213,7 @@ void loop() {
   server.handleClient();
   //##################
   // MQTT ############
+#ifdef notFibaro
   if (WiFiConf.sta_mqtt_port > 0){
         if (!clientmqtt.connected()) {
         long now = millis();
@@ -226,6 +227,7 @@ void loop() {
         clientmqtt.loop();
       }
   }
+#endif
   switch (WiFi.status())
   {
     case WL_CONNECTED:

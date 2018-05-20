@@ -23,7 +23,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 boolean reconnect() {
-  Serial.print("Reconnecting : ");
+  Serial.println("Reconnecting : ");
   if (statusmang==1){
         if (WiFiConf.sta_mqtt_user[0]!='x'){  
                 DEBUG_PRINTLN("Co User");
