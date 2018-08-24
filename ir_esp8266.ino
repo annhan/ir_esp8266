@@ -19,7 +19,7 @@ extern "C" {
 #include <ESP8266mDNS.h>
 #include <IRremoteESP8266.h>
 #include <IRutils.h>
-
+#include <EmonLiteESP.h>
 #include <IRrecv.h>
 #include <IRsend.h>
 #include <ir_Daikin.h>
@@ -36,7 +36,64 @@ extern "C" {
   #define DEBUG_PRINTLN(x)
  #define DEBUG_PRINT(x)
 #endif
+//#define emonTxV3                 // Wemos D1 mini tolerates up to 3.3V
+//#include "EmonLib.h"             // Include Emon Library     
+#define ADC_BITS    10
 
+
+#define CURRENT_PIN             0
+
+// If you are using a nude ESP8266 board it will be 1.0V, if using a NodeMCU there
+// is a voltage divider in place, so use 3.3V instead.
+#define REFERENCE_VOLTAGE       3.3
+
+// Precision of the ADC measure in bits. Arduinos and ESP8266 use 10bits ADCs, but the
+// ADS1115 is a 16bits ADC
+#define ADC_BITS                10
+
+// This is basically the volts per amper ratio of your current measurement sensor.
+// If your sensor has a voltage output it will be written in the sensor enclosure,
+// something like "30V 1A", otherwise it will depend on the burden resistor you are
+// using.
+#define CURRENT_RATIO           0.5
+
+// This version of the library only calculate aparent power, so it asumes a fixes
+// mains voltage
+#define MAINS_VOLTAGE           230
+
+// Number of samples each time you measure
+#define SAMPLES_X_MEASUREMENT   1000
+
+// Time between readings, this is not specific of the library but on this sketch
+#define MEASUREMENT_INTERVAL    10000
+
+EmonLiteESP power;
+unsigned int currentCallback() {
+
+    // If usingthe ADC GPIO in the ESP8266
+    return analogRead(CURRENT_PIN);
+
+}
+
+void powerMonitorSetup() {
+    power.initCurrent(currentCallback, ADC_BITS, REFERENCE_VOLTAGE, CURRENT_RATIO);
+}
+void powerMonitorLoop() {
+
+    static unsigned long last_check = 0;
+
+    if ((millis() - last_check) > MEASUREMENT_INTERVAL) {
+
+        double current = power.getCurrent(SAMPLES_X_MEASUREMENT);
+
+        Serial.print(F("[ENERGY] Power now: "));
+        Serial.print(int(current * MAINS_VOLTAGE));
+        Serial.println(F("W"));
+
+        last_check = millis();
+
+    }
+}
 File myFile;
 
 //#define notFibaro true
@@ -100,8 +157,11 @@ IRMitsubishiAC mitsubir(Send_PIN);
 ESP8266WebServer server(4999);
 WiFiServer serverTCP(4998);
 decode_results  results;
+  
+int adc = 0;
+//EnergyMonitor emon1;             // Create an instance
 
- 
+
 /* SETUP
 
 */
@@ -128,6 +188,9 @@ void setup() {
   conver_time();
   scanWiFi();
   hoclenh = 0;
+  pinMode(A0, INPUT);
+  //emon1.current(A0, 9.1);
+  
   WiFi.setAutoConnect(false);
   WiFi.setAutoReconnect(false);
   WiFi.mode(WIFI_AP_STA);
@@ -194,6 +257,7 @@ void setup() {
 #endif
   udp.begin(localPort);
   weekday = 8;
+   powerMonitorSetup();
 }
 
 
@@ -210,6 +274,7 @@ int hoc_ir(byte stt) {
   return 0;
 }
 void loop() {
+  powerMonitorLoop();
   server.handleClient();
   //##################
   // MQTT ############
@@ -232,7 +297,7 @@ void loop() {
   {
     case WL_CONNECTED:
       // if (hoclenh == 1) {
-
+      
       if (statusmang == 0) {
         WiFi.softAPdisconnect(true);
         getHC();
@@ -254,6 +319,7 @@ void loop() {
       }
       nhan_TCP();
       if (demgiay % 10 == 0) {
+      //  calcPower();
         demgiay++ ;
         float H = dht.readHumidity();
         float T = dht.readTemperature();
@@ -263,6 +329,7 @@ void loop() {
           nhietdo = T;
 
         }
+        //
       }
       else if (demgiay % 33 == 0) {
         send_udp();
