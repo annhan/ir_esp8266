@@ -132,12 +132,12 @@ void SetVariHC(String vari,String giatri) {
   value += giatri;
   value += F("\",\"invokeScenes\":true}");
   int chieudai=value.length();
-  Serial.println(chieudai);
+  DEBUG_PRINTLN(chieudai);
   String url = "http://" + String(WiFiConf.sta_iphc2) + "/api/globalVariables/" + vari;
   //String mahoa= "Basic " + String(encoded);
   http.begin(url);
   http.setAuthorization(encoded);
-  Serial.println(encoded);
+  DEBUG_PRINTLN(encoded);
   http.addHeader("Host:", String(WiFiConf.sta_iphc2));
   http.addHeader("Content-Type", "application/json");
   http.addHeader("Content-Length: ", String(chieudai));
@@ -171,7 +171,7 @@ void getHC() {
       payload.replace("}","");
       payload.replace("\""," ");
       payload.remove(76);
-    SerialHC2=payload;Serial.println(SerialHC2);
+    SerialHC2=payload;DEBUG_PRINTLN(SerialHC2);
   }
   http.writeToStream(&Serial);
   http.end();

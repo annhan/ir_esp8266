@@ -40,7 +40,7 @@ void parseStringRAW(String str) {
   if (code_array == NULL) {  // malloc failed, so give up.
     Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",
                   count * sizeof(uint16_t), ESP.getFreeHeap());
-    NHAN_Debug("Giving up & forcing a reboot.");
+    DEBUG_PRINTLN("Giving up & forcing a reboot.");
     ESP.restart();  // Reboot.
     delay(500);  // Wait for the restart to happen.
     return;  // Should never get here, but just in case.
@@ -63,7 +63,7 @@ void parseStringRAW(String str) {
     // Serial.print(code_array[i]);
     //Serial.print(",");
   }//
-  // NHAN_Debug("");
+  // DEBUG_PRINTLN("");
   irsend.sendRaw(code_array, count - 1, code_array[count - 1] / (1000));
   free(code_array);  // Free up the memory allocated.
 }
@@ -84,7 +84,7 @@ void parseStringGC(String str) {
   // Check we malloc'ed successfully.
   if (code_array == NULL) {  // malloc failed, so give up.
     // Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",count * sizeof(uint16_t), ESP.getFreeHeap());
-    // NHAN_Debug("Giving up & forcing a reboot.");
+    // DEBUG_PRINTLN("Giving up & forcing a reboot.");
     ESP.restart();  // Reboot.
     delay(500);  // Wait for the restart to happen.
     return;  // Should never get here, but just in case.
@@ -1098,19 +1098,19 @@ content += F("<form method='get' action='set_schedule1'>");
     HG1.time_begin_int=conver_time_string_to_int(time_begin);
     HG1.time_end_int=conver_time_string_to_int(time_end);
     HG1.temp_set= tempt.toInt();
-    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");HG1.is_sun=1;}
+    if (server.hasArg("Sun")){DEBUG_PRINTLN("OK Sunday");HG1.is_sun=1;}
     else HG1.is_sun=0;
-    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");HG1.is_mon=1;}
+    if (server.hasArg("Mon")){DEBUG_PRINTLN("OK Monday");HG1.is_mon=1;}
     else HG1.is_mon=0;
-    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");HG1.is_tue=1;}
+    if (server.hasArg("Tue")){DEBUG_PRINTLN("OK Tueday");HG1.is_tue=1;}
     else HG1.is_tue=0;
-    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");HG1.is_wed=1;}
+    if (server.hasArg("Wed")){DEBUG_PRINTLN("OK Webday");HG1.is_wed=1;}
     else HG1.is_wed=0;
-    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");HG1.is_thu=1;}
+    if (server.hasArg("Thu")){DEBUG_PRINTLN("OK Thuday");HG1.is_thu=1;}
     else HG1.is_thu=0;
-    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");HG1.is_fri=1;}
+    if (server.hasArg("Fri")){DEBUG_PRINTLN("OK Friday");HG1.is_fri=1;}
     else HG1.is_fri=0;
-    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");HG1.is_sat=1;}
+    if (server.hasArg("Sat")){DEBUG_PRINTLN("OK Satday");HG1.is_sat=1;}
     else HG1.is_sat=0;
     write_file_setting("Setting/setting.txt",1);
     server.send(200, F("text/html"), duongdan_ML);
@@ -1123,19 +1123,19 @@ content += F("<form method='get' action='set_schedule1'>");
     HG2.time_begin_int=conver_time_string_to_int(time_begin);
     HG2.time_end_int=conver_time_string_to_int(time_end);
     HG2.temp_set= tempt.toInt();
-    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");HG2.is_sun=1;}
+    if (server.hasArg("Sun")){DEBUG_PRINTLN("OK Sunday");HG2.is_sun=1;}
     else HG2.is_sun=0;
-    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");HG2.is_mon=1;}
+    if (server.hasArg("Mon")){DEBUG_PRINTLN("OK Monday");HG2.is_mon=1;}
     else HG2.is_mon=0;
-    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");HG2.is_tue=1;}
+    if (server.hasArg("Tue")){DEBUG_PRINTLN("OK Tueday");HG2.is_tue=1;}
     else HG2.is_tue=0;
-    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");HG2.is_wed=1;}
+    if (server.hasArg("Wed")){DEBUG_PRINTLN("OK Webday");HG2.is_wed=1;}
     else HG2.is_wed=0;
-    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");HG2.is_thu=1;}
+    if (server.hasArg("Thu")){DEBUG_PRINTLN("OK Thuday");HG2.is_thu=1;}
     else HG2.is_thu=0;
-    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");HG2.is_fri=1;}
+    if (server.hasArg("Fri")){DEBUG_PRINTLN("OK Friday");HG2.is_fri=1;}
     else HG2.is_fri=0;
-    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");HG2.is_sat=1;}
+    if (server.hasArg("Sat")){DEBUG_PRINTLN("OK Satday");HG2.is_sat=1;}
     else HG2.is_sat=0;
     write_file_setting("Setting/setting.txt",1);
     server.send(200, F("text/html"), duongdan_ML);
@@ -1148,19 +1148,19 @@ content += F("<form method='get' action='set_schedule1'>");
     HG3.time_begin_int=conver_time_string_to_int(time_begin);
     HG3.time_end_int=conver_time_string_to_int(time_end);
     HG3.temp_set= tempt.toInt();
-    if (server.hasArg("Sun")){NHAN_Debug("OK Sunday");HG3.is_sun=1;}
+    if (server.hasArg("Sun")){DEBUG_PRINTLN("OK Sunday");HG3.is_sun=1;}
     else HG3.is_sun=0;
-    if (server.hasArg("Mon")){NHAN_Debug("OK Monday");HG3.is_mon=1;}
+    if (server.hasArg("Mon")){DEBUG_PRINTLN("OK Monday");HG3.is_mon=1;}
     else HG3.is_mon=0;
-    if (server.hasArg("Tue")){NHAN_Debug("OK Tueday");HG3.is_tue=1;}
+    if (server.hasArg("Tue")){DEBUG_PRINTLN("OK Tueday");HG3.is_tue=1;}
     else HG3.is_tue=0;
-    if (server.hasArg("Wed")){NHAN_Debug("OK Webday");HG3.is_wed=1;}
+    if (server.hasArg("Wed")){DEBUG_PRINTLN("OK Webday");HG3.is_wed=1;}
     else HG3.is_wed=0;
-    if (server.hasArg("Thu")){NHAN_Debug("OK Thuday");HG3.is_thu=1;}
+    if (server.hasArg("Thu")){DEBUG_PRINTLN("OK Thuday");HG3.is_thu=1;}
     else HG3.is_thu=0;
-    if (server.hasArg("Fri")){NHAN_Debug("OK Friday");HG3.is_fri=1;}
+    if (server.hasArg("Fri")){DEBUG_PRINTLN("OK Friday");HG3.is_fri=1;}
     else HG3.is_fri=0;
-    if (server.hasArg("Sat")){NHAN_Debug("OK Satday");HG3.is_sat=1;}
+    if (server.hasArg("Sat")){DEBUG_PRINTLN("OK Satday");HG3.is_sat=1;}
     else HG3.is_sat=0;
     write_file_setting("Setting/setting.txt",1);
     server.send(200, F("text/html"), duongdan_ML);
@@ -1199,7 +1199,7 @@ content += F("<form method='get' action='set_schedule1'>");
     String content = "";
     if (data1.length() < 12) {
       content += F("Not OK");
-      NHAN_Debug(" ");
+      DEBUG_PRINTLN(" ");
     }
     else {
       data1 += ",";
@@ -1273,7 +1273,7 @@ content += F("<form method='get' action='set_schedule1'>");
       #define DAIKIN_POWERFUL       0b00000010
       #define DAIKIN_SILENT         0b00100000
     */
-    String status = server.arg(F("status"));
+   /* String status = server.arg(F("status"));
     String temp = server.arg(F("temp"));
     String fan = server.arg(F("fan"));
     String mode1 = server.arg(F("mode"));
@@ -1285,7 +1285,7 @@ content += F("<form method='get' action='set_schedule1'>");
     else if (mode1 == "heat") dakinir.setMode(DAIKIN_HEAT);
     else if (mode1 == "silent") dakinir.setMode(DAIKIN_SILENT);
     if (status == "OFF") {
-      NHAN_Debug("OFF Daikin");
+      DEBUG_PRINTLN("OFF Daikin");
       dakinir.off();
       dakinir.setFan(temp.toInt());
       dakinir.setTemp(25);
@@ -1300,13 +1300,12 @@ content += F("<form method='get' action='set_schedule1'>");
       dakinir.setSwingHorizontal(0);
     }
     // Now send the IR signal.
-    dakinir.send();
+    dakinir.send()*/
     server.send(200, F("text/html"), status_html_ok);
     // ESP.restart();
   });
-  /*
-     Send MISUBISI
-  */
+  
+
   server.on(html_setup_sendmisu, HTTP_GET,  []() {
     /*#define DAIKIN_COOL                0b011
       #define MITSUBISHI_AC_AUTO        0x20U
@@ -1351,15 +1350,15 @@ content += F("<form method='get' action='set_schedule1'>");
            break;
 
       }*/
-    if (mode1 == "Cool") mitsubir.setMode(MITSUBISHI_AC_COOL);
+    /*if (mode1 == "Cool") mitsubir.setMode(MITSUBISHI_AC_COOL);
     else if (mode1 == "fan") mitsubir.setMode(MITSUBISHI_AC_FAN_AUTO);
     else if (mode1 == "auto") mitsubir.setMode(MITSUBISHI_AC_AUTO);
-    else if (mode1 == "powerful") mitsubir.setMode(DAIKIN_POWERFUL);
+    else if (mode1 == "powerful") mitsubir.setMode(DAIKIN_BYTE_POWERFUL);
     else if (mode1 == "dry") mitsubir.setMode(MITSUBISHI_AC_DRY);
     else if (mode1 == "heat") mitsubir.setMode(MITSUBISHI_AC_HEAT);
     else if (mode1 == "silent") mitsubir.setMode(DAIKIN_SILENT);
     if (status == "OFF") {
-      NHAN_Debug("OFF Misu");
+      DEBUG_PRINTLN("OFF Misu");
       mitsubir.off();
       mitsubir.setFan(temp.toInt());
       mitsubir.setTemp(25);
@@ -1372,7 +1371,7 @@ content += F("<form method='get' action='set_schedule1'>");
       mitsubir.setVane(MITSUBISHI_AC_VANE_AUTO);
     }
     // Now send the IR signal.
-    mitsubir.send();
+    mitsubir.send();*/
     server.send(200, F("text/html"), status_html_ok);
     // ESP.restart();
   });
@@ -1380,7 +1379,7 @@ content += F("<form method='get' action='set_schedule1'>");
   server.on(html_setup_setwifi, HTTP_GET, []() {
     String data1 = server.arg(F("button"));
     data1.toCharArray(WiFiConf.sta_DHCP, sizeof(WiFiConf.sta_DHCP));
-    NHAN_Debug(WiFiConf.sta_DHCP);
+    DEBUG_PRINTLN(WiFiConf.sta_DHCP);
     String new_ssid = server.arg(F("ssid"));
     String new_pwd = server.arg(F("pwd"));
     String new_ip = server.arg(F("ip"));
@@ -1660,7 +1659,7 @@ void setupWeb(void) {
   void parseBytes(const char* str, char sep, byte* bytes, int maxBytes, int base) {
   for (int i = 0; i < maxBytes; i++) {
     bytes[i] = strtoul(str, NULL, base);  
-    NHAN_Debug(bytes[i]);
+    DEBUG_PRINTLN(bytes[i]);
     str = strchr(str, sep);               
     if (str == NULL || *str == '\0') {
       break;                            
@@ -1673,7 +1672,7 @@ void parseBytes1(const char* str, char sep, int address, int maxBytes, int base)
     if (address == 1) ip10[i] = strtoul(str, NULL, base);  // Convert byte  ip10
     else if (address == 2) gateway10[i] = strtoul(str, NULL, base);  // Convert byte
     else if (address == 3) subnet10[i] = strtoul(str, NULL, base);  // Convert byte
-   // NHAN_Debug(bytes[i]);
+   // DEBUG_PRINTLN(bytes[i]);
     str = strchr(str, sep);               // Find next separator
     if (str == NULL || *str == '\0') {
       break;                            // No more separators, exit

@@ -24,7 +24,7 @@ byte gettime_udp()
 {
   int cb = udp.parsePacket();
   if (!cb) {
-        NHAN_Debug("no packet yet");
+       // DEBUG_PRINTLN("no packet yet");
         return 0;
   }
   else {

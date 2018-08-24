@@ -17,16 +17,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
     message[i] = (char)payload[i];
   }
   message[length] = '\0';
-  NHAN_Debug(message);
+  DEBUG_PRINTLN(message);
     if (!processJson(message)) {
     return;
   }
 }
 boolean reconnect() {
-  Serial.print("Reconnecting : ");
+  Serial.println("Reconnecting : ");
   if (statusmang==1){
         if (WiFiConf.sta_mqtt_user[0]!='x'){  
-                NHAN_Debug("Co User");
+                DEBUG_PRINTLN("Co User");
                 if (clientmqtt.connect("arduinoClient",WiFiConf.sta_mqtt_user, WiFiConf.sta_mqtt_pass)) {
                  // if (clientmqtt.connect("arduinoClient")) {
                   clientmqtt.publish(WiFiConf.sta_mqtt_topic,"Reconnect");
@@ -34,7 +34,7 @@ boolean reconnect() {
                 }
         }
         else
-        {        NHAN_Debug("Khong User");
+        {        DEBUG_PRINTLN("Khong User");
                 if (clientmqtt.connect("arduinoClient")) {
                   clientmqtt.publish(WiFiConf.sta_mqtt_topic,"Reconnect");
                   clientmqtt.subscribe(WiFiConf.sta_mqtt_topic);
@@ -47,7 +47,7 @@ boolean reconnect() {
 bool processJson(char* message) {
   StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(message);
-  if (!root.success()) {NHAN_Debug("parseObject() failed");return false;} 
+  if (!root.success()) {DEBUG_PRINTLN("parseObject() failed");return false;} 
   if (root.containsKey("command")) {
     if (strcmp(root["command"], send_cmd) == 0)
     { String type=root["para"]["type"].as<String>();
@@ -98,7 +98,7 @@ bool processJson(char* message) {
     else if (strcmp(root["command"], getsche1_cmd) == 0) 
     {     char msg[75];  
           snprintf (msg, 100, "{\"ip\":\"%X.%X.%X.%X\",\"TB\":%d,\"TE\":%d,\"temp\":%d.%02d,\"sche\":[%d,%d,%d,%d,%d,%d,%d]}",ip[0],ip[1],ip[2],ip[3],HG1.time_begin_int ,HG1.time_end_int ,(int)HG1.temp_set, (int)(HG1.temp_set * 10.0) % 10,HG1.is_sun,HG1.is_mon,HG1.is_tue,HG1.is_wed,HG1.is_thu,HG1.is_fri,HG1.is_sat); //%ld
-          NHAN_Debug(msg);
+          DEBUG_PRINTLN(msg);
           clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
     }
     else if (strcmp(root["command"], setsche2_cmd) == 0)
@@ -131,7 +131,7 @@ bool processJson(char* message) {
     else if (strcmp(root["command"], getsche2_cmd) == 0) 
     {     char msg[75];  
           snprintf (msg, 100, "{\"ip\":\"%X.%X.%X.%X\",\"TB\":%d,\"TE\":%d,\"temp\":%d.%02d,\"sche\":[%d,%d,%d,%d,%d,%d,%d]}",ip[0],ip[1],ip[2],ip[3],HG2.time_begin_int ,HG2.time_end_int ,(int)HG2.temp_set, (int)(HG2.temp_set * 10.0) % 10,HG2.is_sun,HG1.is_mon,HG1.is_tue,HG2.is_wed,HG2.is_thu,HG2.is_fri,HG2.is_sat); //%ld
-          NHAN_Debug(msg);
+          DEBUG_PRINTLN(msg);
           clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
     }
     else if (strcmp(root["command"], setsche3_cmd) == 0)
@@ -164,13 +164,13 @@ bool processJson(char* message) {
     else if (strcmp(root["command"], getsche3_cmd) == 0) 
     {     char msg[75];  
           snprintf (msg, 100, "{\"ip\":\"%X.%X.%X.%X\",\"TB\":%d,\"TE\":%d,\"temp\":%d.%02d,\"sche\":[%d,%d,%d,%d,%d,%d,%d]}",ip[0],ip[1],ip[2],ip[3],HG3.time_begin_int ,HG3.time_end_int ,(int)HG3.temp_set, (int)(HG3.temp_set * 10.0) % 10,HG3.is_sun,HG3.is_mon,HG3.is_tue,HG3.is_wed,HG3.is_thu,HG3.is_fri,HG3.is_sat); //%ld
-          NHAN_Debug(msg);
+          DEBUG_PRINTLN(msg);
           clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
     }
     else if (strcmp(root["command"], get_cmd) == 0) 
     {     char msg[75];  
           snprintf (msg, 75, "{\"ip\":\"%X.%X.%X.%X\",\"T\":%d.%02d,\"H\":%d.%02d,\"M\":%d}",ip[0],ip[1],ip[2],ip[3], (int)nhietdo, (int)(nhietdo * 10.0) % 10,(int)doam, (int)(doam * 10.0) % 10,1); //%ld
-          NHAN_Debug(msg);
+          DEBUG_PRINTLN(msg);
           clientmqtt.publish(WiFiConf.sta_mqtt_topic, msg);
     }
   }
