@@ -58,11 +58,11 @@ void dumpInfo(decode_results *results) {
    if (i < results->rawlen - 1) DEBUG_PRINT(F(","));  // ',' not needed on last one
   }
   DEBUG_PRINTLN(F("};"));  //
- if (IR_leaning_MQTT){
+ /*if (IR_leaning_MQTT){
   IR_leaning_MQTT=false;
   String data = write_file_setting(noiluu_MQTT , 3 );
   noiluu_MQTT="";
- }
+ }*/
 }
 void  dumpCode (decode_results *results)
 { 

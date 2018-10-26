@@ -145,8 +145,8 @@ void setupWiFiConf(void) {
     
     for (int i = 0; i < 2; i++) {
       switch (i) {
-        case 0:  id_check = "DHCP";break;
-        case 1:  id_check = "Static IP";break;
+        case 0:  id_check = "Not Current";break;
+        case 1:  id_check = "Current";break;
       }
       if (atoi(WiFiConf.sta_DHCP) != i)
       content1 += "<option value=\"" + String(i) + "\">" +  id_check + "</option>";
@@ -269,6 +269,7 @@ void setupWiFiConf(void) {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
+  
   server.on("/getHC", []() {
     String content = FPSTR(header); content += FPSTR(begin_title);
     content += F("Wait");
@@ -306,7 +307,53 @@ void setupWiFiConf(void) {
     content += F("<body></html>");
     server.send(200, F("text/html"), content);
   });
-
+  //Current
+  server.on("/ofset_current", []() {
+    // IPAddress ip = WiFi.localIP();
+    String content = FPSTR(header); content += FPSTR(begin_title);
+    String    content1 = ipStr;
+    content1 = ipStr;
+    content1 += F(" ( ");
+    content1 += WiFiConf.module_id;
+    content1 += F(".local )");
+    content1 += FPSTR(p_html);
+    content1 += FPSTR(get_html);
+    content1 += F("'set_current'>");
+    content1 += F("<div class=\"row\">");
+    content1 += FPSTR(label1_html);
+    content1 += F("'offset' class=\"req\">Offset:");
+    content1 += F("</label><input name='offset' class=\"txt\" id='offset' maxlength=32 value=");
+    content1 += String(WiFiConf.offset);
+    content1 += F("></div>");
+    content += FPSTR(wifisetting_html);
+    content += FPSTR(title_html);
+    content += F("<h1>Current Setting</h1>");
+    content += FPSTR(p_html);
+    content += F("Wifi conecting : ");
+    content += WiFiConf.sta_ssid;
+    content += F("</br>IP address: ");
+    content += content1;
+    content += F("<input type='submit'  id=\"submitbtn\"  value='OK' onclick='return confirm(\"Change Setting ?\");'></form>");
+    content += FPSTR(_p_html);
+    content += FPSTR(get_html);
+    content += F("'getHC'>");
+    content += F("<input type='submit' id=\"submitbtn\" value='Check'></form>"); // class=\"button\"
+    content += FPSTR(_p_html);
+    //}
+    content += FPSTR(end_html);
+    server.send(200, F("text/html"), content);
+  });
+server.on("/set_current", []() {
+    String new_offset = server.arg("offset");
+      int chieudai_off=new_offset.length();
+      char tarray[chieudai_off+1];      
+      new_offset.toCharArray(tarray, sizeof(tarray));
+      WiFiConf.offset = atoi(tarray);
+      saveWiFiConf();
+      String content = F("OK...");
+    server.send(200, "text/html", content);
+  });
+  
   server.on(html_setup_switch, []() {
     if (hoclenh == 0) {
       hoclenh = 1;
@@ -444,7 +491,7 @@ void setupWiFiConf(void) {
       content += F("<li>When completed the new code, you have to refresh the page for the latest code update.");
       content += FPSTR(p_html);
       content += F("Thank you for reading.");
-
+/*
       content += F("<form method='get' action='Savecode_ML'>");
       content += F("<nav>");
       content += FPSTR(fieldset);
@@ -578,7 +625,7 @@ void setupWiFiConf(void) {
       content += F("</form>");
       content += F("</nav>");
       //break;
-      //}
+      //}*/
     }
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
@@ -588,7 +635,7 @@ void setupWiFiConf(void) {
      Save data to
   */
 
-  server.on("/Savecode_ML", []() {
+  /*server.on("/Savecode_ML", []() {
     String data1 = server.arg(F("button"));
     //  String maker=server.arg(F("maker"));
     data1 = "ML/User/" + data1 + ".txt";
@@ -688,7 +735,6 @@ void setupWiFiConf(void) {
 
     
     content += F("</nav>");
-*/
 
     content += F("<form method='get' action='set_schedule'>");
     content += F("<nav>");
@@ -784,7 +830,7 @@ void setupWiFiConf(void) {
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
   });
-  server.on("/remote_save2", []() {
+   /* server.on("/remote_save2", []() {
 
     String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
     content = FPSTR(header); content += FPSTR(begin_title);
@@ -798,7 +844,7 @@ void setupWiFiConf(void) {
     content += duongdan_TV;
     String id_check="";
     String thungay="";
-    /*
+  
     content += F("<form method='get' action='set_remote_ML'>");
     content += F("<nav>");
     content += FPSTR(fieldset);
@@ -840,7 +886,7 @@ void setupWiFiConf(void) {
 
     
     content += F("</nav>");
-*/
+
     content += F("<form method='get' action='set_schedule2'>");
     content += F("<nav>");
     content += FPSTR(fieldset);
@@ -934,8 +980,8 @@ void setupWiFiConf(void) {
 
     content += FPSTR(end_html);
     server.send(200, F("text/html"), content);
-  });
-  server.on("/remote_save1", []() {
+  });*/
+  /* server.on("/remote_save1", []() {
 
     String content =  F("<!DOCTYPE HTML>\r\n<html><head>");
     content = FPSTR(header); content += FPSTR(begin_title);
@@ -949,7 +995,7 @@ void setupWiFiConf(void) {
     content += duongdan_TV;
     String id_check="";
     String thungay="";
-    /*
+   
     content += F("<form method='get' action='set_remote_ML'>");
     content += F("<nav>");
     content += FPSTR(fieldset);
@@ -991,12 +1037,12 @@ void setupWiFiConf(void) {
 
     
     content += F("</nav>");
-*/
+
 
     
-//################################ Sche 2
+################################ Sche 2*/
 
-content += F("<form method='get' action='set_schedule1'>");
+/*content += F("<form method='get' action='set_schedule1'>");
     content += F("<nav>");
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);
@@ -1196,6 +1242,7 @@ content += F("<form method='get' action='set_schedule1'>");
     if (data1.length() >= 1264) {
       data1 = urlDecodeir(data1);
     }
+    Serial.println(data1);
     String content = "";
     if (data1.length() < 12) {
       content += F("Not OK");
@@ -1273,24 +1320,24 @@ content += F("<form method='get' action='set_schedule1'>");
       #define DAIKIN_POWERFUL       0b00000010
       #define DAIKIN_SILENT         0b00100000
     */
-   /* String status = server.arg(F("status"));
+    String status = server.arg(F("status"));
     String temp = server.arg(F("temp"));
     String fan = server.arg(F("fan"));
     String mode1 = server.arg(F("mode"));
     if (mode1 == "Cool") dakinir.setMode(DAIKIN_COOL);
     else if (mode1 == "fan") dakinir.setMode(DAIKIN_FAN);
     else if (mode1 == "auto") dakinir.setMode(DAIKIN_AUTO);
-    else if (mode1 == "powerful") dakinir.setMode(DAIKIN_POWERFUL);
+    else if (mode1 == "powerful") dakinir.setMode(DAIKIN_BIT_POWERFUL);
     else if (mode1 == "dry") dakinir.setMode(DAIKIN_DRY);
     else if (mode1 == "heat") dakinir.setMode(DAIKIN_HEAT);
-    else if (mode1 == "silent") dakinir.setMode(DAIKIN_SILENT);
+    else if (mode1 == "silent") dakinir.setMode(DAIKIN_BIT_SILENT);
     if (status == "OFF") {
       DEBUG_PRINTLN("OFF Daikin");
       dakinir.off();
       dakinir.setFan(temp.toInt());
       dakinir.setTemp(25);
-      dakinir.setSwingVertical(0);
-      dakinir.setSwingHorizontal(0);
+      dakinir.setSwingVertical(false);
+      dakinir.setSwingHorizontal(false);
     }
     else {
       dakinir.on();
@@ -1300,7 +1347,7 @@ content += F("<form method='get' action='set_schedule1'>");
       dakinir.setSwingHorizontal(0);
     }
     // Now send the IR signal.
-    dakinir.send()*/
+    dakinir.send();
     server.send(200, F("text/html"), status_html_ok);
     // ESP.restart();
   });
@@ -1476,6 +1523,7 @@ content += F("<form method='get' action='set_schedule1'>");
     content +=  F(",\"H\":"); content += String(doam);
     content +=  F(",\"PIR\":\""); content += String(time_);
     content +=  F("\",\"PIR2\":\""); content += String(motion_time);
+    content +=  F("\",\"Current\":\""); content += String(current);
     content +=  F("\"}");
 
     server.send(200, F("text/html"), content);
@@ -1549,6 +1597,9 @@ void setupWeb(void) {
     content += F("<li>Độ Ẩm: ");
     content += String(doam);
     content += F(" %");
+    content += F("<li>Dòng Điện: ");
+    content += String(current);
+    content += F(" W");
     content += F("<li>PIR : ");
     content += time_;
     content += F("  UTC +7 ");
@@ -1596,6 +1647,7 @@ void setupWeb(void) {
     content += F("'/mqtt_conf'>MQTT Setting");
     content += FPSTR(_legend_html);
     content += FPSTR(_fieldset);
+    
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);
     content += F("'/hc2_conf'>HC2 Setting");
@@ -1605,6 +1657,13 @@ void setupWeb(void) {
     content += SerialHC2;
     content += FPSTR(_fieldset);
 
+    content += FPSTR(fieldset);
+    content += FPSTR(legend_html);
+    content += F("'/ofset_current'>Current Setting");
+    content += FPSTR(_legend_html);
+    content += F("<li>");
+    content += FPSTR(_fieldset);
+    
     content += FPSTR(fieldset);
     content += FPSTR(legend_html);
     content += F("'/remote_save'>Setting Schema1");

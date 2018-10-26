@@ -1,6 +1,7 @@
-#define Send_PIN  15
+#define Send_PIN  4
 #define RECV_PIN  2
 
+#define config_pin  16
 #define status_led  0 //13 //0
 
 //#define DHTTYPE DHT11   // DHT 11
@@ -28,7 +29,7 @@ const int state_update4 = 7;
 const int state_update5 = 8;
 const int state_wait = 9;
 
-
+int static_config = 0;
 String duongdan_ML="User";
 String duongdan_TV="User";
 
@@ -97,12 +98,13 @@ struct WiFiConfStruct {
   char sta_TV[4];
   char sta_MQ[4];
   char sta_Amply[4];
-    char sta_mqtt_address[64];
+  char sta_mqtt_address[64];
   uint16_t sta_mqtt_port;
   char sta_mqtt_user[64];
   char sta_mqtt_pass[64];
   char sta_mqtt_topic[32];
   char sta_DHCP[4];
+  uint16_t offset;
 } WiFiConf = {
   WIFI_CONF_FORMAT,
   "aaaa",
@@ -126,7 +128,8 @@ struct WiFiConfStruct {
   "x",
   "x",
   "IN_MQTT",
-  "1"
+  "1",
+  0
 };
 
 
@@ -180,4 +183,6 @@ int weekday;
 String time_begin="";
 String time_end="";
 
+//Do Dòng
+int current=0;
 

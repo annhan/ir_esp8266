@@ -1,4 +1,4 @@
-
+/*
 String write_file_setting(String namefile, int tt) {
   //namefile=namefile+".txt";
   File myFile1 = SD.open(namefile, O_WRITE | O_TRUNC);
@@ -254,4 +254,4 @@ boolean read_file_setting(String namefile, int tt) {
     return 0;
   }
 }
-
+*/

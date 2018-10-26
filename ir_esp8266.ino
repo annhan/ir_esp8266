@@ -25,8 +25,8 @@ extern "C" {
 #include <ir_Daikin.h>
 #include <ir_Mitsubishi.h>
 #include <WiFiUdp.h>
-#include <SPI.h>
-#include <SD.h>
+//#include <SPI.h>
+//#include <SD.h>
 // Port 1883
 #define DEBUG
 #ifdef DEBUG
@@ -36,16 +36,12 @@ extern "C" {
   #define DEBUG_PRINTLN(x)
  #define DEBUG_PRINT(x)
 #endif
-//#define emonTxV3                 // Wemos D1 mini tolerates up to 3.3V
-//#include "EmonLib.h"             // Include Emon Library     
-#define ADC_BITS    10
 
-
-#define CURRENT_PIN             0
+#define CURRENT_PIN             A0
 
 // If you are using a nude ESP8266 board it will be 1.0V, if using a NodeMCU there
 // is a voltage divider in place, so use 3.3V instead.
-#define REFERENCE_VOLTAGE       3.3
+#define REFERENCE_VOLTAGE       1.0
 
 // Precision of the ADC measure in bits. Arduinos and ESP8266 use 10bits ADCs, but the
 // ADS1115 is a 16bits ADC
@@ -55,14 +51,14 @@ extern "C" {
 // If your sensor has a voltage output it will be written in the sensor enclosure,
 // something like "30V 1A", otherwise it will depend on the burden resistor you are
 // using.
-#define CURRENT_RATIO           0.5
+#define CURRENT_RATIO           17
 
 // This version of the library only calculate aparent power, so it asumes a fixes
 // mains voltage
 #define MAINS_VOLTAGE           230
 
 // Number of samples each time you measure
-#define SAMPLES_X_MEASUREMENT   1000
+#define SAMPLES_X_MEASUREMENT   1500
 
 // Time between readings, this is not specific of the library but on this sketch
 #define MEASUREMENT_INTERVAL    10000
@@ -83,23 +79,22 @@ void powerMonitorLoop() {
     static unsigned long last_check = 0;
 
     if ((millis() - last_check) > MEASUREMENT_INTERVAL) {
-
-        double current = power.getCurrent(SAMPLES_X_MEASUREMENT);
-
-        Serial.print(F("[ENERGY] Power now: "));
-        Serial.print(int(current * MAINS_VOLTAGE));
+        Serial.print(F("B-"));
+        double currentt = power.getCurrent(SAMPLES_X_MEASUREMENT);
+        current=int(currentt * MAINS_VOLTAGE);
+        Serial.print(current);
+        Serial.print(F("-"));
+        if (current>WiFiConf.offset) {
+          current=current-WiFiConf.offset;
+        }
+        else current=0;
+        Serial.print(current);
         Serial.println(F("W"));
-
         last_check = millis();
 
     }
 }
-File myFile;
 
-//#define notFibaro true
-
-
-const int chipSelect = 16;
 
 IPAddress ip10;
 IPAddress ip ;
@@ -143,7 +138,6 @@ ESP8266HTTPUpdateServer httpUpdater;
 WiFiClient client;
 WiFiClient client1;
 //############################################
-PubSubClient clientmqtt(client1);
 //#############################################
 uint16_t CAPTURE_BUFFER_SIZE = 1400;
 #define TIMEOUT 100U  // Suits most messages, while not swallowing repeats.
@@ -157,28 +151,33 @@ IRMitsubishiAC mitsubir(Send_PIN);
 ESP8266WebServer server(4999);
 WiFiServer serverTCP(4998);
 decode_results  results;
-  
-int adc = 0;
-//EnergyMonitor emon1;             // Create an instance
 
-
-/* SETUP
-
-*/
-  struct Hengiostruct HG1;        
-  struct Hengiostruct HG2;
-  struct Hengiostruct HG3; 
+void blink_led(int time_tt){
+  digitalWrite(status_led,1 );
+  delay(time_tt);
+  digitalWrite(status_led, 0);
+  delay(time_tt);
+  digitalWrite(status_led, 1 );
+    delay(time_tt);
+  digitalWrite(status_led, 0 );
+}
 void setup() {
   //ESP.eraseConfig();
+  pinMode(config_pin, INPUT);
   pinMode(status_led, OUTPUT);
   digitalWrite(status_led, LOW);
   Serial.begin(115200);
   EEPROM.begin(1024);
+  if (digitalRead(config_pin)==0){
+    delay(1500);
+    if (digitalRead(config_pin)==0){
+      static_config=1;
+      blink_led(200);
+    }
+  }
+  
   delay(10);
   DEBUG_PRINTLN("Startup");
-#ifdef notFibaro
-  pinMode(MotionPin, INPUT);
-#endif
   irsend.begin();
   if (!loadWiFiConf()){
     resetModuleId();
@@ -190,21 +189,27 @@ void setup() {
   hoclenh = 0;
   pinMode(A0, INPUT);
   //emon1.current(A0, 9.1);
-  
-  WiFi.setAutoConnect(false);
-  WiFi.setAutoReconnect(false);
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP(WiFiConf.module_id, wifi_password);
-  ketnoimang();
-  statusmang = waitConnected();
-  if (WiFi.status() == WL_CONNECTED) {
-    update_fota();
-    DEBUG_PRINTLN("Get HC");
-    getHC();
-    DEBUG_PRINTLN("Connect");
-    WiFi.softAPdisconnect(true);
-   // WiFi.softAP(WiFiConf.module_id, wifi_password, 6, 1);
+  if (static_config == 1){
+      WiFi.setAutoConnect(false);
+      WiFi.setAutoReconnect(false);
+      WiFi.mode(WIFI_AP);
+      WiFi.softAP("mIR-Config", wifi_password);
   }
+  else {
+      WiFi.setAutoConnect(true);
+      WiFi.setAutoReconnect(true);
+      WiFi.mode(WIFI_STA);
+      //WiFi.softAP(WiFiConf.module_id, wifi_password);
+      ketnoimang();
+      statusmang = waitConnected();
+      if (WiFi.status() == WL_CONNECTED) {
+        update_fota();
+        getHC();
+        DEBUG_PRINTLN("Connect");
+      }
+  }
+  
+
   printIP();
   httpUpdater.setup(&server, update_path, update_username, update_password);
   setupWeb();
@@ -230,34 +235,11 @@ void setup() {
   ip = WiFi.localIP();
   timeled = timedelay = millis();
   ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-  _motion_status = 1;
   WiFi.macAddress(macAddr);
   MDNS.addService("http", "tcp", 4999);
-#ifdef notFibaro
-  if (!SD.begin(chipSelect)) {
-    DEBUG_PRINTLN("Card failed, or not present");
-  }
-  DEBUG_PRINTLN("card initialized.");
-  user_using();
-  HG1.state_status = state_no;
-  HG2.state_status = state_no;
-  HG3.state_status = state_no;
-  read_setting = read_file_setting("Setting/setting.txt", 1);
-  read_setting_state = read_file_setting("Setting/state.txt", 2);
-  read_setting_motion = read_file_setting("Setting/Motion.txt", 4);
-  //################################
-  if (WiFiConf.sta_mqtt_port > 0){
-  snprintf (WiFiConf.sta_mqtt_topic, 32, "mIR/%02x%02x%02x%02x%02x%02x",macAddr[WL_MAC_ADDR_LENGTH - 5], macAddr[WL_MAC_ADDR_LENGTH - 6],macAddr[WL_MAC_ADDR_LENGTH - 4], macAddr[WL_MAC_ADDR_LENGTH - 3],macAddr[WL_MAC_ADDR_LENGTH - 2], macAddr[WL_MAC_ADDR_LENGTH - 1]);
-  DEBUG_PRINTLN(WiFiConf.sta_mqtt_topic);
-  clientmqtt.setServer(WiFiConf.sta_mqtt_address, WiFiConf.sta_mqtt_port);
-  clientmqtt.setCallback(callback);
-  lastReconnectAttempt = 0;
-  }
-  else DEBUG_PRINTLN("Not using MQTT");
-#endif
   udp.begin(localPort);
   weekday = 8;
-   powerMonitorSetup();
+  powerMonitorSetup();
 }
 
 
@@ -274,560 +256,84 @@ int hoc_ir(byte stt) {
   return 0;
 }
 void loop() {
-  powerMonitorLoop();
+  wdt_reset(); 
+  if (atoi(WiFiConf.sta_DHCP) == 1){ powerMonitorLoop(); }
   server.handleClient();
   //##################
   // MQTT ############
-#ifdef notFibaro
-  if (WiFiConf.sta_mqtt_port > 0){
-        if (!clientmqtt.connected()) {
-        long now = millis();
-        if (now - lastReconnectAttempt > 5000) {
-          lastReconnectAttempt = now;
-          if (reconnect()) {
-            lastReconnectAttempt = 0;
+  if (static_config == 0){
+      switch (WiFi.status())
+      {
+        case WL_CONNECTED:
+          // if (hoclenh == 1) {
+          
+          if (statusmang == 0) {
+           // WiFi.softAPdisconnect(true);
+            getHC();
+            statusmang = 1;
+            _resetketnoi = 0;
+            digitalWrite(status_led, LOW);
           }
-        }
-      } else {
-        clientmqtt.loop();
+          else if (hoc_ir(hoclenh) == 1) {
+            digitalWrite(status_led, HIGH);
+            _resetketnoi = 100;
+            irrecv.resume();
+          }
+          else if (_resetketnoi == 2) {
+            digitalWrite(status_led, LOW);
+            _resetketnoi = _resetketnoi - 1;
+          }
+          else if (_resetketnoi > 0) {
+            _resetketnoi = _resetketnoi - 1;
+          }
+          nhan_TCP();
+          if (demgiay % 10 == 0) {
+            demgiay++ ;
+            float H = dht.readHumidity();
+            float T = dht.readTemperature();
+            if (isnan(H) || isnan(T)) {DEBUG_PRINTLN("Failed to read from DHT sensor!");}
+            else {
+              doam = H;
+              nhietdo = T;
+    
+            }
+            //
+          }
+          else if (demgiay % 33 == 0) {
+            send_udp();
+            demgiay++;
+          }
+          else if (demgiay % 36 == 0) {
+            demgiay = 1 ;
+            gettime_udp();
+          }
+          break ;
+        default:
+          if (statusmang != 0) {
+           // WiFi.softAPdisconnect(false);
+            statusmang = 0;
+            _resetketnoi = 0;
+          }
+          if  ((_resetketnoi % 5000) == 0)ketnoimang() ;
+          if ( (unsigned long) (millis() - timeled) > 500 ) {
+            if (denled == 0) denled = 1;
+            else denled = 0;
+            digitalWrite(status_led, denled );
+            timeled = millis();
+          }
+          _resetketnoi = _resetketnoi + 1;
+          if (_resetketnoi >= 65000) {
+            digitalWrite(status_led, HIGH );
+            ESP.reset();
+          }
+          break;
       }
-  }
-#endif
-  switch (WiFi.status())
-  {
-    case WL_CONNECTED:
-      // if (hoclenh == 1) {
-      
-      if (statusmang == 0) {
-        WiFi.softAPdisconnect(true);
-        getHC();
-        statusmang = 1;
-        _resetketnoi = 0;
-        digitalWrite(status_led, LOW);
-      }
-      else if (hoc_ir(hoclenh) == 1) {
-        digitalWrite(status_led, HIGH);
-        _resetketnoi = 100;
-        irrecv.resume();
-      }
-      else if (_resetketnoi == 2) {
-        digitalWrite(status_led, LOW);
-        _resetketnoi = _resetketnoi - 1;
-      }
-      else if (_resetketnoi > 0) {
-        _resetketnoi = _resetketnoi - 1;
-      }
-      nhan_TCP();
-      if (demgiay % 10 == 0) {
-      //  calcPower();
-        demgiay++ ;
-        float H = dht.readHumidity();
-        float T = dht.readTemperature();
-        if (isnan(H) || isnan(T)) {DEBUG_PRINTLN("Failed to read from DHT sensor!");}
-        else {
-          doam = H;
-          nhietdo = T;
-
-        }
-        //
-      }
-      else if (demgiay % 33 == 0) {
-        send_udp();
-        demgiay++;
-      }
-      else if (demgiay % 36 == 0) {
-        demgiay = 1 ;
-        gettime_udp();
-#ifdef notFibaro
-        if (read_setting == 0) read_setting = read_file_setting("Setting/setting.txt", 1);
-        if (read_setting_state == 0) read_setting_state=read_file_setting("Setting/state.txt", 2);  
-        if (read_setting_motion == 0) read_setting_motion=read_file_setting("Setting/Motion.txt", 4);  
-#endif
-      }
-      break ;
-    default:
-      if (statusmang != 0) {
-        WiFi.softAPdisconnect(false);
-        statusmang = 0;
-        _resetketnoi = 0;
-      }
-      if  ((_resetketnoi % 5000) == 0)ketnoimang() ;
-      if ( (unsigned long) (millis() - timeled) > 500 ) {
-        if (denled == 0) denled = 1;
-        else denled = 0;
-        digitalWrite(status_led, denled );
-        timeled = millis();
-      }
-      _resetketnoi = _resetketnoi + 1;
-      if (_resetketnoi >= 65000) {
-        digitalWrite(status_led, HIGH );
-        ESP.reset();
-      }
-      break;
   }
   delay(2);
   if (millis() - timedelay > 1000 ) {
     demgiay++;
     timedelay = millis();
   }
-#ifdef notFibaro
-  if (digitalRead(MotionPin) == 1) {
-    if (_motion_status == 0) {
-      if (thoigianthuc - motion_time > 20 ) {
-        DEBUG_PRINTLN("Status Motion : 1");
-        _motion_status = 1;
-        motion_time = thoigianthuc;
-        conver_time();
-        write_file_setting("Setting/Motion.txt", 4);
-      }
-    }
-  }
-  else if (_motion_status == 1) {
-    DEBUG_PRINTLN("Status Motion : 0");
-    _motion_status = 0;
-  }
-      switch (weekday) {
-        case 0 : if (HG1.is_sun) HG1.dung_ngay = true; else HG1.dung_ngay = false; if (HG2.is_sun) HG2.dung_ngay = true; else HG2.dung_ngay = false; if (HG3.is_sun) HG3.dung_ngay = true; else HG3.dung_ngay = false; break;
-        case 1 : if (HG1.is_mon) HG1.dung_ngay = true; else HG1.dung_ngay = false; if (HG2.is_mon) HG2.dung_ngay = true; else HG2.dung_ngay = false; if (HG3.is_mon) HG3.dung_ngay = true; else HG3.dung_ngay = false; break;
-        case 2 : if (HG1.is_tue) HG1.dung_ngay = true; else HG1.dung_ngay = false; if (HG2.is_tue) HG2.dung_ngay = true; else HG2.dung_ngay = false; if (HG3.is_tue) HG3.dung_ngay = true; else HG3.dung_ngay = false; break;
-        case 3 : if (HG1.is_wed) HG1.dung_ngay = true; else HG1.dung_ngay = false; if (HG2.is_wed) HG2.dung_ngay = true; else HG2.dung_ngay = false; if (HG3.is_wed) HG3.dung_ngay = true; else HG3.dung_ngay = false; break;
-        case 4 : if (HG1.is_thu) HG1.dung_ngay = true; else HG1.dung_ngay = false; if (HG2.is_thu) HG2.dung_ngay = true; else HG2.dung_ngay = false; if (HG3.is_thu) HG3.dung_ngay = true; else HG3.dung_ngay = false; break;
-        case 5 : if (HG1.is_fri) HG1.dung_ngay = true; else HG1.dung_ngay = false; if (HG2.is_fri) HG2.dung_ngay = true; else HG2.dung_ngay = false; if (HG3.is_fri) HG3.dung_ngay = true; else HG3.dung_ngay = false; break;
-        case 6 : if (HG1.is_sat) HG1.dung_ngay = true; else HG1.dung_ngay = false; if (HG2.is_sat) HG2.dung_ngay = true; else HG2.dung_ngay = false; if (HG3.is_sat) HG3.dung_ngay = true; else HG3.dung_ngay = false; break;
-        default : HG1.dung_ngay = false; HG2.dung_ngay = false; HG3.dung_ngay = false; break;
-      }
 
-  //State machine for schedule
-  /*
-     Cách tính : lấy thời gian end trừ thời gian bắt đầu ra khoảng thời gian giữa 2 lần set
-     biểu đồ sẽ chia cho 4 trong đó : 1 phần là tăng nhiệt độ khi ngủ, 2 phần duy trì và 1 phần  tăng nhiệt vào buổi sáng
-     Trong phần tăng nhiệt độ thì sẽ chia làm 3 mốc : mốc begin cho nhiệt độ thấp nhất, mốc tiếp theo tăng 1 độ, mốc tiếp tăng 1 độ và mốc cuối cùng set đúng nhiệt độ cài đặt
-     Phần duy trì nhiệt độ sẽ lấy mẫu sau 15 phút, nếu nhiệt độ thấp hơn cài đặt thì tăng 1 độ nếu nhiệt độ cao hơn cài đặt thì giảm 1 độ cho đến giai đoạn cuối
-     Phần kết thúc : là khi trời sáng nhiệt độ phòng cần tăng lên hơn nhiệt độ cài đặt và sau đó đúng giờ thì tắt
-  */
-  switch (HG1.state_status) {
-    case state_begin:
-      HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau / 4;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/18.txt";
-        read_file_setting(file , 3 );
-        HG1.state_status = state_update1;
-        write_file_setting("Setting/state.txt", 3);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_update1:
-      HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau / 3;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/19.txt";
-        read_file_setting(file , 3 );
-        HG1.state_status = state_update2;
-        write_file_setting("Setting/state.txt", 4);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_update2:
-      HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau / 2;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/20.txt";
-        read_file_setting(file , 3 );
-        HG1.state_status = state_update3;
-        write_file_setting("Setting/state.txt", 5);
-      }
-      break;
-    case state_update3:
-      HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/" + String(HG1.temp_set) + ".txt";
-        read_file_setting(file , 3 );
-        HG1.state_status = state_conti;
-        write_file_setting(F("Setting/state.txt"), 2);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_conti:
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc + 900;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        if (float(HG1.temp_set) - nhietdo > 1) {
-          String file = "ML/" + duongdan_ML + "/" + String(HG1.temp_set + 1) + ".txt";
-          read_file_setting(file , 3 );
-        }
-        else {
-          String file = "ML/" + duongdan_ML + "/" + String(HG1.temp_set - 1) + ".txt";
-          read_file_setting(file , 3 );
-        }
-        if ((thoigianthuc - HG1.time_tam_cho_cac_buoc) > (HG1.khoang_time_cach_nhau * 6)) {
-          HG1.state_status = state_update4;
-          write_file_setting("Setting/state.txt", 2);
-        }
-      }
-      //15 phút kiểm tra giu nhiet do đến nhỏ hơn thời gian kết thúc 1h thì chuyển trạng thái
-      break;
-    case state_update4:
-      HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau * 6;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/" + String(HG1.temp_set + 1) + ".txt";
-        read_file_setting(file , 3 );
-        HG1.state_status = state_update5;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      // tăng nhiệt độ lên cao khi trời sáng
-      break;
-    case state_update5:
-      HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau * 7;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/" + String(HG1.temp_set + 2) + ".txt";
-        read_file_setting(file , 3 );
-        HG1.state_status = state_wait;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      break;
-    case state_wait:
-      HG1.time_tam_cho_cac_buoc = HG1.time_begin_int + HG1.khoang_time_cach_nhau * 7;
-      HG1.time_tam_cho_cac_buoc = HG1.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG1.time_tam_cho_cac_buoc) {
-        if (thoigianthuc > HG1.time_end_int){
-         DEBUG_PRINTLN("TAM 8");
-        String file = "ML/" + duongdan_ML + "/OFF.txt";
-        read_file_setting(file , 3 );
-        HG1.state_status = state_no;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      }
-      // kết thúc điều khiển
-      break;
-    case state_no:
-      if (!HG1.dung_ngay) {
-        HG1.state_status = state_not_day;
-        DEBUG_PRINTLN("Không dung ngay dieu khien 2");
-      }
-        //ON ML nhiệt độ thấp nhất
-      else if (HG1.time_begin_int > HG1.time_end_int) {
-            if ((thoigianthuc < HG1.time_end_int)||(thoigianthuc > HG1.time_begin_int))  {
-            HG1.khoang_time_cach_nhau = ( HG1.time_end_int + 86400) - HG1.time_begin_int ;
-            HG1.khoang_time_cach_nhau = HG1.khoang_time_cach_nhau / 8 ;
-            //Serial.print("Khoang thoi gian cach nhau ");
-            DEBUG_PRINTLN(HG1.khoang_time_cach_nhau);
-            //ON ML
-            String file = "ML/" + duongdan_ML + "/ON.txt" ;
-            read_file_setting(file , 3 );
-            HG1.state_status = state_begin;
-            write_file_setting("Setting/state.txt", 2);
-            }
-        }
-      else if ((thoigianthuc < HG1.time_end_int)&&(thoigianthuc > HG1.time_begin_int)) {
-          HG1.khoang_time_cach_nhau = HG1.time_end_int - HG1.time_begin_int ;
-          HG1.khoang_time_cach_nhau = HG1.khoang_time_cach_nhau / 8 ;
-          //Serial.print("Khoang thoi gian cach nhau ");
-          DEBUG_PRINTLN(HG1.khoang_time_cach_nhau);
-          //ON ML
-          String file = "ML/" + duongdan_ML + "/ON.txt" ;
-          read_file_setting(file , 3 );
-          HG1.state_status = state_begin;
-          write_file_setting("Setting/state.txt", 2);
-        }
-      
-      break;
-    case state_not_day:
-      if (HG1.dung_ngay) {
-        HG1.state_status = state_no;
-        DEBUG_PRINTLN("dung ngay dk");
-      }
-      // kết thúc điều khiển
-      break;
-  }
- //LAN 2
-  switch (HG2.state_status) {
-    case state_begin:
-      HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau / 4;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-         DEBUG_PRINTLN("TAM 3");
-        String file = "ML/" + duongdan_ML + "/18.txt";
-        read_file_setting(file , 3 );
-        HG2.state_status = state_update1;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_update1:
-      HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau / 3;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-        DEBUG_PRINTLN("TAM 4");
-        String file = "ML/" + duongdan_ML + "/19.txt";
-        read_file_setting(file , 3 );
-        HG2.state_status = state_update2;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_update2:
-      HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau / 2;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-        DEBUG_PRINTLN("TAM 5");
-        String file = "ML/" + duongdan_ML + "/20.txt";
-        read_file_setting(file , 3 );
-        HG2.state_status = state_update3;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      break;
-    case state_update3:
-      HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-        DEBUG_PRINTLN("TAM 6");
-        String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set) + ".txt";
-        read_file_setting(file , 3 );
-        HG2.state_status = state_conti;
-        write_file_setting(F("Setting/state.txt"), 2);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_conti:
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc + 900;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-        DEBUG_PRINTLN("TAM 5");
-        if (float(HG2.temp_set) - nhietdo > 1) {
-          String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set + 1) + ".txt";
-          read_file_setting(file , 3 );
-        }
-        else {
-          String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set - 1) + ".txt";
-          read_file_setting(file , 3 );
-        }
-        if ((thoigianthuc - HG2.time_tam_cho_cac_buoc) > (HG2.khoang_time_cach_nhau * 6)) {
-          HG2.state_status = state_update4;
-          write_file_setting("Setting/state.txt", 2);
-        }
-      }
-      //15 phút kiểm tra giu nhiet do đến nhỏ hơn thời gian kết thúc 1h thì chuyển trạng thái
-      break;
-    case state_update4:
-      HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau * 6;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-        DEBUG_PRINTLN("TAM 6");
-        String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set + 1) + ".txt";
-        read_file_setting(file , 3 );
-        HG2.state_status = state_update5;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      // tăng nhiệt độ lên cao khi trời sáng
-      break;
-    case state_update5:
-      HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau * 7;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-        DEBUG_PRINTLN("TAM 7");
-        String file = "ML/" + duongdan_ML + "/" + String(HG2.temp_set + 2) + ".txt";
-        read_file_setting(file , 3 );
-        HG2.state_status = state_wait;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      break;
-    case state_wait:
-      HG2.time_tam_cho_cac_buoc = HG2.time_begin_int + HG2.khoang_time_cach_nhau * 7;
-      HG2.time_tam_cho_cac_buoc = HG2.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG2.time_tam_cho_cac_buoc) {
-        if (thoigianthuc > HG2.time_end_int){
-         DEBUG_PRINTLN("TAM 8");
-        String file = "ML/" + duongdan_ML + "/OFF.txt";
-        read_file_setting(file , 3 );
-        HG2.state_status = state_no;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      }
-      // kết thúc điều khiển
-      break;
-    case state_no:
-      if (!HG2.dung_ngay) {
-        HG2.state_status = state_not_day;
-        DEBUG_PRINTLN("Không dung ngay dieu khien 2");
-      }
-        //ON ML nhiệt độ thấp nhất
-      else if (HG2.time_begin_int > HG2.time_end_int) {
-            if ((thoigianthuc < HG2.time_end_int)||(thoigianthuc > HG2.time_begin_int))  {
-            HG2.khoang_time_cach_nhau = ( HG2.time_end_int + 86400) - HG2.time_begin_int ;
-            HG2.khoang_time_cach_nhau = HG2.khoang_time_cach_nhau / 8 ;
-            //Serial.print("Khoang thoi gian cach nhau ");
-            DEBUG_PRINTLN(HG2.khoang_time_cach_nhau);
-            //ON ML
-            String file = "ML/" + duongdan_ML + "/ON.txt" ;
-            read_file_setting(file , 3 );
-            HG2.state_status = state_begin;
-            write_file_setting("Setting/state.txt", 2);
-            }
-        }
-        else if ((thoigianthuc < HG2.time_end_int)&&(thoigianthuc > HG2.time_begin_int)) {
-          HG2.khoang_time_cach_nhau = HG2.time_end_int - HG2.time_begin_int ;
-          HG2.khoang_time_cach_nhau = HG2.khoang_time_cach_nhau / 8 ;
-          //Serial.print("Khoang thoi gian cach nhau ");
-          DEBUG_PRINTLN(HG2.khoang_time_cach_nhau);
-          //ON ML
-          String file = "ML/" + duongdan_ML + "/ON.txt" ;
-          read_file_setting(file , 3 );
-          HG2.state_status = state_begin;
-          write_file_setting("Setting/state.txt", 2);
-        }
-      
-      break;
-    case state_not_day:
-      if (HG2.dung_ngay) {
-        HG2.state_status = state_no;
-        DEBUG_PRINTLN("dung ngay dk 2");
-      }
-      // kết thúc điều khiển
-      break;
-  }
-// LAN 3
-  switch (HG3.state_status) {
-    case state_begin:
-      HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau / 4;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/18.txt";
-        read_file_setting(file , 3 );
-        HG3.state_status = state_update1;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_update1:
-      HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau / 3;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/19.txt";
-        read_file_setting(file , 3 );
-        HG3.state_status = state_update2;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_update2:
-      HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau / 2;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/20.txt";
-        read_file_setting(file , 3 );
-        HG3.state_status = state_update3;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      break;
-    case state_update3:
-      HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/" + String(HG3.temp_set) + ".txt";
-        read_file_setting(file , 3 );
-        HG3.state_status = state_conti;
-        write_file_setting(F("Setting/state.txt"), 2);
-      }
-      //Tăng nhiệt độ cách 15 phút
-      break;
-    case state_conti:
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc + 900;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        if (float(HG3.temp_set) - nhietdo > 1) {
-          String file = "ML/" + duongdan_ML + "/" + String(HG3.temp_set + 1) + ".txt";
-          read_file_setting(file , 3 );
-        }
-        else {
-          String file = "ML/" + duongdan_ML + "/" + String(HG3.temp_set - 1) + ".txt";
-          read_file_setting(file , 3 );
-        }
-        if ((thoigianthuc - HG3.time_tam_cho_cac_buoc) > (HG3.khoang_time_cach_nhau * 6)) {
-          HG3.state_status = state_update4;
-          write_file_setting("Setting/state.txt", 2);
-        }
-      }
-      //15 phút kiểm tra giu nhiet do đến nhỏ hơn thời gian kết thúc 1h thì chuyển trạng thái
-      break;
-    case state_update4:
-      HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau * 6;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/" + String(HG3.temp_set + 1) + ".txt";
-        read_file_setting(file , 3 );
-        HG3.state_status = state_update5;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      // tăng nhiệt độ lên cao khi trời sáng
-      break;
-    case state_update5:
-      HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau * 7;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        String file = "ML/" + duongdan_ML + "/" + String(HG3.temp_set + 2) + ".txt";
-        read_file_setting(file , 3 );
-        HG3.state_status = state_wait;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      break;
-    case state_wait:
-      HG3.time_tam_cho_cac_buoc = HG3.time_begin_int + HG3.khoang_time_cach_nhau * 7;
-      HG3.time_tam_cho_cac_buoc = HG3.time_tam_cho_cac_buoc % 86400L;
-      if (thoigianthuc > HG3.time_tam_cho_cac_buoc) {
-        if (thoigianthuc > HG3.time_end_int){
-        DEBUG_PRINTLN("TAM 8");
-        String file = "ML/" + duongdan_ML + "/OFF.txt";
-        read_file_setting(file , 3 );
-        HG3.state_status = state_no;
-        write_file_setting("Setting/state.txt", 2);
-      }
-      }
-      // kết thúc điều khiển
-      break;
-    case state_no:
-      if (!HG3.dung_ngay) {
-        HG3.state_status = state_not_day;
-        DEBUG_PRINTLN("Không dung ngay dieu khien 2");
-      }
-        //ON ML nhiệt độ thấp nhất
-      else if (HG3.time_begin_int > HG3.time_end_int) {
-            if ((thoigianthuc < HG3.time_end_int)||(thoigianthuc > HG3.time_begin_int))  {
-            HG3.khoang_time_cach_nhau = ( HG3.time_end_int + 86400) - HG3.time_begin_int ;
-            HG3.khoang_time_cach_nhau = HG3.khoang_time_cach_nhau / 8 ;
-            //Serial.print("Khoang thoi gian cach nhau ");
-            DEBUG_PRINTLN(HG3.khoang_time_cach_nhau);
-            //ON ML
-            String file = "ML/" + duongdan_ML + "/ON.txt" ;
-            read_file_setting(file , 3 );
-            HG3.state_status = state_begin;
-            write_file_setting("Setting/state.txt", 2);
-            }
-        }
-        else if ((thoigianthuc < HG3.time_end_int)&&(thoigianthuc > HG3.time_begin_int)) {
-          HG3.khoang_time_cach_nhau = HG3.time_end_int - HG3.time_begin_int ;
-          HG3.khoang_time_cach_nhau = HG3.khoang_time_cach_nhau / 8 ;
-          //Serial.print("Khoang thoi gian cach nhau ");
-          DEBUG_PRINTLN(HG3.khoang_time_cach_nhau);
-          //ON ML
-          String file = "ML/" + duongdan_ML + "/ON.txt" ;
-          read_file_setting(file , 3 );
-          HG3.state_status = state_begin;
-          write_file_setting("Setting/state.txt", 2);
-        }
-      
-      break;
-    case state_not_day:
-      if (HG3.dung_ngay) {
-        HG3.state_status = state_no;
-        DEBUG_PRINT("dung ngay dk 3");
-      }
-      // kết thúc điều khiển
-      break;
-  }
-#endif
 }
 

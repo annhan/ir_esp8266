@@ -1,4 +1,4 @@
-const int BUFFER_SIZE = 1200;
+/*const int BUFFER_SIZE = 1200;
 const char* send_cmd = "SendIR";
 const char* lean_cmd = "LeanIR";
 const char* get_cmd = "Get_infor";
@@ -175,4 +175,4 @@ bool processJson(char* message) {
     }
   }
   return true;
-}
+}*/
