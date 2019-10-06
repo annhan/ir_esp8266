@@ -35,7 +35,7 @@ void parseStringRAW(String str) {
   } while (index != -1);
 
   // Now we know how many there are, allocate the memory to store them all.
-  code_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
+  uint16_t *code_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
   // Check we malloc'ed successfully.
   if (code_array == NULL) {  // malloc failed, so give up.
     Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",
@@ -80,7 +80,7 @@ void parseStringGC(String str) {
   } while (index != -1);
 
   // Now we know how many there are, allocate the memory to store them all.
-  code_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
+  uint16_t *code_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
   // Check we malloc'ed successfully.
   if (code_array == NULL) {  // malloc failed, so give up.
     // Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",count * sizeof(uint16_t), ESP.getFreeHeap());
