@@ -66,7 +66,7 @@ int statusmang=0;
 
 String ts;
 String json_ts="38000";
-uint16_t *code_array;
+uint16_t *code_array = NULL;
 
 int demgiay=0;
 unsigned long timeled=0;
